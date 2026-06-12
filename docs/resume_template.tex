@@ -1,0 +1,212 @@
+%% =============================================================================
+%% RESUMINT — LaTeX Resume Template
+%% =============================================================================
+%% This file is a TEMPLATE. All personal data has been stripped and replaced
+%% with labeled placeholders wrapped in double curly braces: {{LABEL}}.
+%%
+%% The AI resume generator MUST use ONLY this template structure.
+%% It MUST fill placeholders exclusively from the user's stored profile data.
+%% It MUST NOT hallucinate, invent, or fabricate any information.
+%%
+%% ── Placeholder Reference ────────────────────────────────────────────────────
+%%  HEADER / CONTACT:
+%%    {{FULL_NAME}}              — User's full name
+%%    {{PHONE}}                  — Phone number with country code
+%%    {{EMAIL}}                  — Email address
+%%    {{EMAIL_DISPLAY}}          — Display text for email
+%%    {{LINKEDIN_URL}}           — Full LinkedIn profile URL
+%%    {{LEETCODE_URL}}           — Full LeetCode profile URL  (optional)
+%%    {{GITHUB_URL}}             — Full GitHub profile URL
+%%
+%%  EDUCATION (repeat row per entry):
+%%    {{EDU_DEGREE_N}}           — Degree or course name (e.g. B.Tech CS)
+%%    {{EDU_YEAR_N}}             — Year range (e.g. 2023–2027)
+%%    {{EDU_INSTITUTION_N}}      — Institution name
+%%    {{EDU_SCORE_N}}            — CGPA or percentage
+%%
+%%  EXPERIENCE (repeat block per entry):
+%%    {{EXP_TITLE_N}}            — Role title + company (e.g. SDE Intern -- Google)
+%%    {{EXP_DATES_N}}            — Date range (e.g. May 2026 -- Present)
+%%    {{EXP_TECHSTACK_N}}        — Tech stack used (optional, omit line if empty)
+%%    {{EXP_BULLET_N_M}}         — Individual bullet point (M = bullet index)
+%%
+%%  PROJECTS (repeat block per entry):
+%%    {{PROJ_NAME_N}}            — Project title
+%%    {{PROJ_DATES_N}}           — Date or month/year
+%%    {{PROJ_PURPOSE_N}}         — One-line purpose/description
+%%    {{PROJ_TECHSTACK_N}}       — Tech stack list
+%%    {{PROJ_BULLET_N_M}}        — Individual bullet point (M = bullet index)
+%%    {{PROJ_GITHUB_URL_N}}      — GitHub repo link (optional)
+%%    {{PROJ_GITHUB_LABEL_N}}    — Display label for the repo link
+%%
+%%  EXTRA-CURRICULAR & ACHIEVEMENTS (repeat per entry):
+%%    {{EXTRA_ENTRY_N}}          — Full line for an achievement/activity
+%%    {{EXTRA_LINK_URL_N}}       — Optional hyperlink URL
+%%    {{EXTRA_LINK_LABEL_N}}     — Optional hyperlink display text
+%%
+%%  TECHNICAL SKILLS:
+%%    {{SKILLS_LANGUAGES}}       — Comma-separated list of languages
+%%    {{SKILLS_TOOLS}}           — Comma-separated list of tools & IDEs
+%%    {{SKILLS_FRAMEWORKS}}      — Comma-separated list of frameworks
+%%    {{SKILLS_BACKEND}}         — Comma-separated list of backend technologies
+%%    {{SKILLS_COURSEWORK}}      — Comma-separated list of relevant coursework
+%% =============================================================================
+
+\documentclass[10pt]{article}
+\usepackage[letterpaper,margin=0.55in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{palatino}
+\usepackage{tabularx}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+\usepackage{hyperref}
+\hypersetup{
+    hidelinks,
+    colorlinks=true,
+    urlcolor=blue
+}
+
+\linespread{1.0}
+\setlist[itemize]{noitemsep, topsep=2pt, left=0pt}
+\pagestyle{empty}
+
+\newcommand{\resheading}[1]{\vspace{6pt} \noindent \textbf{\large\scshape{#1}} \vspace{3pt} \hrule \vspace{4pt}}
+\newcommand{\ressubheading}[3]{
+\begin{tabular*}{6.62in}{l @{\extracolsep{\fill}} r}
+    \textsc{\textbf{#1}} & \textit{[#2]} \\
+\end{tabular*}\vspace{-8pt}}
+
+\begin{document}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%% HEADER — Contact Information
+%% ═══════════════════════════════════════════════════════════════════════════════
+\begin{table}
+    \begin{minipage}{0\linewidth}
+        \centering
+        \includegraphics[height=0.5in]{NSUT_logo.png}
+    \end{minipage}
+    \begin{minipage}{1\linewidth}
+        \centering
+        \def\arraystretch{3}
+        \textbf{\Large{{{FULL_NAME}}}}\\ \vspace{0.5em}
+        {{PHONE}} |
+        \href{mailto:{{EMAIL}}}{\textcolor{black}{{{EMAIL_DISPLAY}}}} \\
+        \href{{{LINKEDIN_URL}}}{\textcolor{black}{LinkedIn}} |
+        \href{{{LEETCODE_URL}}}{\textcolor{black}{LeetCode}} |
+        \href{{{GITHUB_URL}}}{\textcolor{black}{Github}}
+    \end{minipage}
+\end{table}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%% EDUCATION
+%% Repeat one row per education entry. N = 1, 2, 3 ...
+%% ═══════════════════════════════════════════════════════════════════════════════
+\resheading{EDUCATION}
+\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}r@{}}
+\textbf{Degree/Course} & \textbf{Year} & \textbf{Institution} & \textbf{CGPA/\%} \\
+\toprule
+%% --- Education Entry 1 ---
+\textbf{{{EDU_DEGREE_1}}} & {{EDU_YEAR_1}} & {{EDU_INSTITUTION_1}} & \textbf{{{EDU_SCORE_1}}} \\
+%% --- Education Entry 2 ---
+\textbf{{{EDU_DEGREE_2}}} & {{EDU_YEAR_2}} & {{EDU_INSTITUTION_2}} & \textbf{{{EDU_SCORE_2}}} \\
+%% --- Education Entry 3 (optional, remove if not needed) ---
+\textbf{{{EDU_DEGREE_3}}} & {{EDU_YEAR_3}} & {{EDU_INSTITUTION_3}} & \textbf{{{EDU_SCORE_3}}} \\
+\end{tabular*}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%% EXPERIENCE
+%% Repeat block per experience entry. N = 1, 2, 3 ...
+%% Each entry can have multiple bullet points: M = 1, 2, 3 ...
+%% ═══════════════════════════════════════════════════════════════════════════════
+\resheading{EXPERIENCE}
+\begin{itemize}
+%% --- Experience Entry 1 ---
+\item \textbf{{{EXP_TITLE_1}}} \hfill {{EXP_DATES_1}}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Tech Stack:} {{EXP_TECHSTACK_1}}
+        \item {{EXP_BULLET_1_1}}
+    \end{itemize}
+%% --- Experience Entry 2 ---
+\item \textbf{{{EXP_TITLE_2}}} \hfill {{EXP_DATES_2}}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Tech Stack:} {{EXP_TECHSTACK_2}}
+        \item {{EXP_BULLET_2_1}}
+    \end{itemize}
+%% --- Add more experience entries as needed following the same pattern ---
+\end{itemize}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%% PROJECTS
+%% Repeat block per project. N = 1, 2, 3 ...
+%% Each project can have multiple bullet points: M = 1, 2, 3 ...
+%% ═══════════════════════════════════════════════════════════════════════════════
+\resheading{PROJECTS}
+\begin{itemize}
+%% --- Project Entry 1 ---
+\item \textbf{{{PROJ_NAME_1}}} \hfill {{PROJ_DATES_1}}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Purpose:} {{PROJ_PURPOSE_1}}
+        \item \textbf{Tech Stack:} {{PROJ_TECHSTACK_1}}
+        \item {{PROJ_BULLET_1_1}}
+        \item {{PROJ_BULLET_1_2}}
+        \item {{PROJ_BULLET_1_3}} \textbf{GitHub:} \href{{{PROJ_GITHUB_URL_1}}}{{{PROJ_GITHUB_LABEL_1}}}
+    \end{itemize}
+%% --- Project Entry 2 ---
+\item \textbf{{{PROJ_NAME_2}}} \hfill {{PROJ_DATES_2}}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Purpose:} {{PROJ_PURPOSE_2}}
+        \item \textbf{Tech Stack:} {{PROJ_TECHSTACK_2}}
+        \item {{PROJ_BULLET_2_1}}
+        \item {{PROJ_BULLET_2_2}}
+    \end{itemize}
+%% --- Project Entry 3 ---
+\item \textbf{{{PROJ_NAME_3}}} \hfill {{PROJ_DATES_3}}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Purpose:} {{PROJ_PURPOSE_3}}
+        \item \textbf{Tech Stack:} {{PROJ_TECHSTACK_3}}
+        \item {{PROJ_BULLET_3_1}}
+        \item {{PROJ_BULLET_3_2}}
+        \item {{PROJ_BULLET_3_3}} \textbf{GitHub:} \href{{{PROJ_GITHUB_URL_3}}}{{{PROJ_GITHUB_LABEL_3}}}
+    \end{itemize}
+%% --- Add more project entries as needed following the same pattern ---
+\end{itemize}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%% EXTRA-CURRICULAR ACTIVITIES & ACHIEVEMENTS
+%% Repeat per entry. N = 1, 2, 3 ...
+%% Link fields are optional — omit \href wrapper if no link exists.
+%% ═══════════════════════════════════════════════════════════════════════════════
+\resheading{EXTRA-CURRICULAR ACTIVITIES \& ACHIEVEMENTS}
+\begin{itemize}
+    %% --- Entry 1 ---
+    \item \textbf{{{EXTRA_ENTRY_1}}}: \href{{{EXTRA_LINK_URL_1}}}{{{EXTRA_LINK_LABEL_1}}}
+    %% --- Entry 2 ---
+    \item \textbf{{{EXTRA_ENTRY_2}}}: \href{{{EXTRA_LINK_URL_2}}}{{{EXTRA_LINK_LABEL_2}}}
+    %% --- Entry 3 ---
+    \item \textbf{{{EXTRA_ENTRY_3}}}: \href{{{EXTRA_LINK_URL_3}}}{{{EXTRA_LINK_LABEL_3}}}
+    %% --- Entry 4 ---
+    \item \textbf{{{EXTRA_ENTRY_4}}}: \href{{{EXTRA_LINK_URL_4}}}{{{EXTRA_LINK_LABEL_4}}}
+    %% --- Entry 5 (no link variant) ---
+    \item \textbf{{{EXTRA_ENTRY_5}}}
+    %% --- Add more entries as needed ---
+\end{itemize}
+
+%% ═══════════════════════════════════════════════════════════════════════════════
+%% TECHNICAL SKILLS
+%% Each category is a comma-separated list filled from the user's profile.
+%% ═══════════════════════════════════════════════════════════════════════════════
+\resheading{TECHNICAL SKILLS}
+\begin{itemize}
+\item \textbf{Languages:} {{SKILLS_LANGUAGES}}
+\item \textbf{Tools \& IDEs:} {{SKILLS_TOOLS}}
+\item \textbf{Frameworks:} {{SKILLS_FRAMEWORKS}}
+\item \textbf{Backend:} {{SKILLS_BACKEND}}
+\item \textbf{Coursework:} {{SKILLS_COURSEWORK}}
+\end{itemize}
+
+\end{document}
