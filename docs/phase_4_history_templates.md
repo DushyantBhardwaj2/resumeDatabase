@@ -51,8 +51,8 @@ Add advanced features such as historical tracking of tailored resumes, customiza
 ---
 
 ## 5. Definition of Done
-- [ ] Historical resume records are saved in the database after every tailoring event.
-- [ ] Users can browse, preview, and download previously generated resumes from a history dashboard.
-- [ ] The customizer panel successfully alters resume styling (typography, spacing, accents) in real time.
-- [ ] Headless PDF exports reflect custom styles correctly.
-- [ ] Interface includes transitions, hover animations, and a cohesive dark/light design system.
+- [x] Historical resume records are saved in the database after every tailoring event.
+- [x] Users can browse, preview, and download previously generated resumes from a history dashboard.
+- [x] The customizer panel successfully alters resume styling (typography, spacing, accents) in real time.
+- [x] Headless PDF exports reflect custom styles correctly.
+- [x] Interface includes transitions, hover animations, and a cohesive dark/light design system.

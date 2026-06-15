@@ -39,9 +39,9 @@ graph TD
    - The system reads raw bytes from the uploaded PDF resume.
    - Clean UTF-8 text is extracted, stripping layout headers and lines, preserving space/newlines.
 2. **AI-Driven Structuring (LLM Parsing)**:
-   - The raw text is wrapped in a structured prompt and sent to the LLM (e.g., Google Gemini).
-   - **System Instruction**: Enforces parsing the text into a strict JSON format.
-   - **Data Validation**: The server validates the JSON payload to ensure essential keys (e.g., `education`, `skills`) are present.
+   - The raw text is wrapped in a structured prompt and sent to the LLM (OpenCode Zen / `deepseek-v4-flash-free` via direct `fetch`).
+   - **System Instruction**: Enforces parsing the text into a strict JSON format (with explicit schema in the prompt).
+   - **Data Validation**: The server parses the response via `extractJson()` regex, then validates with Zod to ensure essential keys (e.g., `education`, `skills`) are present and correctly typed.
 3. **User Approval (Form Review)**:
    - The UI renders the parsed JSON structure in editable form fields.
    - The user corrects any parsing errors (e.g., incorrectly structured dates or organization names) and clicks "Save Profile".
@@ -140,7 +140,7 @@ To ensure clean processing during stage 1 (PDF Parse) and stage 2 (GitHub Sync),
 ```json
 {
   "role": "system",
-  "content": "You are a precise data extractor. Your task is to extract resume data from raw text. Output MUST match the following JSON schema strictly. Do not add markdown backticks outside of JSON. If a field is missing, return an empty array or null.\n\nSchema:\n{\n  \"education\": [{\"school\": string, \"degree\": string, \"gpa\": string, \"start_year\": number, \"end_year\": number}],\n  \"experience\": [{\"company\": string, \"role\": string, \"start_date\": string, \"end_date\": string, \"bullets\": [string]}],\n  \"projects\": [{\"title\": string, \"tech_stack\": [string], \"bullets\": [string], \"url\": string}],\n  \"skills\": {\"languages\": [string], \"frameworks\": [string], \"tools\": [string]}\n}"
+  "content": "You are a precise resume data extractor. Extract the following fields from the resume text and return ONLY valid JSON matching the schema. If a field is missing from the resume, use null for scalar fields and empty arrays for list fields. Return ONLY the raw JSON object — no markdown, no code fences, no explanation, no surrounding text.\n\nExpected JSON structure:\n{\n  \"contact\": { \"phone\": string | null, \"linkedin\": string | null, \"github\": string | null, \"portfolio\": string | null },\n  \"education\": [{ \"school\": string, \"degree\": string, \"gpa\": string | null, \"startYear\": number | null, \"endYear\": number | null }],\n  \"experience\": [{ \"company\": string, \"role\": string, \"startDate\": string | null, \"endDate\": string | null, \"bullets\": string[] }],\n  \"projects\": [{ \"title\": string, \"techStack\": string[], \"bullets\": string[], \"url\": string | null }],\n  \"skills\": { \"languages\": string[], \"frameworks\": string[], \"tools\": string[] }\n}"
 }
 ```
 

@@ -47,8 +47,8 @@ Build the main dashboard where users can manage, edit, and expand their stored p
 ---
 
 ## 5. Definition of Done
-- [ ] Users can edit all sections of their profile (Education, Experience, Skills, Projects) and persist edits to the database.
-- [ ] GitHub repository fetch lists active public repositories correctly.
-- [ ] Users can select specific repositories to import.
-- [ ] Imported repositories populate the profile's project list with title, description, link, and tech stack details.
-- [ ] Dashboard displays profile completion status to guide user data entry.
+- [x] Users can edit all sections of their profile (Education, Experience, Skills, Projects) and persist edits to the database.
+- [x] GitHub repository fetch lists active public repositories correctly.
+- [x] Users can select specific repositories to import.
+- [x] Imported repositories populate the profile's project list with title, description, link, and tech stack details.
+- [x] Dashboard displays profile completion status to guide user data entry.

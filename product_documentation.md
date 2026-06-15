@@ -41,20 +41,20 @@ For detailed specifications on data flows, database entity relationships, schema
 
 ## 4. Proposed Development Phases
 
-### Phase 1: Authentication & Cold Start (Resume Parsing)
+### Phase 1: Authentication & Cold Start (Resume Parsing) ✅
 *Detailed Doc: [phase_1_auth_and_parsing.md](file:///c:/Users/Dushy/OneDrive/Desktop/Projects/resumemint/docs/phase_1_auth_and_parsing.md)*
 - Institutional Google OAuth authentication restricted to `@nsut.ac.in`.
 - PDF upload interface.
 - Backend pipeline to extract and structure text from the uploaded PDF.
 - Database schema and storage for structured user profiles.
+### Phase 2: Profile Dashboard & Integration ✅
 
-### Phase 2: Profile Dashboard & Integration
 *Detailed Doc: [phase_2_profile_dashboard.md](file:///c:/Users/Dushy/OneDrive/Desktop/Projects/resumemint/docs/phase_2_profile_dashboard.md)*
 - User interface to view, edit, and enrich the user profile.
 - GitHub integration (allowing users to sync or link repositories and projects).
 - Management of skills, education, and experience.
 
-### Phase 3: Resume Tailoring & AI Generation
+### Phase 3: Resume Tailoring & AI Generation ✅
 *Detailed Doc: [phase_3_resume_tailoring.md](file:///c:/Users/Dushy/OneDrive/Desktop/Projects/resumemint/docs/phase_3_resume_tailoring.md)*
 - Input interface for Job Descriptions.
 - AI prompt orchestration combining profile data + JD.

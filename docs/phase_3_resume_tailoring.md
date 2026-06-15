@@ -56,7 +56,7 @@ Build the AI engine and UI that accepts a Job Description (JD), matches it again
 ---
 
 ## 5. Definition of Done
-- [ ] Users can submit a job title, company, and raw job description.
-- [ ] LLM successfully returns tailored bullet points and aligned skills based only on real profile data.
-- [ ] UI shows a split preview of the tailored changes.
-- [ ] The user can download the generated resume as a standard, ATS-friendly, correctly-formatted PDF.
+- [x] Users can submit a job title, company, and raw job description.
+- [x] LLM successfully returns tailored bullet points and aligned skills based only on real profile data.
+- [x] UI shows a split preview of the tailored changes.
+- [x] The user can download the generated resume as a standard, ATS-friendly, correctly-formatted PDF.
