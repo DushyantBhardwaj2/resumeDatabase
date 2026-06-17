@@ -1,5 +1,5 @@
 import type { IProfileRepository, ITailoredResumeRepository, IGitHubRepoRepository } from "../core/domain/repositories"
-import type { IAIService, IPDFParser, ILatexCompiler, ILatexTemplateFiller } from "../core/application/ports"
+import type { IAIService, IPDFParser, ILatexTemplateFiller } from "../core/application/ports"
 import { ProfileUseCases } from "../core/application/use-cases/profile-use-cases"
 import { ResumeUseCases } from "../core/application/use-cases/resume-use-cases"
 import { AiUseCases } from "../core/application/use-cases/ai-use-cases"
@@ -10,7 +10,6 @@ import { GitHubRepoRepository } from "../infrastructure/persistence/github-repo-
 import { OpenCodeZenAIService } from "../infrastructure/ai"
 import { PDFParser } from "../infrastructure/pdf"
 import { LatexTemplateFiller } from "../infrastructure/latex/latex-template"
-import { LatexCompiler } from "../infrastructure/latex/latex-compiler"
 
 class Container {
   private _profileRepo?: IProfileRepository
@@ -19,8 +18,6 @@ class Container {
   private _aiService?: IAIService
   private _pdfParser?: IPDFParser
   private _latexTemplate?: ILatexTemplateFiller
-  private _latexCompiler?: ILatexCompiler
-
   private _profileUseCases?: ProfileUseCases
   private _resumeUseCases?: ResumeUseCases
   private _aiUseCases?: AiUseCases
@@ -90,10 +87,6 @@ class Container {
     return this._latexTemplate
   }
 
-  get latexCompiler(): ILatexCompiler {
-    if (!this._latexCompiler) this._latexCompiler = new LatexCompiler()
-    return this._latexCompiler
-  }
 }
 
 export const container = new Container()

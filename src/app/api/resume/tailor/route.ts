@@ -26,8 +26,15 @@ export async function POST(request: NextRequest) {
     const result = await container.resumeUseCases.tailorResume(session.user.id, validation.data)
     return Response.json(result)
   } catch (e) {
-    const message = e instanceof Error ? e.message : "Internal server error"
     console.error("Tailor error:", e)
-    return Response.json({ error: message }, { status: 500 })
+    const message = e instanceof Error ? e.message : "Internal server error"
+    
+    let status = 500
+    if (message.includes("Profile not found")) status = 404
+    if (message.includes("Invalid request") || message.includes("Complete onboarding")) status = 400
+    if (message.includes("Unauthorized")) status = 401
+    if (message.includes("Missing OPENCODE_API_KEY")) status = 503 // Service Unavailable
+
+    return Response.json({ error: message }, { status })
   }
 }

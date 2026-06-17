@@ -1,14 +1,10 @@
-export interface ILatexCompiler {
-  compile(latex: string): Promise<Buffer>
-}
-
 export interface ILatexTemplateFiller {
   fill(
-    contact: Record<string, unknown>,
-    education: Array<Record<string, unknown>>,
-    experience: Array<Record<string, unknown>>,
-    projects: Array<Record<string, unknown>>,
-    skills: Record<string, string[]>,
+    contact: Record<string, unknown> | null,
+    education: Array<Record<string, unknown>> | null,
+    experience: Array<Record<string, unknown>> | null,
+    projects: Array<Record<string, unknown>> | null,
+    skills: Record<string, string[]> | null,
     tailored: unknown
   ): string
 }

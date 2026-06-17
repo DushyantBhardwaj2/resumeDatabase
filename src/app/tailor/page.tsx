@@ -3,6 +3,7 @@
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
 import { toast } from "sonner"
+import { OverleafButton } from "@/components/ui/overleaf-button"
 
 type ProfileData = {
   contact: Record<string, unknown>
@@ -211,7 +212,6 @@ function ResumePreview({
   const [edited, setEdited] = useState<TailoredOutput>(result.tailored)
   const [editingBullets, setEditingBullets] = useState<{ section: string; index: number } | null>(null)
   const [editText, setEditText] = useState("")
-  const [downloading, setDownloading] = useState(false)
   const [showStyling, setShowStyling] = useState(false)
   const [showLatex, setShowLatex] = useState(false)
   const [styleConfig, setStyleConfig] = useState({
@@ -255,28 +255,6 @@ function ResumePreview({
     setEditingBullets(null)
   }
 
-  function handleDownloadPdf() {
-    if (!result.latex) { toast.error("No LaTeX source available"); return }
-    setDownloading(true)
-    fetch("/api/resume/compile-latex", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ latex: result.latex }),
-    })
-      .then(async (res) => {
-        if (!res.ok) throw new Error(await res.text())
-        const blob = await res.blob()
-        const url = URL.createObjectURL(blob)
-        const a = document.createElement("a")
-        a.href = url
-        a.download = `${result.jobTitle}_${result.company}_resume.pdf`
-        a.click()
-        URL.revokeObjectURL(url)
-      })
-      .catch((err) => toast.error("Failed to compile PDF: " + err.message))
-      .finally(() => setDownloading(false))
-  }
-
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
@@ -313,23 +291,7 @@ function ResumePreview({
               </svg>
               LaTeX
             </button>
-            <button
-              onClick={handleDownloadPdf}
-              disabled={downloading}
-              className="inline-flex h-10 items-center gap-2 rounded-full bg-primary px-5 text-sm font-medium text-white transition-colors hover:bg-primary-dark disabled:opacity-50"
-            >
-              {downloading ? (
-                <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                </svg>
-              ) : (
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-                </svg>
-              )}
-              {downloading ? "Compiling..." : "Download PDF"}
-            </button>
+            <OverleafButton latexCode={result.latex} />
           </div>
       </div>
 

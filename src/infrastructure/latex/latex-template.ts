@@ -33,22 +33,28 @@ function stripSection(tex: string, sectionName: string): string {
 
 export class LatexTemplateFiller implements ILatexTemplateFiller {
   fill(
-    contact: Contact,
-    education: Education,
-    experience: Experience,
-    projects: Projects,
-    skills: Skills,
+    contact: Contact | null,
+    education: Education | null,
+    experience: Experience | null,
+    projects: Projects | null,
+    skills: Skills | null,
     tailored: unknown
   ): string {
     const data = tailored as TailoredData
     let tex = readFileSync(join(process.cwd(), "docs", "resume_template.tex"), "utf-8")
 
-    const name = typeof contact.name === "string" ? contact.name : ""
-    const phone = typeof contact.phone === "string" ? contact.phone : ""
-    const email = typeof contact.email === "string" ? contact.email : ""
-    const linkedin = typeof contact.linkedin === "string" ? contact.linkedin : ""
-    const leetcode = typeof contact.leetcode === "string" ? contact.leetcode : ""
-    const github = typeof contact.github === "string" ? contact.github : ""
+    const safeContact = contact || {} as Contact
+    const safeEducation = education || []
+    const safeExperience = experience || []
+    const safeProjects = projects || []
+    const safeSkills = skills || { languages: [], frameworks: [], tools: [] }
+
+    const name = typeof safeContact.name === "string" ? safeContact.name : ""
+    const phone = typeof safeContact.phone === "string" ? safeContact.phone : ""
+    const email = typeof safeContact.email === "string" ? safeContact.email : ""
+    const linkedin = typeof safeContact.linkedin === "string" ? safeContact.linkedin : ""
+    const leetcode = typeof safeContact.leetcode === "string" ? safeContact.leetcode : ""
+    const github = typeof safeContact.github === "string" ? safeContact.github : ""
 
     tex = tex.replace(/\{\{FULL_NAME\}\}/g, esc(name))
     tex = tex.replace(/\{\{PHONE\}\}/g, esc(phone))
@@ -61,7 +67,7 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
     tex = tex.replace(/\\includegraphics\[height=0.5in\]\{NSUT_logo\.png\}\n/, "")
 
     for (let i = 1; i <= 3; i++) {
-      const entry = education[i - 1]
+      const entry = safeEducation[i - 1]
       if (entry) {
         tex = tex.replace(new RegExp(`\\{\\{EDU_DEGREE_${i}\\}\\}`, "g"), esc(String(entry.degree ?? "")))
         tex = tex.replace(new RegExp(`\\{\\{EDU_YEAR_${i}\\}\\}`, "g"), esc(String(entry.yearRange ?? "")))
@@ -76,8 +82,9 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
       }
     }
 
+    const tailoredExperience = data?.experience || []
     for (let i = 1; i <= 10; i++) {
-      const exp: { role?: string; company?: string; startDate?: string; endDate?: string; dates?: string; techStack?: string[]; bullets?: string[]; url?: string } = data.experience[i - 1] || experience[i - 1]
+      const exp: { role?: string; company?: string; startDate?: string; endDate?: string; dates?: string; techStack?: string[]; bullets?: string[]; url?: string } = tailoredExperience[i - 1] || safeExperience[i - 1]
       if (exp) {
         const title = `${exp.role} -- ${exp.company}`
         tex = tex.replace(new RegExp(`\\{\\{EXP_TITLE_${i}\\}\\}`, "g"), esc(title))
@@ -107,8 +114,9 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
       }
     }
 
+    const tailoredProjects = data?.projects || []
     for (let i = 1; i <= 10; i++) {
-      const proj: { title?: string; dates?: string; yearRange?: string; purpose?: string; techStack?: string[]; bullets?: string[]; url?: string } = data.projects[i - 1] || projects[i - 1]
+      const proj: { title?: string; dates?: string; yearRange?: string; purpose?: string; techStack?: string[]; bullets?: string[]; url?: string } = tailoredProjects[i - 1] || safeProjects[i - 1]
       if (proj) {
         tex = tex.replace(new RegExp(`\\{\\{PROJ_NAME_${i}\\}\\}`, "g"), esc(String(proj.title ?? "")))
         const dates = proj.dates || proj.yearRange || ""
@@ -140,9 +148,10 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
 
     tex = stripSection(tex, "EXTRA-CURRICULAR ACTIVITIES \\& ACHIEVEMENTS")
 
-    tex = tex.replace(/\{\{SKILLS_LANGUAGES\}\}/g, esc((data.skills.languages ?? skills.languages ?? []).join(", ")))
-    tex = tex.replace(/\{\{SKILLS_TOOLS\}\}/g, esc((data.skills.tools ?? skills.tools ?? []).join(", ")))
-    tex = tex.replace(/\{\{SKILLS_FRAMEWORKS\}\}/g, esc((data.skills.frameworks ?? skills.frameworks ?? []).join(", ")))
+    const tailoredSkills = data?.skills || { languages: [], frameworks: [], tools: [] }
+    tex = tex.replace(/\{\{SKILLS_LANGUAGES\}\}/g, esc((tailoredSkills.languages ?? safeSkills.languages ?? []).join(", ")))
+    tex = tex.replace(/\{\{SKILLS_TOOLS\}\}/g, esc((tailoredSkills.tools ?? safeSkills.tools ?? []).join(", ")))
+    tex = tex.replace(/\{\{SKILLS_FRAMEWORKS\}\}/g, esc((tailoredSkills.frameworks ?? safeSkills.frameworks ?? []).join(", ")))
     tex = tex.replace(/\{\{SKILLS_BACKEND\}\}/g, esc(""))
     tex = tex.replace(/\{\{SKILLS_COURSEWORK\}\}/g, esc(""))
 
