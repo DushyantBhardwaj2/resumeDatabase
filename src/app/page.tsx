@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { signIn } from "@/lib/auth-client"
+import { signIn } from "@/config/auth-client"
 
 export default function Home() {
   const [loading, setLoading] = useState(false)

@@ -1,8 +1,8 @@
-import { getServerSession } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { getServerSession } from "@/config/auth"
+import { prisma } from "@/config/prisma"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { computeCompleteness, completenessColor, completenessBg, completenessHint } from "@/lib/profile-utils"
+import { computeCompleteness, completenessColor, completenessBg, completenessHint } from "@/infrastructure/profile-utils"
 
 export default async function DashboardPage() {
   const session = await getServerSession()

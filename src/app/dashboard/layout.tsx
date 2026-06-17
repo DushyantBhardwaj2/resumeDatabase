@@ -1,4 +1,4 @@
-import { getServerSession } from "@/lib/auth"
+import { getServerSession } from "@/config/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
 import { DashboardNav, MobileMenu } from "./nav"

@@ -1,5 +1,5 @@
-import { getServerSession } from "@/lib/auth"
-import { prisma } from "@/lib/prisma"
+import { getServerSession } from "@/config/auth"
+import { prisma } from "@/config/prisma"
 import { redirect } from "next/navigation"
 
 export default async function AuthRedirectPage() {

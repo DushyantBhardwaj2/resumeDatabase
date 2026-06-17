@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useState, useCallback } from "react"
 import { toast } from "sonner"
-import { computeCompleteness, completenessBg, completenessColor, completenessHint } from "@/lib/profile-utils"
+import { computeCompleteness, completenessBg, completenessColor, completenessHint } from "@/infrastructure/profile-utils"
 import { Field } from "@/components/ui/field"
 import { SectionCard } from "@/components/ui/section-card"
 import { BulletList } from "@/components/ui/bullet-list"

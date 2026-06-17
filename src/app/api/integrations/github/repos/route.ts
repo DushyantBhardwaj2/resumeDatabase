@@ -1,4 +1,4 @@
-import { getServerSession } from "@/lib/auth"
+import { getServerSession } from "@/config/auth"
 import { NextRequest } from "next/server"
 
 export async function GET(request: NextRequest) {
