@@ -1,7 +1,10 @@
 export interface Contact {
+  name: string | null
+  email: string | null
   phone: string | null
   linkedin: string | null
   github: string | null
+  leetcode: string | null
   portfolio: string | null
 }
 

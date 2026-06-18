@@ -1,7 +1,7 @@
 import { getServerSession } from "@/config/auth"
-import { prisma } from "@/config/prisma"
 import { redirect } from "next/navigation"
 import Link from "next/link"
+import { container } from "@/di/container"
 import { computeCompleteness, completenessColor, completenessBg, completenessHint } from "@/infrastructure/profile-utils"
 
 export default async function DashboardPage() {
@@ -10,9 +10,7 @@ export default async function DashboardPage() {
     redirect("/")
   }
 
-  const profile = await prisma.profile.findUnique({
-    where: { userId: session.user.id },
-  })
+  const profile = await container.profileUseCases.getProfile(session.user.id)
 
   if (!profile) {
     redirect("/onboarding")
