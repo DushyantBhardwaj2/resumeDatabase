@@ -1,6 +1,9 @@
 {
-  "buildCommand": "npx prisma generate && next build",
+  "buildCommand": "next build",
   "installCommand": "npm install",
   "framework": "nextjs",
-  "outputDirectory": ".next"
+  "outputDirectory": ".next",
+  "rewrites": [
+    { "source": "/api/:path*", "destination": "https://resume-backend.onrender.com/api/:path*" }
+  ]
 }
