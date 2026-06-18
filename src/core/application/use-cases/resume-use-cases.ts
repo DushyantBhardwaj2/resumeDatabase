@@ -31,7 +31,7 @@ export class ResumeUseCases {
     if (!profile) throw new Error("Profile not found. Complete onboarding first.")
 
     const userContent = JSON.stringify({ ...input, candidateProfile: profile })
-    const tailored = await this.aiService.generateStructuredData(this.tailorPrompt, userContent, this.tailorSchema)
+    const tailored = await this.aiService.generateStructuredData(this.tailorPrompt, userContent, this.tailorSchema) as unknown as TailoredOutput
 
     const latex = this.latexTemplate.fill(
       profile.contact as unknown as Record<string, unknown>,
