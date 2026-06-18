@@ -27,6 +27,9 @@ COPY server/src/ ./server/src/
 COPY server/tsconfig.json ./server/
 COPY tsconfig.json ./
 
+# Install server dependencies (tsx, express, cors, multer)
+RUN cd server && npm install
+
 # Copy LaTeX template
 COPY docs/ ./docs/
 
