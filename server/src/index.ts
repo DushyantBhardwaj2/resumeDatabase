@@ -20,6 +20,7 @@ app.use(cors({
   credentials: true,
 }))
 
+app.set("trust proxy", 1)
 app.use(express.json({ limit: "10mb" }))
 
 // Better Auth handler — mounted at /api/auth/*
