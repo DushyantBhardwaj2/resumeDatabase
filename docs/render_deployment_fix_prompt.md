@@ -8,7 +8,7 @@ The Express backend is deployed on Render as a **Docker-based web service**. The
 
 ```
 Frontend (Vercel)  ──rewrite──>  Backend (Render)
-  resumint.vercel.app              resumint-backend-j047.onrender.com
+  resumint.vercel.app              resumint-backend-ihjf.onrender.com
                                         │
                                    PostgreSQL
 ```
@@ -83,12 +83,12 @@ The server exposes `GET /api/health` which Returns `200 OK { status: "healthy" }
 1. Push to `main` branch on GitHub
 2. Render detects the push, pulls the repo, builds the Docker image, and deploys
 3. On successful start, the health check is verified
-4. The backend is available at `https://resumint-backend-j047.onrender.com`
+4. The backend is available at `https://resumint-backend-ihjf.onrender.com`
 
 ## Troubleshooting
 
 - **Build fails**: Check Docker build logs in Render dashboard. Common issues: missing `texlive` packages, npm install failures.
 - **Runtime errors**: Check the Render runtime logs. The server crashes on startup if required env vars are missing or imports fail.
-- **Health check failing**: Ensure the server starts without errors and listens on the correct `PORT`. Run `curl https://resumint-backend-j047.onrender.com/api/health` to test.
+- **Health check failing**: Ensure the server starts without errors and listens on the correct `PORT`. Run `curl https://resumint-backend-ihjf.onrender.com/api/health` to test.
 - **OAuth issues**: Verify `BETTER_AUTH_URL` points to the Vercel domain, not the Render domain. Google OAuth callbacks must go to the frontend.
 - **LaTeX compilation errors**: Check the server logs when "Download PDF" is triggered. Missing `texlive` packages will cause `pdflatex` to fail.

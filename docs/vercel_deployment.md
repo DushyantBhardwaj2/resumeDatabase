@@ -8,7 +8,7 @@ The Next.js frontend is deployed on Vercel. Better Auth (authentication) is hand
 
 ```
 User ──> Vercel (Next.js) ──rewrite──> Render (Express backend)
-           resumint.vercel.app           resumint-backend-j047.onrender.com
+           resumint.vercel.app           resumint-backend-ihjf.onrender.com
                │
                └── /api/auth/* ──handled locally──> Better Auth (Prisma → Supabase)
 ```
@@ -54,7 +54,7 @@ The deployment config is at the project root:
   "framework": "nextjs",
   "outputDirectory": ".next",
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://resumint-backend-j047.onrender.com/api/:path*" }
+    { "source": "/api/:path*", "destination": "https://resumint-backend-ihjf.onrender.com/api/:path*" }
   ]
 }
 ```
