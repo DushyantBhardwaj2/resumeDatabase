@@ -41,8 +41,8 @@ Build the entry point of the Resumint application, allowing users to securely au
   ```
 - **Known Issue**: Throwing a plain `Error` causes Better Auth to return generic `"unable to create user"` instead of the actual message. Should throw `APIError("FORBIDDEN", ...)` instead.
 - **Session**: Cookie-based, managed by Better Auth. Use `getServerSession(headers)` in API routes, `createAuthClient()` on client.
-- **Redirect URI**: `http://localhost:3000/api/auth/callback/google` (set in Google Cloud Console).
-- **API Route**: `src/app/api/auth/[...all]/route.ts` — uses `toNextJsHandler` from `better-auth/integrations/next-js`.
+- **Redirect URI**: `https://resume-database.vercel.app/api/auth/callback/google` (set in Google Cloud Console — must match Vercel domain).
+- **API Route**: All `/api/*` endpoints including auth are handled by the **Render backend** and proxied via Vercel rewrites. See `docs/vercel_deployment.md` for the full architecture.
 
 ### B. PDF Parsing & Extraction Pipeline
 1. **File Upload Handling**: Accept only `.pdf` files, limit file size to 5MB, validated client-side and server-side.
@@ -59,9 +59,9 @@ Build the entry point of the Resumint application, allowing users to securely au
    - Response text is extracted from `choices[0].message.content`.
    - JSON is extracted via `extractJson()` helper (handles markdown code fences, raw braces).
    - Validated against Zod schema (`parsedResumeSchema`) before returning.
-4. **Endpoints**:
-   - `POST /api/resume/parse` — file upload → text extraction → AI parsing → Zod validation → return `{ rawText, parsed }`
-   - `POST /api/profile/save` — accept `{ rawText, parsed }` → upsert to Profiles table
+4. **Endpoints** (all authenticated routes use `/api/protected/*` prefix):
+   - `POST /api/protected/resume/parse` — file upload → text extraction → AI parsing → Zod validation → return `{ rawText, parsed }`
+   - `POST /api/protected/profile` — accept `{ rawText, parsed }` → upsert to Profiles table
 
 ### C. Database Schema (Current — Prisma v7)
 
@@ -125,24 +125,24 @@ Build the entry point of the Resumint application, allowing users to securely au
 
 ## 4. Key Endpoints & APIs
 
-### `* /api/auth/[...all]`
-Better Auth handler via `toNextJsHandler`. Handles Google OAuth flow, session management, sign-out.
+### `* /api/auth/**`
+Better Auth handler on the Render backend (`backend/src/index.ts`). Handles Google OAuth flow, session management, sign-out. Proxied from Vercel via `vercel.json` rewrites.
 
-### `POST /api/resume/parse`
-**Auth**: Required (session check).
+### `POST /api/protected/resume/parse`
+**Auth**: Required (session check via `/api/protected/*` middleware).
 **Request**: `multipart/form-data` with `file` field (PDF, max 5MB).
 **Response** (200):
 ```json
 { "rawText": "...", "parsed": { "contact": {...}, "education": [...], ... } }
 ```
 **Response** (errors): `{ "error": "..." }` — 400/401/422/500.
-**Pipeline**: Validations → `Buffer` → `pdf-parse` text extraction → `fetch` to OpenCode Zen → `extractJson()` → Zod validation.
+**Pipeline**: Validations → `Buffer` → `pdf-parse` text extraction → `ResumeUseCases.parseResume()` (AI parsing + Zod validation).
 
-### `POST /api/profile/save`
-**Auth**: Required (session check).
+### `POST /api/protected/profile`
+**Auth**: Required (session check via `/api/protected/*` middleware).
 **Request**: `{ rawText: string, parsed: ParsedResume }`.
 **Response** (200): `{ profile: {...} }`.
-**Logic**: Upserts Profile for `session.user.id`. Errors return `{ error: "..." }`.
+**Logic**: Uses `ProfileUseCases.saveFromOnboarding()` to upsert Profile with `rawResumeText` + parsed fields for `session.user.id`. Errors return `{ error: "..." }`.
 
 ---
 
@@ -161,15 +161,13 @@ Better Auth handler via `toNextJsHandler`. Handles Google OAuth flow, session ma
 |------|---------|
 | `prisma/schema.prisma` | 7 models (no `datasource.url`) |
 | `prisma.config.ts` | Prisma v7 datasource URL config |
-| `src/lib/prisma.ts` | PrismaClient singleton with `PrismaPg` adapter |
-| `src/lib/auth.ts` | Better Auth config + `getServerSession` |
-| `src/lib/auth-client.ts` | Better Auth React client |
-| `src/lib/ai.ts` | Direct `fetch` → OpenCode Zen + `extractJson()` |
-| `src/lib/pdf-parser.ts` | `pdf-parse` v2 + AI extraction + Zod schema |
-| `src/lib/validators.ts` | Re-exports from pdf-parser |
-| `src/app/api/auth/[...all]/route.ts` | Better Auth handler |
-| `src/app/api/resume/parse/route.ts` | Resume parse endpoint |
-| `src/app/api/profile/save/route.ts` | Profile save endpoint |
+| `backend/src/index.ts` | Express (Hono) server — all API routes including `/api/protected/*` |
+| `backend/src/config/auth.ts` | Better Auth config (shared, runs on Render) |
+| `backend/src/di/container.ts` | Dependency injection container |
+| `backend/src/core/application/use-cases/resume-use-cases.ts` | `parseResume(buffer)` — PDF text extraction + AI parsing |
+| `backend/src/core/application/use-cases/profile-use-cases.ts` | `saveFromOnboarding(rawText, parsed)` — profile upsert |
+| `src/config/auth-client.ts` | Better Auth React client (points to Render via `NEXT_PUBLIC_API_URL`) |
+| `src/config/auth.ts` | Server-side session fetch (calls Render) |
 | `src/app/page.tsx` | Landing page |
 | `src/app/onboarding/page.tsx` | Upload → parse → review → save |
 | `src/app/dashboard/page.tsx` | Post-onboarding dashboard |

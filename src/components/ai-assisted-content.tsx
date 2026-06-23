@@ -36,7 +36,7 @@ export function AIAssistedContent({
     setLoading(true)
     setError(null)
     try {
-      const res = await fetchApi("/api/ai/generate-bullets", {
+      const res = await fetchApi("/api/protected/ai/generate-bullets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ section, rawInput, context }),

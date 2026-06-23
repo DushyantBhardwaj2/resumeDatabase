@@ -186,19 +186,14 @@ function UploadStep({ onParsed }: { onParsed: (p: Partial<Profile>) => void }) {
     }
     setParsing(true);
     try {
-      const fd = new FormData();
-      fd.append('file', file);
-      const res = await fetch('/api/protected/resume/parse', {
-        method: 'POST',
-        credentials: 'include',
-        body: fd,
-      });
-      if (!res.ok) throw new Error((await res.json()).error ?? 'Parse failed');
-      const data = await res.json();
-      onParsed(data);
-      toast.success('Resume parsed successfully');
-    } catch (err: any) {
-      toast.error(err?.message ?? 'Failed to parse resume');
+      const res = await fetchApi("/api/protected/resume/parse", { method: "POST", body: formData })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || "Failed to parse resume")
+      setRawText(result.rawText)
+      setData(result.parsed)
+      setStep(1)
+    } catch (e) {
+      setError(e instanceof Error ? e.message : "Something went wrong")
     } finally {
       setParsing(false);
     }
@@ -273,16 +268,14 @@ function ExperienceStep({
   const improve = async (idx: number) => {
     setImprovingIdx(idx);
     try {
-      const exp = experience[idx];
-      const res = await fetch('/api/protected/ai/bullets', {
-        method: 'POST', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: exp.role, company: exp.company, bullets: exp.bullets }),
-      });
-      if (!res.ok) throw new Error();
-      const { bullets } = await res.json();
-      update(idx, { bullets });
-      toast.success('Bullets improved');
+      const res = await fetchApi("/api/protected/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rawText, parsed: data }),
+      })
+      if (!res.ok) throw new Error("Failed to save profile")
+      toast.success("Profile saved successfully!")
+      router.push("/dashboard")
     } catch {
       toast.error('AI improvement failed');
     } finally {
