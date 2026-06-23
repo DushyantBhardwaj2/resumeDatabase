@@ -1,131 +1,219 @@
-@import url("https://api.fontshare.com/v2/css?f[]=satoshi@300,301,400,401,500,501,700,701,900,901&display=swap");
+/* ── Fonts (Fontshare CDN) ──────────────────────────────────────────────── */
+@import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@variable&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@variable&display=swap');
 @import "tailwindcss";
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-primary: #6366f1;
-  --color-primary-dark: #4f46e5;
-  --color-primary-light: #a5b4fc;
-  --color-accent: #06b6d4;
-  --color-accent-dark: #0891b2;
-  --color-accent-light: #67e8f9;
-  --color-success: #10b981;
-  --color-warning: #f59e0b;
-  --color-error: #ef4444;
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-border: var(--border);
+/* ── Design Tokens — Light Mode ─────────────────────────────────────────── */
+:root {
+  /* Surfaces */
+  --surface:          #FAFAF7;
+  --surface-subtle:   #F4F4F0;
+  --card:             #FFFFFF;
+  --muted:            #F0F0EC;
 
-  --font-sans: "Inter", system-ui, sans-serif;
-  --font-heading: "Satoshi", system-ui, sans-serif;
-  --font-mono: "JetBrains Mono", monospace;
+  /* Content */
+  --content:          #1A1A1C;
+  --content-muted:    #6B7280;
+  --content-subtle:   #9CA3AF;
 
-  --radius-sm: 0.375rem;
-  --radius-md: 0.5rem;
-  --radius-lg: 0.75rem;
-  --radius-xl: 1rem;
-  --radius-2xl: 1.25rem;
+  /* Borders */
+  --edge:             #E5E5E1;
+  --edge-strong:      #D0D0CC;
+
+  /* Brand — Emerald Green */
+  --brand:            #16A34A;
+  --brand-hover:      #15803D;
+  --brand-light:      #DCFCE7;
+  --brand-fg:         #FFFFFF;
+
+  /* Sidebar */
+  --sidebar-bg:       #FFFFFF;
+  --sidebar-border:   #F0F0EC;
+  --sidebar-w:        228px;
+  --sidebar-icon-w:   64px;
+
+  /* Radius */
+  --radius-sm:        0.375rem;   /* 6px */
+  --radius-md:        0.625rem;   /* 10px */
+  --radius-lg:        0.875rem;   /* 14px */
+  --radius-xl:        1.25rem;    /* 20px */
+  --radius-2xl:       1.75rem;    /* 28px */
+
+  /* Shadows */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.04);
+  --shadow-md: 0 1px 3px 0 rgb(0 0 0 / 0.06), 0 1px 2px -1px rgb(0 0 0 / 0.04);
+  --shadow-lg: 0 4px 6px -1px rgb(0 0 0 / 0.06), 0 2px 4px -2px rgb(0 0 0 / 0.04);
+  --shadow-xl: 0 10px 15px -3px rgb(0 0 0 / 0.06), 0 4px 6px -4px rgb(0 0 0 / 0.04);
 }
 
-:root,
-.light {
-  --background: #ffffff;
-  --foreground: #0f172a;
-  --muted: #f1f5f9;
-  --muted-foreground: #64748b;
-  --card: #ffffff;
-  --card-foreground: #0f172a;
-  --border: #e2e8f0;
-}
-
+/* ── Design Tokens — Dark Mode ──────────────────────────────────────────── */
 .dark {
-  --background: #0a0a0f;
-  --foreground: #f8fafc;
-  --muted: #1e1e2a;
-  --muted-foreground: #94a3b8;
-  --card: #13131e;
-  --card-foreground: #f8fafc;
-  --border: #1e1e2a;
+  --surface:          #0C0C0E;
+  --surface-subtle:   #111114;
+  --card:             #141417;
+  --muted:            #1A1A1E;
+
+  --content:          #F2F2F4;
+  --content-muted:    #A1A1AA;
+  --content-subtle:   #71717A;
+
+  --edge:             #27272B;
+  --edge-strong:      #3F3F46;
+
+  --brand:            #22C55E;
+  --brand-hover:      #16A34A;
+  --brand-light:      #052E16;
+  --brand-fg:         #0C0C0E;
+
+  --sidebar-bg:       #141417;
+  --sidebar-border:   #1E1E22;
+
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+}
+
+/* ── Tailwind v4 Semantic Color Bindings ────────────────────────────────── */
+@theme inline {
+  --color-surface:          var(--surface);
+  --color-surface-subtle:   var(--surface-subtle);
+  --color-card:             var(--card);
+  --color-muted-bg:         var(--muted);
+  --color-content:          var(--content);
+  --color-content-muted:    var(--content-muted);
+  --color-content-subtle:   var(--content-subtle);
+  --color-edge:             var(--edge);
+  --color-edge-strong:      var(--edge-strong);
+  --color-brand:            var(--brand);
+  --color-brand-light:      var(--brand-light);
+  --color-brand-fg:         var(--brand-fg);
+
+  --font-display: "Cabinet Grotesk Variable", "Cabinet Grotesk", ui-sans-serif, sans-serif;
+  --font-sans:    "Satoshi Variable", "Satoshi", ui-sans-serif, sans-serif;
+}
+
+/* ── Base Styles ────────────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
+  background-color: var(--surface);
+  color: var(--content);
   font-family: var(--font-sans);
-  transition: background-color 0.2s ease, color 0.2s ease;
+  line-height: 1.6;
 }
 
-.glass {
-  background: rgba(255, 255, 255, 0.7);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(226, 232, 240, 0.5);
+/* Smooth theme transitions */
+*, *::before, *::after {
+  transition-property: background-color, border-color, color;
+  transition-duration: 0.15s;
+  transition-timing-function: ease;
+}
+/* Exclude layout properties from global transition */
+*:not(svg):not(path) {
+  transition-property: background-color, border-color, color, opacity, box-shadow;
+  transition-duration: 0.15s;
 }
 
-.dark .glass {
-  background: rgba(19, 19, 30, 0.7);
-  border-color: rgba(30, 30, 42, 0.5);
+/* ── Typography ─────────────────────────────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  color: var(--content);
+}
+
+/* ── Focus Ring ─────────────────────────────────────────────────────────── */
+:focus-visible {
+  outline: 2px solid var(--brand);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ── Custom Scrollbar ───────────────────────────────────────────────────── */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb {
+  background: var(--edge);
+  border-radius: 99px;
+}
+::-webkit-scrollbar-thumb:hover { background: var(--edge-strong); }
+
+/* ── Keyframes ──────────────────────────────────────────────────────────── */
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
 @keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-@keyframes slide-up {
-  from { opacity: 0; transform: translateY(16px); }
-  to { opacity: 1; transform: translateY(0); }
+@keyframes slide-in-left {
+  from { opacity: 0; transform: translateX(-10px); }
+  to   { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes scale-in {
-  from { opacity: 0; transform: scale(0.95); }
-  to { opacity: 1; transform: scale(1); }
+@keyframes shimmer {
+  from { background-position: -200% 0; }
+  to   { background-position: 200% 0; }
 }
 
-.animate-fade-in {
-  animation: fade-in 0.3s ease-out;
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 
-.animate-slide-up {
-  animation: slide-up 0.4s ease-out;
+/* ── Animation Utilities ────────────────────────────────────────────────── */
+.animate-fade-up    { animation: fade-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-fade-in    { animation: fade-in 0.25s ease both; }
+.animate-slide-left { animation: slide-in-left 0.3s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.animate-spin-btn   { animation: spin 0.7s linear infinite; }
+
+.delay-75  { animation-delay: 75ms; }
+.delay-100 { animation-delay: 100ms; }
+.delay-150 { animation-delay: 150ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+
+/* ── Shimmer (skeleton) ─────────────────────────────────────────────────── */
+.shimmer {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 0%,
+    var(--surface-subtle) 50%,
+    var(--muted) 100%
+  );
+  background-size: 200% 100%;
+  animation: shimmer 1.6s ease-in-out infinite;
 }
 
-.animate-scale-in {
-  animation: scale-in 0.2s ease-out;
+/* ── Glass Panel ─────────────────────────────────────────────────────────── */
+.glass {
+  background: rgb(255 255 255 / 0.75);
+  backdrop-filter: blur(16px) saturate(1.4);
+  -webkit-backdrop-filter: blur(16px) saturate(1.4);
+  border: 1px solid rgb(255 255 255 / 0.4);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.25);
 }
 
-.stagger-1 { animation-delay: 50ms; }
-.stagger-2 { animation-delay: 100ms; }
-.stagger-3 { animation-delay: 150ms; }
-.stagger-4 { animation-delay: 200ms; }
-
-a, button, input, textarea, select {
-  transition: all 0.15s ease;
+.dark .glass {
+  background: rgb(20 20 23 / 0.8);
+  border: 1px solid rgb(255 255 255 / 0.06);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
 }
 
-:focus-visible {
-  outline: 2px solid var(--color-primary);
-  outline-offset: 2px;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-::-webkit-scrollbar-thumb {
-  background: var(--border);
-  border-radius: 3px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: var(--muted-foreground);
+/* ── Prose ───────────────────────────────────────────────────────────────── */
+.prose-resumint {
+  max-width: 65ch;
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  color: var(--content-muted);
 }

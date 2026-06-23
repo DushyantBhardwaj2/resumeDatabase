@@ -1,34 +1,21 @@
-import Link from "next/link"
+import { ShieldWarning } from '@phosphor-icons/react/dist/ssr'
+import Link from 'next/link'
 
-export default function AccessDenied() {
+export default function AccessDeniedPage() {
   return (
-    <div className="flex flex-1 flex-col items-center justify-center px-6 text-center">
-      <div className="mx-auto max-w-md space-y-6">
-        <div className="flex justify-center">
-          <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-error/10">
-            <svg
-              className="h-8 w-8 text-error"
-              fill="none"
-              viewBox="0 0 24 24"
-              strokeWidth="1.5"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z"
-              />
-            </svg>
-          </div>
+    <div className="min-h-[100dvh] bg-surface flex items-center justify-center px-6">
+      <div className="max-w-md text-center animate-fade-up">
+        <div className="w-14 h-14 rounded-[var(--radius-xl)] bg-red-50 dark:bg-red-950/30 border border-red-200 dark:border-red-900 flex items-center justify-center mx-auto mb-6">
+          <ShieldWarning size={26} className="text-red-500" weight="regular" />
         </div>
-        <h1 className="text-2xl font-bold tracking-tight">Access Restricted</h1>
-        <p className="text-muted-foreground">
-          Resumint is currently available exclusively for NSUT students and staff
-          with an <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-sm">@nsut.ac.in</code> email address.
+        <h1 className="font-display text-2xl font-bold tracking-tight text-content">Access Restricted</h1>
+        <p className="text-content-muted text-sm mt-3 leading-relaxed">
+          Resumint is currently available exclusively for NSUT students and alumni.
+          Please sign in with your <span className="font-medium text-content">@nsut.ac.in</span> email address.
         </p>
         <Link
           href="/"
-          className="inline-flex h-10 items-center rounded-full bg-primary px-6 text-sm font-medium text-white transition-colors hover:bg-primary-dark"
+          className="inline-flex items-center gap-2 bg-brand text-brand-fg rounded-[var(--radius-md)] px-5 py-2.5 text-sm font-medium mt-8 hover:opacity-90 transition-opacity"
         >
           Back to Home
         </Link>

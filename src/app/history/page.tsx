@@ -1,276 +1,255 @@
-"use client"
+'use client';
 
-import { useEffect, useState, useCallback } from "react"
-import { useRouter } from "next/navigation"
-import { toast } from "sonner"
-import { fetchApi } from "@/config/api-client"
+import React, { useEffect, useMemo, useState } from 'react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { Clock, Trash, MagnifyingGlass } from '@phosphor-icons/react';
+import { toast } from 'sonner';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
-type ResumeSummary = {
-  id: string
-  companyName: string
-  jobTitle: string
-  createdAt: string
+// ── Types ─────────────────────────────────────────────────────────────────────
+
+type HistoryItem = {
+  id: string;
+  jobTitle: string;
+  companyName: string;
+  createdAt: string;
+};
+
+// ── Helpers ───────────────────────────────────────────────────────────────────
+
+function formatDate(iso: string) {
+  const d = new Date(iso);
+  return d.toLocaleDateString('en-IN', {
+    day: 'numeric',
+    month: 'short',
+    year: 'numeric',
+  });
 }
 
-type FullResume = ResumeSummary & {
-  jobDescription: string
-  tailoredData: {
-    tailored?: {
-      experience?: Array<{ role: string; company: string; bullets: string[] }>
-      projects?: Array<{ title: string; techStack?: string[]; bullets: string[] }>
-      skills?: Record<string, string[]>
-    }
-  }
-  styleConfig: Record<string, string> | null
+// ── Loading skeleton ──────────────────────────────────────────────────────────
+
+function HistorySkeleton() {
+  return (
+    <div className="divide-y divide-edge">
+      {[...Array(5)].map((_, i) => (
+        <div key={i} className="py-4 flex items-center justify-between animate-pulse">
+          <div className="flex flex-col gap-1.5">
+            <div className="h-3.5 w-44 bg-muted-bg rounded" />
+            <div className="h-3 w-28 bg-muted-bg rounded" />
+            <div className="h-3 w-20 bg-muted-bg rounded" />
+          </div>
+          <div className="flex gap-2">
+            <div className="h-8 w-16 bg-muted-bg rounded-[var(--radius-md)]" />
+            <div className="h-8 w-14 bg-muted-bg rounded-[var(--radius-md)]" />
+            <div className="h-8 w-8 bg-muted-bg rounded-[var(--radius-md)]" />
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 }
 
-export default function HistoryPage() {
-  const router = useRouter()
-  const [resumes, setResumes] = useState<ResumeSummary[]>([])
-  const [loading, setLoading] = useState(true)
-  const [search, setSearch] = useState("")
-  const [previewId, setPreviewId] = useState<string | null>(null)
-  const [previewData, setPreviewData] = useState<FullResume | null>(null)
-  const [deleteConfirm, setDeleteConfirm] = useState<string | null>(null)
+// ── Row component ─────────────────────────────────────────────────────────────
 
-  const fetchResumes = useCallback(async (query?: string) => {
-    setLoading(true)
+function HistoryRow({
+  item,
+  onDelete,
+}: {
+  item: HistoryItem;
+  onDelete: (id: string) => void;
+}) {
+  const router = useRouter();
+  const [confirm, setConfirm] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const confirmTimer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const startConfirm = () => {
+    setConfirm(true);
+    confirmTimer.current = setTimeout(() => setConfirm(false), 3000);
+  };
+
+  const cancelConfirm = () => {
+    setConfirm(false);
+    if (confirmTimer.current) clearTimeout(confirmTimer.current);
+  };
+
+  const handleDelete = async () => {
+    if (confirmTimer.current) clearTimeout(confirmTimer.current);
+    setDeleting(true);
     try {
-      const url = query ? `/api/history?search=${encodeURIComponent(query)}` : "/api/history"
-      const res = await fetchApi(url)
-      if (res.status === 401) { router.push("/"); return }
-      const data = await res.json()
-      setResumes(data.resumes ?? [])
+      const res = await fetch(`/api/protected/history/${item.id}`, {
+        method: 'DELETE',
+        credentials: 'include',
+      });
+      if (!res.ok) throw new Error();
+      onDelete(item.id);
+      toast.success('Deleted');
     } catch {
-      toast.error("Failed to load history")
-    } finally {
-      setLoading(false)
+      toast.error('Failed to delete');
+      setDeleting(false);
+      setConfirm(false);
     }
-  }, [router])
-
-  useEffect(() => {
-    fetchApi("/api/history")
-      .then((r) => { if (r.status === 401) router.push("/"); return r.json() })
-      .then((data) => setResumes(data.resumes ?? []))
-      .catch(() => toast.error("Failed to load history"))
-      .finally(() => setLoading(false))
-  }, [router])
-
-  function handleSearch(val: string) {
-    setSearch(val)
-    fetchResumes(val)
-  }
-
-  async function openPreview(id: string) {
-    try {
-      const res = await fetchApi(`/api/history/${id}`)
-      if (!res.ok) throw new Error()
-      const data = await res.json()
-      setPreviewData(data)
-      setPreviewId(id)
-    } catch {
-      toast.error("Failed to load resume")
-    }
-  }
-
-  async function handleDelete(id: string) {
-    try {
-      const res = await fetchApi(`/api/history/${id}`, { method: "DELETE" })
-      if (!res.ok) throw new Error()
-      toast.success("Resume deleted")
-      setResumes((prev) => prev.filter((r) => r.id !== id))
-      if (previewId === id) { setPreviewId(null); setPreviewData(null) }
-    } catch {
-      toast.error("Failed to delete resume")
-    }
-    setDeleteConfirm(null)
-  }
-
-  function handleClone(r: ResumeSummary) {
-    router.push(`/tailor?clone=${encodeURIComponent(r.id)}`)
-  }
-
-  function handleEdit(r: ResumeSummary) {
-    router.push(`/tailor?edit=${encodeURIComponent(r.id)}`)
-  }
+  };
 
   return (
-    <div className="mx-auto max-w-4xl space-y-6 py-8 animate-fade-in">
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-2xl font-bold tracking-tight">My Resumes</h1>
-          <p className="mt-1 text-muted-foreground">
-            View and manage your previously tailored resumes.
-          </p>
-        </div>
-        <input
-          type="text"
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          placeholder="Search by company or title..."
-          className="max-w-xs rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-colors focus:border-primary"
-        />
+    <div className="py-4 flex items-center justify-between px-2 -mx-2 rounded-[var(--radius-md)] hover:bg-surface-subtle transition-colors group">
+      {/* Left */}
+      <div className="flex flex-col gap-0.5 min-w-0 mr-4">
+        <p className="font-medium text-content text-sm leading-snug truncate">
+          {item.jobTitle}
+        </p>
+        <p className="text-xs text-content-muted mt-0.5 truncate">{item.companyName}</p>
+        <p className="text-xs text-content-subtle mt-0.5 font-mono">
+          {formatDate(item.createdAt)}
+        </p>
       </div>
 
-      {loading && (
-        <div className="flex items-center justify-center py-20">
-          <svg className="h-6 w-6 animate-spin text-primary" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
-        </div>
-      )}
-
-      {!loading && resumes.length === 0 && (
-        <div className="glass rounded-2xl p-12 text-center shadow-sm">
-          <p className="text-muted-foreground">No tailored resumes yet.</p>
-          <button
-            onClick={() => router.push("/tailor")}
-            className="mt-4 inline-flex h-10 items-center rounded-full bg-primary px-5 text-sm font-medium text-white"
-          >
-            Tailor Your First Resume
-          </button>
-        </div>
-      )}
-
-      {!loading && resumes.length > 0 && (
-        <div className="grid gap-4 sm:grid-cols-2">
-          {resumes.map((r, idx) => (
-            <div
-              key={r.id}
-              className={`glass rounded-2xl p-5 shadow-sm transition-all hover:shadow-md hover:border-primary/30 animate-slide-up stagger-${Math.min(idx + 1, 4)}`}
+      {/* Right actions */}
+      <div className="flex items-center gap-2 shrink-0">
+        {confirm ? (
+          <>
+            <Button
+              size="sm"
+              variant="destructive"
+              loading={deleting}
+              onClick={handleDelete}
             >
-              <div className="mb-3">
-                <h3 className="font-semibold text-card-foreground">{r.jobTitle}</h3>
-                <p className="text-sm text-muted-foreground">{r.companyName}</p>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                {new Date(r.createdAt).toLocaleDateString("en-IN", {
-                  day: "numeric", month: "short", year: "numeric",
-                })}
-              </p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                <button
-                  onClick={() => openPreview(r.id)}
-                  className="rounded-full bg-primary/10 px-3 py-1.5 text-xs font-medium text-primary transition-colors hover:bg-primary/20"
-                >
-                  Preview
-                </button>
-                <button
-                  onClick={() => handleClone(r)}
-                  className="rounded-full border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
-                >
-                  Clone
-                </button>
-                <button
-                  onClick={() => handleEdit(r)}
-                  className="rounded-full border border-border px-3 py-1.5 text-xs font-medium transition-colors hover:bg-muted"
-                >
-                  Edit
-                </button>
-                <button
-                  onClick={() => setDeleteConfirm(r.id)}
-                  className="rounded-full border border-border px-3 py-1.5 text-xs font-medium text-error transition-colors hover:bg-error/10"
-                >
-                  Delete
-                </button>
-              </div>
+              Confirm?
+            </Button>
+            <Button size="sm" variant="ghost" onClick={cancelConfirm}>
+              Cancel
+            </Button>
+          </>
+        ) : (
+          <>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => router.push(`/tailor?clone=${item.id}`)}
+            >
+              Clone
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => router.push(`/tailor?edit=${item.id}`)}
+            >
+              Edit
+            </Button>
+            <button
+              onClick={startConfirm}
+              className="h-8 w-8 flex items-center justify-center rounded-[var(--radius-md)] text-content-subtle hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors"
+              aria-label="Delete"
+            >
+              <Trash size={16} />
+            </button>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
 
-              {deleteConfirm === r.id && (
-                <div className="absolute inset-0 flex items-center justify-center rounded-2xl bg-background/95 backdrop-blur-sm">
-                  <div className="text-center">
-                    <p className="mb-3 text-sm font-medium">Delete this resume?</p>
-                    <div className="flex gap-2">
-                      <button
-                        onClick={() => handleDelete(r.id)}
-                        className="rounded-full bg-error px-4 py-1.5 text-xs font-medium text-white"
-                      >
-                        Delete
-                      </button>
-                      <button
-                        onClick={() => setDeleteConfirm(null)}
-                        className="rounded-full border border-border px-4 py-1.5 text-xs font-medium"
-                      >
-                        Cancel
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
+// ── Empty state ───────────────────────────────────────────────────────────────
 
-      {previewData && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4 backdrop-blur-sm">
-          <div className="max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-2xl glass p-6 shadow-xl animate-scale-in">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <h2 className="text-lg font-bold">{previewData.jobTitle}</h2>
-                <p className="text-sm text-muted-foreground">{previewData.companyName}</p>
-              </div>
-              <button
-                onClick={() => { setPreviewId(null); setPreviewData(null) }}
-                className="rounded-full border border-border p-2 transition-colors hover:bg-muted"
-              >
-                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
+function EmptyState() {
+  return (
+    <div className="flex flex-col items-center justify-center py-24 gap-4 text-center">
+      <div className="h-12 w-12 rounded-full bg-muted-bg flex items-center justify-center">
+        <Clock size={24} className="text-content-subtle" />
+      </div>
+      <div>
+        <p className="font-display font-semibold text-content text-base">
+          No tailored resumes yet
+        </p>
+        <p className="text-sm text-content-muted mt-1">
+          Generate your first tailored resume to see it here.
+        </p>
+      </div>
+      <Link href="/tailor">
+        <Button variant="primary" size="sm">
+          Tailor a resume
+        </Button>
+      </Link>
+    </div>
+  );
+}
 
-            <div className="space-y-4 text-sm">
-              <div>
-                <h3 className="mb-1 font-semibold">Tailored Experience</h3>
-                {((previewData.tailoredData.tailored?.experience) ?? []).map(
-                  (exp, i: number) => (
-                    <div key={i} className="mb-3">
-                      <p className="font-medium">{exp.role} at {exp.company}</p>
-                      <ul className="mt-1 list-disc pl-4 text-muted-foreground">
-                        {exp.bullets.map((b: string, j: number) => (
-                          <li key={j}>{b}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  )
-                )}
-              </div>
-              {previewData.tailoredData.tailored?.projects && previewData.tailoredData.tailored.projects.length > 0 && (
-                <div>
-                  <h3 className="mb-1 font-semibold">Projects</h3>
-                  {previewData.tailoredData.tailored.projects.map(
-                    (proj, i: number) => (
-                      <div key={i} className="mb-3">
-                        <p className="font-medium">{proj.title}</p>
-                        <ul className="mt-1 list-disc pl-4 text-muted-foreground">
-                          {proj.bullets.map((b: string, j: number) => (
-                            <li key={j}>{b}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    )
-                  )}
-                </div>
-              )}
-              <div>
-                <h3 className="mb-1 font-semibold">Skills</h3>
-                <div className="flex flex-wrap gap-1.5">
-                  {Object.entries(
-                    previewData.tailoredData.tailored?.skills ?? {}
-                  ).map(([cat, skills]) =>
-                    (skills as string[]).map((skill: string, i: number) => (
-                      <span key={`${cat}-${i}`} className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs text-primary">
-                        {skill}
-                      </span>
-                    ))
-                  )}
-                </div>
-              </div>
-            </div>
+// ── Page ──────────────────────────────────────────────────────────────────────
+
+export default function HistoryPage() {
+  const [items, setItems] = useState<HistoryItem[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch('/api/protected/history', { credentials: 'include' });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+        setItems(data);
+      } catch {
+        toast.error('Failed to load history');
+      } finally {
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  const filtered = useMemo(() => {
+    if (!search.trim()) return items;
+    const q = search.toLowerCase();
+    return items.filter(
+      (i) =>
+        i.jobTitle.toLowerCase().includes(q) ||
+        i.companyName.toLowerCase().includes(q),
+    );
+  }, [items, search]);
+
+  const handleDelete = (id: string) => {
+    setItems((prev) => prev.filter((i) => i.id !== id));
+  };
+
+  return (
+    <div className="max-w-3xl mx-auto px-4 py-8">
+      {/* Header */}
+      <div className="flex items-center justify-between gap-4 mb-8 flex-wrap">
+        <h1 className="font-display text-2xl font-bold tracking-tight text-content">
+          History
+        </h1>
+        {!loading && items.length > 0 && (
+          <div className="w-64">
+            <Input
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder="Search by company or role..."
+              icon={<MagnifyingGlass size={14} />}
+            />
           </div>
+        )}
+      </div>
+
+      {/* Content */}
+      {loading ? (
+        <HistorySkeleton />
+      ) : filtered.length === 0 && items.length === 0 ? (
+        <EmptyState />
+      ) : (
+        <div className="divide-y divide-edge">
+          {filtered.length === 0 && search ? (
+            <p className="py-12 text-center text-sm text-content-muted">
+              No results for &ldquo;{search}&rdquo;
+            </p>
+          ) : (
+            filtered.map((item) => (
+              <HistoryRow key={item.id} item={item} onDelete={handleDelete} />
+            ))
+          )}
         </div>
       )}
     </div>
-  )
+  );
 }

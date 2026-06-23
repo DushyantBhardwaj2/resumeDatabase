@@ -1,68 +1,89 @@
-"use client"
+'use client'
 
-import { forwardRef } from "react"
+import * as React from 'react'
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
   label?: string
+  helperText?: string
   error?: string
-  hint?: string
+  icon?: React.ReactNode
 }
 
-const baseInput =
-  "w-full rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none transition-colors placeholder:text-muted-foreground focus:border-primary"
+export const Input = React.forwardRef<HTMLInputElement, InputProps>(
+  ({ label, helperText, error, icon, id, className = '', ...props }, ref) => {
+    const generatedId = React.useId()
+    const inputId = id ?? generatedId
+    const hasError = Boolean(error)
 
-const errorInput = "border-error focus:border-error"
-
-export const Input = forwardRef<HTMLInputElement, InputProps>(
-  ({ label, error, hint, className = "", id, ...props }, ref) => {
-    const inputId = id || label?.toLowerCase().replace(/\s+/g, "-")
     return (
-      <div className="flex flex-col gap-1.5">
+      <div className="flex flex-col w-full">
         {label && (
-          <label htmlFor={inputId} className="text-sm font-medium text-muted-foreground">
+          <label
+            htmlFor={inputId}
+            className="text-sm font-medium text-content mb-1.5 leading-none"
+          >
             {label}
           </label>
         )}
-        <input
-          ref={ref}
-          id={inputId}
-          className={`${baseInput} ${error ? errorInput : ""} ${className}`}
-          {...props}
-        />
-        {error && <p className="text-xs text-error">{error}</p>}
-        {hint && !error && <p className="text-xs text-muted-foreground">{hint}</p>}
-      </div>
-    )
-  }
-)
 
-Input.displayName = "Input"
+        <div className="relative flex items-center">
+          {icon && (
+            <span className="absolute left-3 top-1/2 -translate-y-1/2 flex items-center text-content-muted pointer-events-none">
+              {icon}
+            </span>
+          )}
 
-interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
-  label?: string
-  error?: string
-}
+          <input
+            ref={ref}
+            id={inputId}
+            className={[
+              'h-9 w-full rounded-[var(--radius-md)] bg-card border text-sm text-content',
+              'placeholder:text-content-subtle',
+              'transition-colors duration-150',
+              'outline-none',
+              'focus:border-brand focus:ring-1 focus:ring-brand/20',
+              'disabled:opacity-50 disabled:cursor-not-allowed',
+              hasError
+                ? 'border-red-400 focus:border-red-400 focus:ring-red-200'
+                : 'border-edge',
+              icon ? 'pl-9 pr-3' : 'px-3',
+              className,
+            ]
+              .filter(Boolean)
+              .join(' ')}
+            aria-describedby={
+              error
+                ? `${inputId}-error`
+                : helperText
+                ? `${inputId}-helper`
+                : undefined
+            }
+            aria-invalid={hasError ? true : undefined}
+            {...props}
+          />
+        </div>
 
-export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ label, error, className = "", id, ...props }, ref) => {
-    const textareaId = id || label?.toLowerCase().replace(/\s+/g, "-")
-    return (
-      <div className="flex flex-col gap-1.5">
-        {label && (
-          <label htmlFor={textareaId} className="text-sm font-medium text-muted-foreground">
-            {label}
-          </label>
+        {error && (
+          <p
+            id={`${inputId}-error`}
+            className="text-xs text-red-500 mt-1 leading-snug"
+            role="alert"
+          >
+            {error}
+          </p>
         )}
-        <textarea
-          ref={ref}
-          id={textareaId}
-          className={`${baseInput} resize-y ${error ? errorInput : ""} ${className}`}
-          {...props}
-        />
-        {error && <p className="text-xs text-error">{error}</p>}
+
+        {!error && helperText && (
+          <p
+            id={`${inputId}-helper`}
+            className="text-xs text-content-subtle mt-1 leading-snug"
+          >
+            {helperText}
+          </p>
+        )}
       </div>
     )
-  }
+  },
 )
 
-Textarea.displayName = "Textarea"
+Input.displayName = 'Input'
