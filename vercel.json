@@ -4,6 +4,6 @@
   "framework": "nextjs",
   "outputDirectory": ".next",
   "rewrites": [
-    { "source": "/api/:path*", "destination": "https://resumint-backend-j047.onrender.com/api/:path*" }
+    { "source": "/api/:path*", "destination": "https://resumint-backend-ihjf.onrender.com/api/:path*" }
   ]
 }
