@@ -1,48 +1,98 @@
-"use client"
+'use client'
 
-import { forwardRef } from "react"
+import * as React from 'react'
+import { ArrowClockwise } from '@phosphor-icons/react'
 
-type ButtonVariant = "primary" | "secondary" | "ghost" | "danger"
-type ButtonSize = "sm" | "md" | "lg"
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'outline' | 'destructive'
+type ButtonSize = 'sm' | 'md' | 'lg' | 'icon'
 
-interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variant?: ButtonVariant
   size?: ButtonSize
   loading?: boolean
+  icon?: React.ReactNode
+  iconRight?: React.ReactNode
+  fullWidth?: boolean
 }
 
-const variantStyles: Record<ButtonVariant, string> = {
-  primary: "bg-primary text-white hover:bg-primary-dark shadow-sm",
-  secondary: "border border-border bg-card text-foreground hover:bg-muted",
-  ghost: "text-muted-foreground hover:text-foreground hover:bg-muted",
-  danger: "bg-error text-white hover:bg-red-600 shadow-sm",
+const variantClasses: Record<ButtonVariant, string> = {
+  primary: 'bg-brand text-brand-fg hover:opacity-90 border border-transparent',
+  secondary: 'bg-card text-content border border-edge hover:bg-surface',
+  ghost: 'bg-transparent text-content hover:bg-surface border border-transparent',
+  outline: 'bg-transparent text-content border border-edge hover:bg-surface',
+  destructive: 'bg-red-500 text-white hover:bg-red-600 border border-transparent',
 }
 
-const sizeStyles: Record<ButtonSize, string> = {
-  sm: "h-8 px-3 text-xs rounded-full",
-  md: "h-10 px-5 text-sm rounded-full",
-  lg: "h-12 px-8 text-base rounded-full",
+const sizeClasses: Record<ButtonSize, string> = {
+  sm: 'h-8 px-3 text-xs gap-1.5',
+  md: 'h-9 px-4 text-sm gap-2',
+  lg: 'h-10 px-5 text-sm gap-2',
+  icon: 'h-9 w-9 p-0',
 }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ variant = "primary", size = "md", loading, disabled, className = "", children, ...props }, ref) => {
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      variant = 'primary',
+      size = 'md',
+      loading = false,
+      icon,
+      iconRight,
+      fullWidth = false,
+      disabled,
+      className = '',
+      children,
+      ...props
+    },
+    ref,
+  ) => {
+    const isDisabled = disabled || loading
+
     return (
       <button
         ref={ref}
-        disabled={disabled || loading}
-        className={`inline-flex items-center justify-center gap-2 font-medium transition-all focus-visible:outline-2 focus-visible:outline-primary disabled:opacity-50 disabled:cursor-not-allowed ${variantStyles[variant]} ${sizeStyles[size]} ${className}`}
+        disabled={isDisabled}
+        className={[
+          'inline-flex items-center justify-center font-medium rounded-[var(--radius-md)]',
+          'transition-all duration-150 cursor-pointer select-none',
+          'active:scale-[0.98]',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand/40 focus-visible:ring-offset-1',
+          'disabled:opacity-50 disabled:cursor-not-allowed disabled:pointer-events-none',
+          variantClasses[variant],
+          sizeClasses[size],
+          fullWidth ? 'w-full' : '',
+          className,
+        ]
+          .filter(Boolean)
+          .join(' ')}
         {...props}
       >
-        {loading && (
-          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
-            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-          </svg>
+        {loading ? (
+          <ArrowClockwise
+            size={size === 'sm' ? 13 : 15}
+            className="animate-[spin_0.7s_linear_infinite] shrink-0"
+            aria-hidden="true"
+          />
+        ) : (
+          icon && (
+            <span className="shrink-0 flex items-center" aria-hidden="true">
+              {icon}
+            </span>
+          )
         )}
-        {children}
+
+        {size !== 'icon' && children && (
+          <span className={loading ? 'opacity-70' : ''}>{children}</span>
+        )}
+
+        {!loading && iconRight && size !== 'icon' && (
+          <span className="shrink-0 flex items-center" aria-hidden="true">
+            {iconRight}
+          </span>
+        )}
       </button>
     )
-  }
+  },
 )
 
-Button.displayName = "Button"
+Button.displayName = 'Button'

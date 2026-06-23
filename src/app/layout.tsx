@@ -1,44 +1,56 @@
-import type { Metadata } from "next"
-import { Inter, JetBrains_Mono } from "next/font/google"
-import { Toaster } from "sonner"
-import { ThemeProvider } from "next-themes"
-import "./globals.css"
-
-const inter = Inter({
-  variable: "--font-sans",
-  subsets: ["latin"],
-  display: "swap",
-})
+import type { Metadata } from "next";
+import { JetBrains_Mono } from "next/font/google";
+import { ThemeProvider } from "next-themes";
+import { Toaster } from "sonner";
+import "./globals.css";
 
 const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-mono",
   subsets: ["latin"],
+  variable: "--font-mono-jetbrains",
   display: "swap",
-})
+});
 
 export const metadata: Metadata = {
   title: "Resumint — Tailor your resume with AI",
   description:
-    "Upload your resume, build your profile, and generate AI-tailored resumes for any job description.",
-}
+    "Role-specific resumes that pass ATS and get you noticed. Built for NSUT students.",
+  openGraph: {
+    title: "Resumint",
+    description: "AI-powered resume tailoring for students.",
+    type: "website",
+  },
+};
 
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <html
-      lang="en"
-      className={`${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="min-h-full flex flex-col">
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <html lang="en" suppressHydrationWarning className={jetbrainsMono.variable}>
+      <body className="antialiased bg-surface text-content">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange={false}
+        >
           {children}
-          <Toaster richColors closeButton position="top-right" theme="system" />
+          <Toaster
+            position="bottom-right"
+            toastOptions={{
+              style: {
+                background: "var(--card)",
+                color: "var(--content)",
+                border: "1px solid var(--edge)",
+                borderRadius: "var(--radius-lg)",
+                fontFamily: "var(--font-sans)",
+                fontSize: "0.875rem",
+              },
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>
-  )
+  );
 }
