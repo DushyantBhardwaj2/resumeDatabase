@@ -82,7 +82,7 @@ export default function OnboardingPage() {
     formData.append("file", file)
 
     try {
-      const res = await fetchApi("/api/resume/parse", { method: "POST", body: formData })
+      const res = await fetchApi("/api/protected/resume/parse", { method: "POST", body: formData })
       const result = await res.json()
       if (!res.ok) throw new Error(result.error || "Failed to parse resume")
       setRawText(result.rawText)
@@ -98,7 +98,7 @@ export default function OnboardingPage() {
   async function handleSave() {
     setLoading(true)
     try {
-      const res = await fetchApi("/api/profile/save", {
+      const res = await fetchApi("/api/protected/profile", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rawText, parsed: data }),

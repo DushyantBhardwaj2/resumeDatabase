@@ -21,6 +21,19 @@ This version has breaking changes — APIs, conventions, and file structure may 
 - Template handles optional entries (education/experience/projects up to 10 slots), strips unused rows, removes extracurricular section
 - `pdflatex` (MiKTeX 25.12) is locally available for compilation
 
+### Routing Convention — ALL authenticated backend routes use `/api/protected/*`
+
+The Vercel frontend proxies all `/api/*` requests to the Render backend. **Every route that requires authentication** must be under the `/api/protected/*` namespace — the Hono middleware in `backend/src/index.ts` automatically checks the session for all matching paths.
+
+| Old (deprecated) | Correct replacement |
+|---|---|
+| `POST /api/resume/parse` | `POST /api/protected/resume/parse` |
+| `POST /api/profile/save` | `POST /api/protected/profile` |
+| `POST /api/resume/tailor` | `POST /api/protected/resume/tailor` |
+| `POST /api/resume/compile` | `POST /api/protected/resume/compile` |
+
+Routes that do NOT require auth (e.g., `GET /api/health`) stay outside `/api/protected/*`.
+
 ### Status
 - **Phase 1**: 22/22
 - **Phase 2**: 21/21

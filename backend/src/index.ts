@@ -47,7 +47,8 @@ app.get('/api/protected/profile', async (c) => {
 app.post('/api/protected/profile', async (c) => {
   const session = c.get('session')
   const body = await c.req.json()
-  const profile = await container.profileUseCases.updateProfile(session.user.id, body)
+  const { rawText, parsed: data } = body
+  const profile = await container.profileUseCases.saveFromOnboarding(session.user.id, rawText || "", data || {})
   return c.json(profile)
 })
 
@@ -57,6 +58,28 @@ app.post('/api/protected/resume/tailor', async (c) => {
   const { url, description } = await c.req.json()
   try {
     const result = await container.resumeUseCases.tailorResume(session.user.id, url, description)
+    return c.json(result)
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500)
+  }
+})
+
+// Resume Parse API
+app.post('/api/protected/resume/parse', async (c) => {
+  try {
+    const body = await c.req.parseBody()
+    const file = body['file']
+    if (!file || !(file instanceof File)) {
+      return c.json({ error: "No file uploaded" }, 400)
+    }
+    if (!file.name.endsWith('.pdf')) {
+      return c.json({ error: "Only PDF files are accepted" }, 400)
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      return c.json({ error: "File size exceeds 5MB limit" }, 400)
+    }
+    const buffer = Buffer.from(await file.arrayBuffer())
+    const result = await container.resumeUseCases.parseResume(buffer)
     return c.json(result)
   } catch (err: any) {
     return c.json({ error: err.message }, 500)

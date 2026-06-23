@@ -46,8 +46,8 @@
 - [x] **F1.5.2** — `profiles` table: id, user_id (FK), raw_resume_text, contact (JSONB), education (JSONB), experience (JSONB), projects (JSONB), skills (JSONB), updated_at
 - [x] **F1.5.3** — `* /api/auth/[...all]` — Better Auth handler (covers login, callback, session, logout)
 - [x] **F1.5.4** — OAuth callback handled via Better Auth at `/api/auth/callback/google`
-- [x] **F1.5.5** — `POST /api/resume/parse` — upload PDF, extract text, call AI, return JSON
-- [x] **F1.5.6** — `POST /api/profile/save` — persist profile JSON to database
+- [x] **F1.5.5** — `POST /api/protected/resume/parse` — upload PDF, extract text, call AI, return JSON
+- [x] **F1.5.6** — `POST /api/protected/profile` — persist profile JSON to database
 
 ---
 
