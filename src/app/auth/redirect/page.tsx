@@ -1,12 +1,15 @@
 import { getServerSession } from "@/config/auth"
 import { redirect } from "next/navigation"
-import { container } from "@/di/container"
+import { fetchWithSession } from "@/config/api-client-server"
 
 export default async function AuthRedirectPage(props: {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>
+  searchParams?: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>
 }) {
-  const searchParams = await props.searchParams
-  const error = searchParams?.error
+  let error: string | string[] | undefined;
+  if (props.searchParams) {
+    const sp = await props.searchParams;
+    error = sp?.error;
+  }
 
   if (error) {
     console.error("Auth redirect error:", error)
@@ -18,9 +21,10 @@ export default async function AuthRedirectPage(props: {
     redirect("/")
   }
 
-  let profile: import("@/core/domain/entities").Profile | null = null
+  let profile = null
   try {
-    profile = await container.profileUseCases.getProfile(session.user.id)
+    const res = await fetchWithSession('/api/protected/profile')
+    if (res.ok) profile = await res.json()
   } catch (e) {
     console.error("Failed to fetch profile:", e)
   }

@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
 import { toast } from "sonner"
+import { fetchApi } from "@/config/api-client"
 
 type ResumeSummary = {
   id: string
@@ -36,7 +37,7 @@ export default function HistoryPage() {
     setLoading(true)
     try {
       const url = query ? `/api/history?search=${encodeURIComponent(query)}` : "/api/history"
-      const res = await fetch(url)
+      const res = await fetchApi(url)
       if (res.status === 401) { router.push("/"); return }
       const data = await res.json()
       setResumes(data.resumes ?? [])
@@ -48,7 +49,7 @@ export default function HistoryPage() {
   }, [router])
 
   useEffect(() => {
-    fetch("/api/history")
+    fetchApi("/api/history")
       .then((r) => { if (r.status === 401) router.push("/"); return r.json() })
       .then((data) => setResumes(data.resumes ?? []))
       .catch(() => toast.error("Failed to load history"))
@@ -62,7 +63,7 @@ export default function HistoryPage() {
 
   async function openPreview(id: string) {
     try {
-      const res = await fetch(`/api/history/${id}`)
+      const res = await fetchApi(`/api/history/${id}`)
       if (!res.ok) throw new Error()
       const data = await res.json()
       setPreviewData(data)
@@ -74,7 +75,7 @@ export default function HistoryPage() {
 
   async function handleDelete(id: string) {
     try {
-      const res = await fetch(`/api/history/${id}`, { method: "DELETE" })
+      const res = await fetchApi(`/api/history/${id}`, { method: "DELETE" })
       if (!res.ok) throw new Error()
       toast.success("Resume deleted")
       setResumes((prev) => prev.filter((r) => r.id !== id))

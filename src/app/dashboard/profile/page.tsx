@@ -3,7 +3,8 @@
 import { useRouter } from "next/navigation"
 import { useEffect, useState, useCallback } from "react"
 import { toast } from "sonner"
-import { computeCompleteness, completenessBg, completenessColor, completenessHint } from "@/infrastructure/profile-utils"
+import { computeCompleteness, completenessBg, completenessColor, completenessHint } from "@/lib/profile-utils"
+import { fetchApi } from "@/config/api-client"
 import { Field } from "@/components/ui/field"
 import { SectionCard } from "@/components/ui/section-card"
 import { BulletList } from "@/components/ui/bullet-list"
@@ -49,7 +50,7 @@ export default function ProfilePage() {
   const [dirty, setDirty] = useState(false)
 
   useEffect(() => {
-    fetch("/api/profile")
+    fetchApi("/api/profile")
       .then((r) => {
         if (r.status === 404) {
           router.push("/onboarding")
@@ -82,7 +83,7 @@ export default function ProfilePage() {
     if (!profile) return
     setSaving(true)
     try {
-      const res = await fetch("/api/profile", {
+      const res = await fetchApi("/api/profile", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(profile),
@@ -392,7 +393,7 @@ function ExperienceEditor({ data, onChange }: { data: Experience[]; onChange: (d
                 setAiAddLoading(true)
                 setAiAddError(null)
                 try {
-                  const res = await fetch("/api/ai/generate-bullets", {
+                  const res = await fetchApi("/api/ai/generate-bullets", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ section: "experience_entry", rawInput: aiAddInput }),
@@ -585,7 +586,7 @@ function ProjectsEditor({ data, onChange }: { data: Project[]; onChange: (d: Pro
                 setAiAddLoading(true)
                 setAiAddError(null)
                 try {
-                  const res = await fetch("/api/ai/generate-bullets", {
+                  const res = await fetchApi("/api/ai/generate-bullets", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ section: "project", rawInput: aiAddInput }),
@@ -725,7 +726,7 @@ function SkillsEditor({ data, onChange }: { data: Skills; onChange: (d: Skills) 
                   setAiAddLoading(true)
                   setAiAddError(null)
                   try {
-                    const res = await fetch("/api/ai/generate-bullets", {
+                    const res = await fetchApi("/api/ai/generate-bullets", {
                       method: "POST",
                       headers: { "Content-Type": "application/json" },
                       body: JSON.stringify({ section: "skills", rawInput: aiAddInput }),
@@ -822,7 +823,7 @@ function IntegrationsEditor({
     setRepos([])
     onGithubUsernameChange(username.trim())
     try {
-      const res = await fetch(`/api/integrations/github/repos?username=${encodeURIComponent(username.trim())}`)
+      const res = await fetchApi(`/api/integrations/github/repos?username=${encodeURIComponent(username.trim())}`)
       if (!res.ok) {
         const err = await res.json()
         toast.error(err.error || "Failed to fetch repos")
@@ -841,7 +842,7 @@ function IntegrationsEditor({
     if (!username.trim()) return
     setFetching(true)
     try {
-      const res = await fetch(`/api/integrations/github/repos?username=${encodeURIComponent(username.trim())}`)
+      const res = await fetchApi(`/api/integrations/github/repos?username=${encodeURIComponent(username.trim())}`)
       if (!res.ok) throw new Error()
       const data = await res.json()
       setRepos(data.repos)
@@ -870,7 +871,7 @@ function IntegrationsEditor({
     setImporting(true)
     try {
       const selectedRepos = repos.filter((r) => selected.has(r.url))
-      const res = await fetch("/api/profile/projects/github-import", {
+      const res = await fetchApi("/api/profile/projects/github-import", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -1021,7 +1022,7 @@ function IntegrationsEditor({
                     setAiAddLoading(true)
                     setAiAddError(null)
                     try {
-                      const res = await fetch("/api/ai/generate-bullets", {
+                      const res = await fetchApi("/api/ai/generate-bullets", {
                         method: "POST",
                         headers: { "Content-Type": "application/json" },
                         body: JSON.stringify({ section: "project", rawInput: aiAddInput }),

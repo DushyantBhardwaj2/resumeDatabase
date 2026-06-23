@@ -10,15 +10,11 @@
     "postinstall": "prisma generate"
   },
   "dependencies": {
-    "@better-auth/prisma-adapter": "^1.6.18",
     "@fontsource-variable/jetbrains-mono": "^5.2.8",
-    "@prisma/adapter-pg": "^7.8.0",
-    "@prisma/client": "^7.8.0",
-    "better-auth": "^1.6.18",
+    "better-auth": "^1.6.20",
     "next": "16.2.9",
     "next-themes": "^0.4.6",
     "pdf-parse": "^2.4.5",
-    "pg": "^8.21.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "sonner": "^2.0.7",
@@ -32,7 +28,6 @@
     "dotenv": "^16.4.7",
     "eslint": "^9",
     "eslint-config-next": "16.2.9",
-    "prisma": "^7.8.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

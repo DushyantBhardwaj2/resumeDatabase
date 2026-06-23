@@ -1,8 +1,8 @@
 import { getServerSession } from "@/config/auth"
 import { redirect } from "next/navigation"
 import Link from "next/link"
-import { container } from "@/di/container"
-import { computeCompleteness, completenessColor, completenessBg, completenessHint } from "@/infrastructure/profile-utils"
+import { fetchWithSession } from "@/config/api-client-server"
+import { computeCompleteness, completenessColor, completenessBg, completenessHint } from "@/lib/profile-utils"
 
 export default async function DashboardPage() {
   const session = await getServerSession()
@@ -10,7 +10,8 @@ export default async function DashboardPage() {
     redirect("/")
   }
 
-  const profile = await container.profileUseCases.getProfile(session.user.id)
+  const res = await fetchWithSession('/api/protected/profile')
+  const profile = res.ok ? await res.json() : null
 
   if (!profile) {
     redirect("/onboarding")

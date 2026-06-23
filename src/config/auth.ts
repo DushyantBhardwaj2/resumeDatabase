@@ -1,43 +1,18 @@
-import { betterAuth } from "better-auth"
-import { prisma } from "./prisma"
-import { prismaAdapter } from "better-auth/adapters/prisma"
-import { PrismaClient } from "@prisma/client"
-import { APIError } from "better-auth/api"
-import { nextCookies } from "better-auth/next-js"
+import { headers as nextHeaders } from "next/headers"
 
-export const auth = betterAuth({
-  database: prismaAdapter(prisma as unknown as PrismaClient, {
-    provider: "postgresql",
-  }),
-  baseURL: process.env.BETTER_AUTH_URL || "http://localhost:3000",
-  trustedProxyHeaders: true,
-  socialProviders: {
-    google: {
-      clientId: process.env.GOOGLE_CLIENT_ID ?? "",
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
-    },
-  },
-  plugins: [nextCookies()],
-  databaseHooks: {
-    user: {
-      create: {
-        before: async (user) => {
-          const email = user.email.toLowerCase()
-          if (!email.endsWith("@nsut.ac.in")) {
-            throw new APIError("FORBIDDEN", { message: "Only @nsut.ac.in emails are allowed." })
-          }
-        },
-      },
-    },
-  },
-})
-
-export async function getServerSession(headers?: Headers) {
+export async function getServerSession() {
   try {
-    const { headers: nextHeaders } = await import("next/headers")
-    const h = headers ?? (await nextHeaders())
-    const session = await auth.api.getSession({ headers: h })
-    return session
+    const h = await nextHeaders()
+    const cookie = h.get("cookie") || ""
+    
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+    const res = await fetch(`${apiUrl}/api/auth/get-session`, {
+      headers: { cookie },
+      cache: 'no-store'
+    })
+    
+    if (!res.ok) return null
+    return await res.json()
   } catch (error) {
     console.error("getServerSession error:", error)
     return null

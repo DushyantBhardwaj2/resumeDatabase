@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react"
 import { useRouter } from "next/navigation"
+import { fetchApi } from "@/config/api-client"
 import { toast } from "sonner"
 import { SectionCard } from "@/components/ui/section-card"
 import { Field } from "@/components/ui/field"
@@ -81,7 +82,7 @@ export default function OnboardingPage() {
     formData.append("file", file)
 
     try {
-      const res = await fetch("/api/resume/parse", { method: "POST", body: formData })
+      const res = await fetchApi("/api/resume/parse", { method: "POST", body: formData })
       const result = await res.json()
       if (!res.ok) throw new Error(result.error || "Failed to parse resume")
       setRawText(result.rawText)
@@ -97,7 +98,7 @@ export default function OnboardingPage() {
   async function handleSave() {
     setLoading(true)
     try {
-      const res = await fetch("/api/profile/save", {
+      const res = await fetchApi("/api/profile/save", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rawText, parsed: data }),

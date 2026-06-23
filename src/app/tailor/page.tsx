@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react"
 import { useSearchParams } from "next/navigation"
+const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
 import { toast } from "sonner"
 import { OverleafButton } from "@/components/ui/overleaf-button"
 
@@ -51,7 +52,7 @@ function TailorPage() {
     const editId = searchParams.get("edit")
     const id = cloneId || editId
     if (!id) return
-    fetch(`/api/history/${id}`)
+    fetch(`${apiUrl}/api/history/${id}`, { credentials: 'include' })
       .then((r) => r.json())
       .then((data) => {
         setJobTitle(data.jobTitle || "")
@@ -89,9 +90,10 @@ function TailorPage() {
     }, 2000)
 
     try {
-      const res = await fetch("/api/resume/tailor", {
+      const res = await fetch(`${apiUrl}/api/protected/resume/tailor`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "include",
         body: JSON.stringify({ jobTitle, company, jobDescription }),
       })
 
@@ -501,9 +503,10 @@ function ResumePreview({
                 <button
                   onClick={async () => {
                     try {
-                      const res = await fetch(`/api/history/${editingId}/styling`, {
+                      const res = await fetch(`${apiUrl}/api/history/${editingId}/styling`, {
                         method: "PUT",
                         headers: { "Content-Type": "application/json" },
+                        credentials: "include",
                         body: JSON.stringify(styleConfig),
                       })
                       if (!res.ok) throw new Error()

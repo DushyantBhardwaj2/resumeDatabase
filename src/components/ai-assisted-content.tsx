@@ -1,6 +1,8 @@
 "use client"
 
 import { useState } from "react"
+import { toast } from "sonner"
+import { fetchApi } from "@/config/api-client"
 import { Button } from "@/components/ui/button"
 
 type SectionType = "experience" | "projects" | "skills" | "summary"
@@ -34,7 +36,7 @@ export function AIAssistedContent({
     setLoading(true)
     setError(null)
     try {
-      const res = await fetch("/api/ai/generate-bullets", {
+      const res = await fetchApi("/api/ai/generate-bullets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ section, rawInput, context }),
