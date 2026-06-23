@@ -11,7 +11,7 @@ export default function Home() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/auth/redirect",
+        callbackURL: `${window.location.origin}/auth/redirect`,
       })
     } catch {
       setLoading(false)
