@@ -4,7 +4,8 @@ services:
     runtime: docker
     repo: https://github.com/DushyantBhardwaj2/resumeDatabase
     branch: main
-    dockerfilePath: backend/Dockerfile
+    rootDir: backend
+    dockerfilePath: Dockerfile
     envVars:
       - key: DATABASE_URL
         sync: false
