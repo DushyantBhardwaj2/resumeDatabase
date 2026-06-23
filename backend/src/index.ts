@@ -52,6 +52,24 @@ app.post('/api/protected/profile', async (c) => {
   return c.json(profile)
 })
 
+// AI Generate Bullets API
+app.post('/api/protected/ai/generate-bullets', async (c) => {
+  const session = c.get('session')
+  const { section, rawInput, context } = await c.req.json()
+  
+  if (!section || !rawInput) {
+    return c.json({ error: "Missing required fields" }, 400)
+  }
+
+  try {
+    const result = await container.aiUseCases.generate(section, rawInput, context)
+    return c.json(result)
+  } catch (err: any) {
+    console.error("AI generation error:", err)
+    return c.json({ error: err.message }, 500)
+  }
+})
+
 // Tailor Resume API
 app.post('/api/protected/resume/tailor', async (c) => {
   const session = c.get('session')
