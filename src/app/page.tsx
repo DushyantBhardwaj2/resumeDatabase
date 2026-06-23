@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import { ArrowRight, Target, Sparkle, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
+import { Target, Sparkle, ShieldCheck } from '@phosphor-icons/react/dist/ssr'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { SignInButton } from '@/components/sign-in-button'
 
 export default function LandingPage() {
   return (
@@ -14,12 +14,7 @@ export default function LandingPage() {
           </span>
           <div className="flex items-center gap-3">
             <ThemeToggle />
-            <Link
-              href="/api/auth/signin"
-              className="bg-brand text-brand-fg px-4 py-2 rounded-[var(--radius-md)] text-sm font-medium hover:opacity-90 transition-opacity"
-            >
-              Sign In
-            </Link>
+            <SignInButton variant="minimal" />
           </div>
         </div>
       </header>
@@ -44,13 +39,7 @@ export default function LandingPage() {
             </p>
 
             <div className="mt-10">
-              <Link
-                href="/api/auth/signin"
-                className="bg-brand text-brand-fg rounded-[var(--radius-md)] px-6 py-3 font-medium text-sm inline-flex items-center gap-2 hover:opacity-90 transition-opacity"
-              >
-                Sign in with Google
-                <ArrowRight size={16} />
-              </Link>
+              <SignInButton />
               <p className="text-xs text-content-subtle mt-3">
                 Restricted to @nsut.ac.in email addresses
               </p>
