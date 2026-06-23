@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 interface AuthLayoutProps {
   children: React.ReactNode
 }
@@ -9,13 +11,13 @@ export default function AuthLayout({ children }: AuthLayoutProps) {
       <div className="flex-1 flex flex-col min-h-[100dvh] bg-surface">
         {/* Logo */}
         <div className="px-8 lg:px-16 py-8">
-          <a
+          <Link
             href="/"
             className="font-display font-bold text-xl text-content inline-flex items-center gap-1"
           >
             resumint
             <span className="w-1.5 h-1.5 rounded-full bg-brand inline-block mb-1 ml-0.5" aria-hidden="true" />
-          </a>
+          </Link>
         </div>
 
         {/* Form content */}

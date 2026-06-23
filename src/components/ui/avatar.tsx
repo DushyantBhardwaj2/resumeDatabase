@@ -3,7 +3,7 @@ import * as React from 'react'
 type AvatarSize = 'sm' | 'md' | 'lg'
 
 export interface AvatarProps {
-  src?: string
+  src?: string | null
   name?: string
   size?: AvatarSize
   className?: string

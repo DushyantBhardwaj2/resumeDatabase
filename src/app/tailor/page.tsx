@@ -469,8 +469,8 @@ export default function TailorPage() {
       const data: TailoredResult = await res.json();
       setResult(data);
       setStep('result');
-    } catch (err: any) {
-      toast.error(err?.message ?? 'Generation failed');
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : 'Generation failed');
       setStep('input');
     }
   };

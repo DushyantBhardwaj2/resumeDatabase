@@ -2,7 +2,7 @@
 
 import { useTheme } from 'next-themes'
 import { Sun, Moon } from '@phosphor-icons/react'
-import { useEffect, useState } from 'react'
+import { useSyncExternalStore } from 'react'
 
 interface ThemeToggleProps {
   size?: number
@@ -11,11 +11,11 @@ interface ThemeToggleProps {
 
 export function ThemeToggle({ size = 16, className }: ThemeToggleProps) {
   const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
-
-  useEffect(() => {
-    setMounted(true)
-  }, [])
+  const mounted = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  )
 
   if (!mounted) return null
 

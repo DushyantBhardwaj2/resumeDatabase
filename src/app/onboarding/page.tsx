@@ -15,6 +15,7 @@ import {
   CheckCircle,
 } from '@phosphor-icons/react';
 import { toast } from 'sonner';
+import { fetchApi } from '@/config/api-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -186,14 +187,14 @@ function UploadStep({ onParsed }: { onParsed: (p: Partial<Profile>) => void }) {
     }
     setParsing(true);
     try {
-      const res = await fetchApi("/api/protected/resume/parse", { method: "POST", body: formData })
+      const fd = new FormData();
+      fd.append("file", file);
+      const res = await fetchApi("/api/protected/resume/parse", { method: "POST", body: fd })
       const result = await res.json()
       if (!res.ok) throw new Error(result.error || "Failed to parse resume")
-      setRawText(result.rawText)
-      setData(result.parsed)
-      setStep(1)
+      onParsed(result.parsed)
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Something went wrong")
+      toast.error(e instanceof Error ? e.message : "Something went wrong")
     } finally {
       setParsing(false);
     }
@@ -268,14 +269,22 @@ function ExperienceStep({
   const improve = async (idx: number) => {
     setImprovingIdx(idx);
     try {
-      const res = await fetchApi("/api/protected/profile", {
+      const exp = experience[idx]
+      const res = await fetchApi("/api/protected/ai/generate-bullets", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ rawText, parsed: data }),
+        body: JSON.stringify({
+          section: "experience",
+          rawInput: exp.bullets.join("\n"),
+          context: { role: exp.role, company: exp.company },
+        }),
       })
-      if (!res.ok) throw new Error("Failed to save profile")
-      toast.success("Profile saved successfully!")
-      router.push("/dashboard")
+      if (!res.ok) throw new Error("AI improvement failed")
+      const result = await res.json()
+      if (result.bullets) {
+        update(idx, { bullets: result.bullets })
+        toast.success("Bullets improved!")
+      }
     } catch {
       toast.error('AI improvement failed');
     } finally {
