@@ -3,6 +3,7 @@ import { prisma } from "./prisma"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { PrismaClient } from "@prisma/client"
 import { APIError } from "better-auth/api"
+import { nextCookies } from "better-auth/next-js"
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma as unknown as PrismaClient, {
@@ -16,6 +17,7 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     },
   },
+  plugins: [nextCookies()],
   databaseHooks: {
     user: {
       create: {
@@ -31,8 +33,13 @@ export const auth = betterAuth({
 })
 
 export async function getServerSession(headers?: Headers) {
-  const { headers: nextHeaders } = await import("next/headers")
-  const h = headers ?? (await nextHeaders())
-  const session = await auth.api.getSession({ headers: h })
-  return session
+  try {
+    const { headers: nextHeaders } = await import("next/headers")
+    const h = headers ?? (await nextHeaders())
+    const session = await auth.api.getSession({ headers: h })
+    return session
+  } catch (error) {
+    console.error("getServerSession error:", error)
+    return null
+  }
 }
