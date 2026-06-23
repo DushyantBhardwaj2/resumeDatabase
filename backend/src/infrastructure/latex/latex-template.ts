@@ -41,7 +41,7 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
     tailored: unknown
   ): string {
     const data = tailored as TailoredData
-    let tex = readFileSync(join(process.cwd(), "docs", "resume_template.tex"), "utf-8")
+    let tex = readFileSync(join(__dirname, "resume_template.tex"), "utf-8")
 
     const safeContact = contact || {} as Contact
     const safeEducation = education || []
