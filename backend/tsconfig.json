@@ -4,6 +4,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "strict": true,
+    "ignoreDeprecations": "6.0",
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
@@ -14,5 +15,6 @@
       "@/*": ["src/*"]
     }
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"],
+  "exclude": ["src/**/__tests__/**", "scripts/**/__tests__/**"]
 }

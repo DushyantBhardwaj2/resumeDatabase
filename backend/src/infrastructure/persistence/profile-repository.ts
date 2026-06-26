@@ -1,10 +1,39 @@
 import { prisma } from "../../config/prisma"
-import type { Profile } from "../../core/domain/entities"
+import type { Profile, Experience, Project, VaultBullet } from "../../core/domain/entities"
 import type { IProfileRepository } from "../../core/domain/repositories"
 import type { Prisma } from "@prisma/client"
 
 function toJson(value: unknown): Prisma.InputJsonValue {
   return value as Prisma.InputJsonValue
+}
+
+function migrateBullets(bullets: unknown): VaultBullet[] {
+  if (!bullets) return []
+  if (Array.isArray(bullets) && bullets.length > 0 && typeof bullets[0] === "object" && "id" in bullets[0]) {
+    return bullets as VaultBullet[]
+  }
+  return (bullets as string[]).map((b: string) => ({
+    id: crypto.randomUUID(),
+    text: b,
+    keywords: [],
+    isAIGenerated: false,
+  }))
+}
+
+function migrateExperience(raw: unknown): Experience[] {
+  if (!raw) return []
+  return (raw as any[]).map((e) => ({
+    ...e,
+    vaultBullets: migrateBullets(e.vaultBullets ?? e.bullets),
+  }))
+}
+
+function migrateProjects(raw: unknown): Project[] {
+  if (!raw) return []
+  return (raw as any[]).map((p) => ({
+    ...p,
+    vaultBullets: migrateBullets(p.vaultBullets ?? p.bullets),
+  }))
 }
 
 export class ProfileRepository implements IProfileRepository {
@@ -14,9 +43,10 @@ export class ProfileRepository implements IProfileRepository {
     return {
       contact: row.contact as unknown as Profile["contact"],
       education: row.education as unknown as Profile["education"],
-      experience: row.experience as unknown as Profile["experience"],
-      projects: row.projects as unknown as Profile["projects"],
+      experience: migrateExperience(row.experience),
+      projects: migrateProjects(row.projects),
       skills: row.skills as unknown as Profile["skills"],
+      certificates: (row.certificates as unknown as Profile["certificates"]) ?? [],
       githubUsername: row.githubUsername,
     }
   }
@@ -28,6 +58,7 @@ export class ProfileRepository implements IProfileRepository {
     if (data.experience !== undefined) updateData.experience = toJson(data.experience)
     if (data.projects !== undefined) updateData.projects = toJson(data.projects)
     if (data.skills !== undefined) updateData.skills = toJson(data.skills)
+    if (data.certificates !== undefined) updateData.certificates = toJson(data.certificates)
     if (data.githubUsername !== undefined) updateData.githubUsername = data.githubUsername
 
     const row = await prisma.profile.upsert({
@@ -40,9 +71,10 @@ export class ProfileRepository implements IProfileRepository {
     return {
       contact: row.contact as unknown as Profile["contact"],
       education: row.education as unknown as Profile["education"],
-      experience: row.experience as unknown as Profile["experience"],
-      projects: row.projects as unknown as Profile["projects"],
+      experience: migrateExperience(row.experience),
+      projects: migrateProjects(row.projects),
       skills: row.skills as unknown as Profile["skills"],
+      certificates: (row.certificates as unknown as Profile["certificates"]) ?? [],
       githubUsername: row.githubUsername,
     }
   }
@@ -55,6 +87,7 @@ export class ProfileRepository implements IProfileRepository {
       experience: toJson(parsed.experience),
       projects: toJson(parsed.projects),
       skills: toJson(parsed.skills),
+      certificates: toJson(parsed.certificates),
     }
     const row = await prisma.profile.upsert({
       where: { userId },
@@ -66,9 +99,10 @@ export class ProfileRepository implements IProfileRepository {
     return {
       contact: row.contact as unknown as Profile["contact"],
       education: row.education as unknown as Profile["education"],
-      experience: row.experience as unknown as Profile["experience"],
-      projects: row.projects as unknown as Profile["projects"],
+      experience: migrateExperience(row.experience),
+      projects: migrateProjects(row.projects),
       skills: row.skills as unknown as Profile["skills"],
+      certificates: (row.certificates as unknown as Profile["certificates"]) ?? [],
       githubUsername: row.githubUsername,
     }
   }

@@ -126,7 +126,7 @@ Build the entry point of the Resumint application, allowing users to securely au
 ## 4. Key Endpoints & APIs
 
 ### `* /api/auth/**`
-Better Auth handler on the Render backend (`backend/src/index.ts`). Handles Google OAuth flow, session management, sign-out. Proxied from Vercel via `vercel.json` rewrites.
+Better Auth handler runs **directly on Vercel** via `src/app/api/auth/[...all]/route.ts` (file routes take precedence over proxy rewrites). Handles Google OAuth flow, session management, sign-out. Keeps session cookies on the same domain, avoiding cross-domain cookie issues.
 
 ### `POST /api/protected/resume/parse`
 **Auth**: Required (session check via `/api/protected/*` middleware).

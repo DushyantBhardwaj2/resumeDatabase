@@ -51,7 +51,7 @@ Build the AI engine and UI that accepts a Job Description (JD), matches it again
     }
     ```
   - **Behavior**: Retrieves user profile, runs LLM orchestration, saves output version, and returns tailored JSON data.
-- `POST /api/resume/export-pdf` - Receives tailored HTML/JSON and compiles it into a downloadable PDF binary.
+- `POST /api/protected/resume/compile` - LaTeX compilation: renders tailored data into `docs/resume_template.tex`, runs `pdflatex` server-side, returns PDF binary.
 
 ---
 

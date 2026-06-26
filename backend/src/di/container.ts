@@ -6,14 +6,15 @@ import { AiUseCases } from "../core/application/use-cases/ai-use-cases"
 import type { SectionConfig } from "../core/application/use-cases/ai-use-cases"
 import { HistoryUseCases } from "../core/application/use-cases/history-use-cases"
 import { GithubUseCases } from "../core/application/use-cases/github-use-cases"
+import { ChatUseCases } from "../core/application/use-cases/chat-use-cases"
 import { ProfileRepository } from "../infrastructure/persistence/profile-repository"
 import { TailoredResumeRepository } from "../infrastructure/persistence/tailored-resume-repository"
 import { GitHubRepoRepository } from "../infrastructure/persistence/github-repo-repository"
 import { OpenCodeZenAIService } from "../infrastructure/ai"
 import { PDFParser } from "../infrastructure/pdf"
 import { LatexTemplateFiller } from "../infrastructure/latex/latex-template"
-import { GENERATE_BULLETS, PARSE_RESUME, TAILOR_RESUME, GITHUB_README_BULLETS } from "../infrastructure/prompts"
-import { SECTION_SCHEMAS, parsedResumeSchema, tailorOutputSchema } from "../infrastructure/validation"
+import { GENERATE_BULLETS, PARSE_RESUME, GITHUB_README_BULLETS, CHAT_INTENT_PARSER, VAULT_EXPANDER, BULLET_SELECTOR } from "../infrastructure/prompts"
+import { SECTION_SCHEMAS, parsedResumeSchema, bulletSelectionSchema } from "../infrastructure/validation"
 import { z } from "zod"
 
 class Container {
@@ -29,6 +30,7 @@ class Container {
   private _aiUseCases?: AiUseCases
   private _historyUseCases?: HistoryUseCases
   private _githubUseCases?: GithubUseCases
+  private _chatUseCases?: ChatUseCases
 
   get profileUseCases(): ProfileUseCases {
     if (!this._profileUseCases) {
@@ -47,8 +49,8 @@ class Container {
         this.latexTemplate,
         PARSE_RESUME,
         parsedResumeSchema,
-        TAILOR_RESUME,
-        tailorOutputSchema
+        BULLET_SELECTOR,
+        bulletSelectionSchema
       )
     }
     return this._resumeUseCases
@@ -108,6 +110,18 @@ class Container {
   private get pdfParser(): IPDFParser {
     if (!this._pdfParser) this._pdfParser = new PDFParser()
     return this._pdfParser
+  }
+
+  get chatUseCases(): ChatUseCases {
+    if (!this._chatUseCases) {
+      this._chatUseCases = new ChatUseCases(
+        this.aiService,
+        CHAT_INTENT_PARSER,
+        VAULT_EXPANDER,
+        BULLET_SELECTOR
+      )
+    }
+    return this._chatUseCases
   }
 
   get latexTemplate(): ILatexTemplateFiller {

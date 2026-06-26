@@ -1,0 +1,101 @@
+%% =============================================================================
+%% RESUMINT — Modern Resume Template
+%% Helvetica font, blue accents, wider margins
+%% Placeholders wrapped in double curly braces: {{LABEL}}
+%% =============================================================================
+
+\documentclass[10pt]{article}
+\usepackage[letterpaper,margin=0.65in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{helvet}
+\usepackage{tabularx}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\renewcommand{\familydefault}{\sfdefault}
+\hypersetup{
+    hidelinks,
+    colorlinks=true,
+    urlcolor=blue!70!black
+}
+
+\definecolor{accentblue}{RGB}{41, 98, 255}
+\linespread{1.05}
+\setlist[itemize]{noitemsep, topsep=1.5pt, left=0pt}
+\pagestyle{empty}
+
+\newcommand{\resheading}[1]{\vspace{8pt} \noindent \textcolor{accentblue}{\textbf{\large\scshape{#1}}} \vspace{2pt} {\color{accentblue!30}\hrule} \vspace{5pt}}
+\newcommand{\ressubheading}[3]{
+\begin{tabular*}{6.32in}{l @{\extracolsep{\fill}} r}
+    \textbf{#1} & \textit{[#2]} \\
+\end{tabular*}\vspace{-8pt}}
+
+\begin{document}
+
+%% HEADER
+\begin{center}
+    \textbf{\Huge{{{FULL_NAME}}}}\\[4pt]
+    {\small {{PHONE}} \hspace{0.3em}$|$\hspace{0.3em}
+    \href{mailto:{{EMAIL}}}{\textcolor{black}{{{EMAIL_DISPLAY}}}} \hspace{0.3em}$|$\hspace{0.3em}
+    \href{{{LINKEDIN_URL}}}{\textcolor{accentblue}{LinkedIn}} \hspace{0.3em}$|$\hspace{0.3em}
+    \href{{{GITHUB_URL}}}{\textcolor{accentblue}{GitHub}}}
+\end{center}
+
+%% EDUCATION
+\resheading{EDUCATION}
+\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}r@{}}
+\textbf{Degree} & \textbf{Year} & \textbf{Institution} & \textbf{CGPA/\%} \\
+\midrule
+\textbf{{{EDU_DEGREE_1}}} & {{EDU_YEAR_1}} & {{EDU_INSTITUTION_1}} & \textbf{{{EDU_SCORE_1}}} \\
+\textbf{{{EDU_DEGREE_2}}} & {{EDU_YEAR_2}} & {{EDU_INSTITUTION_2}} & \textbf{{{EDU_SCORE_2}}} \\
+\textbf{{{EDU_DEGREE_3}}} & {{EDU_YEAR_3}} & {{EDU_INSTITUTION_3}} & \textbf{{{EDU_SCORE_3}}} \\
+\end{tabular*}
+
+%% EXPERIENCE
+\resheading{EXPERIENCE}
+\begin{itemize}
+\item \textbf{{{EXP_TITLE_1}}} \hfill {{EXP_DATES_1}}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Tech Stack:} {{EXP_TECHSTACK_1}}
+        \item {{EXP_BULLET_1_1}}
+    \end{itemize}
+\item \textbf{{{EXP_TITLE_2}}} \hfill {{EXP_DATES_2}}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Tech Stack:} {{EXP_TECHSTACK_2}}
+        \item {{EXP_BULLET_2_1}}
+    \end{itemize}
+\end{itemize}
+
+%% PROJECTS
+\resheading{PROJECTS}
+\begin{itemize}
+\item \textbf{{{PROJ_NAME_1}}} \hfill {{PROJ_DATES_1}}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Purpose:} {{PROJ_PURPOSE_1}}
+        \item \textbf{Tech Stack:} {{PROJ_TECHSTACK_1}}
+        \item {{PROJ_BULLET_1_1}}
+        \item {{PROJ_BULLET_1_2}}
+        \item {{PROJ_BULLET_1_3}} \textbf{GitHub:} \href{{{PROJ_GITHUB_URL_1}}}{{{PROJ_GITHUB_LABEL_1}}}
+    \end{itemize}
+\item \textbf{{{PROJ_NAME_2}}} \hfill {{PROJ_DATES_2}}
+    \begin{itemize}[noitemsep]
+        \item \textbf{Purpose:} {{PROJ_PURPOSE_2}}
+        \item \textbf{Tech Stack:} {{PROJ_TECHSTACK_2}}
+        \item {{PROJ_BULLET_2_1}}
+        \item {{PROJ_BULLET_2_2}}
+    \end{itemize}
+\end{itemize}
+
+%% TECHNICAL SKILLS
+\resheading{TECHNICAL SKILLS}
+\begin{itemize}
+\item \textbf{Languages:} {{SKILLS_LANGUAGES}}
+\item \textbf{Frameworks:} {{SKILLS_FRAMEWORKS}}
+\item \textbf{Tools:} {{SKILLS_TOOLS}}
+\end{itemize}
+
+\end{document}

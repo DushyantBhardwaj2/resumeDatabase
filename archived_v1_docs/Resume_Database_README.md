@@ -114,7 +114,6 @@
   - Developed secure, production-ready backend with Docker deployment
   - Integrated Twilio WhatsApp and Dialogflow for natural language understanding
   - Implemented health alert broadcasting and appointment scheduling
-- **Github Link:** https://github.com/UtkarshDubeyGIT/Sehat-Sathee
 
 ### 5. University Smart Classroom Occupancy Detector
 - **Duration:** May 2025 – Jul 2025

@@ -1,0 +1,115 @@
+\documentclass[10pt]{article}
+\usepackage[letterpaper,margin=0.55in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{palatino}
+\usepackage{tabularx}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+\usepackage{hyperref}
+\hypersetup{
+    hidelinks,
+    colorlinks=true,
+    urlcolor=blue
+}
+
+\linespread{1.0}
+\setlist[itemize]{noitemsep, topsep=2pt, left=0pt}
+\pagestyle{empty}
+
+\newcommand{\resheading}[1]{\vspace{6pt} \noindent \textbf{\large\scshape{#1}} \vspace{3pt} \hrule \vspace{4pt}}
+\newcommand{\ressubheading}[3]{
+\begin{tabular*}{6.62in}{l @{\extracolsep{\fill}} r}
+    \textsc{\textbf{#1}} & \textit{[#2]} \\
+\end{tabular*}\vspace{-8pt}}
+
+\begin{document}
+\begin{table}
+    \begin{minipage}{0\linewidth}
+        \centering
+        \includegraphics[height=0.5in]{NSUT_logo.png}
+    \end{minipage}
+    \begin{minipage}{1\linewidth}
+        \centering
+        \def\arraystretch{3}
+        \textbf{\Large{Dushyant Bhardwaj}}\\ \vspace{0.5em}
+        +91-8588802630 |
+        \href{mailto:dushyant.bhardwaj.ug23@nsut.ac.in}{\textcolor{black}{dushyant.bhardwaj.ug23@nsut.ac.in}} \\
+        \href{https://www.linkedin.com/in/dushyant-bhardwaj-3003a9219/}{\textcolor{black}{LinkedIn}} |
+        \href{https://leetcode.com/u/Dushyant_Bhardwaj/}{\textcolor{black}{LeetCode}} |
+        \href{https://github.com/DushyantBhardwaj2}{\textcolor{black}{Github}}  
+    \end{minipage}
+\end{table}
+
+\resheading{EDUCATION}
+\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}r@{}}
+\textbf{Degree/Course} & \textbf{Year} & \textbf{Institution} & \textbf{CGPA/\%} \\
+\toprule
+\textbf{B.Tech Computer Science \& Data Science} & 2023–2027 & Netaji Subhas University of Technology, Delhi & \textbf{8.29/10} \\
+\textbf{Senior Secondary (CBSE)} & 2022 & Evergreen Public School & \textbf{91.8\%} \\
+\textbf{Secondary (CBSE)} & 2020 & Evergreen Public School & \textbf{95.2\%} \\
+\end{tabular*}
+
+\resheading{EXPERIENCE}
+\begin{itemize}
+\item \textbf{Associate Software Engineer Intern -- Accenture} \hfill May 2026 -- Present
+    \begin{itemize}[noitemsep]
+        \item \textbf{Working:} Managed enterprise networks and backend cloud services in the Allianz NIS Service Delivery Problem Management team, utilizing ITSM tools and ITIL processes to resolve client infrastructure queries.
+        \item \textbf{Automation:} Collaborated with the automation team to automate client troubleshooting queries, significantly reducing the workload on the Problem Management Team (PMT).
+    \end{itemize}
+\item \textbf{AI Engineer Intern -- Sculpt} \hfill Jan 2026 -- Apr 2026
+    \begin{itemize}[noitemsep]
+        \item \textbf{Tech Stack:} Flutter, Dart, Hive, OpenAI API, Mistral API
+        \item \textbf{Working:} Built AI-driven behavioral analysis for the \href{https://github.com/arijitpaull/woque}{Woque} app, supporting daily prompts, mood tracking, progress analytics, and personalized insights for 100+ user interactions/day.
+    \end{itemize}
+\end{itemize}
+
+\resheading{PROJECTS}
+\begin{itemize}
+\item \textbf{PokerSense AI} \hfill Jun 2026
+    \begin{itemize}[noitemsep]
+        \item \textbf{Purpose:} Real-time poker intelligence platform providing EV calculations and behavioral strategic advice.
+        \item \textbf{Tech Stack:} Astro, React, FastAPI (Python), XGBoost, PostgreSQL (Neon), Tailwind CSS, Docker
+        \item \textbf{Algorithms \& ML:} Integrated Monte Carlo simulations (10k+ iterations/hand) to deliver real-time EV analysis with 94.2\% accuracy.
+        \item \textbf{Behavioral Layer:} Developed XGBoost classifier using VPIP/PFR stats to predict opponent bluff probability with 87\% precision.
+        \item \textbf{Engineering \& Security:} Optimized serverless cold-starts via non-blocking wakeup hooks and hardened SQL security using strict Pydantic schemas. \textbf{GitHub:} \href{https://github.com/DushyantBhardwaj2/Poker_AI}{Poker\_AI}
+    \end{itemize}
+\item \textbf{Hostel Dada} \hfill Jan 2026
+    \begin{itemize}[noitemsep]
+        \item \textbf{Purpose:} Cross-platform hostel management application utilizing shared business logic and advanced algorithmic abstractions.
+        \item \textbf{Tech Stack:} Kotlin Multiplatform (KMP), Compose Multiplatform, Koin, SQLDelight, Ktor, MVVM, Clean Architecture
+        \item \textbf{Algorithms \& DSA:} Implemented Tries for O(K) prefix search of inventory, Graph-based algorithms for roommate compatibility matching, and Priority Queues for maintenance requests.
+        \item \textbf{Architecture:} Architected a 3-layer Clean Architecture (Domain, Data, Presentation) enabling 80\%+ code reuse across Android, iOS, and Desktop apps.
+    \end{itemize}
+\item \textbf{LetsConnect} \hfill Dec 2024 -- Jan 2025
+    \begin{itemize}[noitemsep]
+        \item \textbf{Purpose:} Secure, real-time messaging application designed for high-concurrency instant communication.
+        \item \textbf{Tech Stack:} Kotlin, Jetpack Compose, Firebase Authentication, Realtime Database, Hilt, MVVM, Gradle
+        \item \textbf{Message Delivery:} Achieved 100\% message delivery rate under local network test runs using Firebase Realtime Database.
+        \item \textbf{Architecture:} Decoupled UI and data handling layers through Hilt dependency injection and MVVM to reduce code duplication by 40\%.
+        \item \textbf{UI Optimization:} Built a reactive Compose UI utilizing state hoisting and lazy loading components for smooth 60fps scrolling. \textbf{GitHub:} \href{https://github.com/DushyantBhardwaj2/ChattingAppNew}{LetsConnect}
+    \end{itemize}
+\end{itemize}
+
+\resheading{EXTRA-CURRICULAR ACTIVITIES \& ACHIEVEMENTS}
+\begin{itemize}
+    \item \textbf{Android App Development in 34 Hours: MobDevOps+ Android 15 (Udemy, 2025)}: \href{https://udemy-certificate.s3.amazonaws.com/pdf/UC-332b5f26-9095-4d67-9ffb-956f05e35ffe.pdf}{Certificate}
+    \item \textbf{400+ DSA questions solved (Codolio Profile):} \href{https://codolio.com/profile/Negative_Bhardwaj}{Codolio}
+    \item \textbf{Data Analytics with Python (NPTEL, 2026)}: \href{https://storage.googleapis.com/2026-mar-halltickets/certificate-generation-apr26/final/regular/noc26-cs86/NOC26CS86S66240572604493783.pdf}{Certificate} \& \textbf{Ethical Hacking (NPTEL, 2026)}: \href{https://archive.nptel.ac.in/content/noc/NOC25/SEM2/Ecertificates/106/noc25-cs142/Course/NPTEL25CS142S106540131810478214.pdf}{Certificate}
+    \item \textbf{Finalist -- Adobe Express Add-ons for Enterprise Hackathon (NSUT, 2025)}: Designed and built "BrandBrain" add-on for Adobe Express, reaching the final round. \href{https://devpost.com/software/brandbrain}{Project Link}
+    \item \textbf{Placement Coordinator -- Training and Placement Cell, NSUT} (Apr 2025 -- Present)
+\end{itemize}
+
+\resheading{TECHNICAL SKILLS}
+\begin{itemize}
+\item \textbf{Languages:} C++ (Advanced DSA), Kotlin, Python, Java (Familiar)
+\item \textbf{Tools \& IDEs:} Android Studio, VS Code, Git, GitHub, Git Bash, GitHub Copilot
+\item \textbf{Frameworks:} Astro, React, Jetpack Compose, Kotlin Multi Platform (KMP), MVVM, Hilt, Material 3, Navigation Component, Tailwind CSS, Pandas, NumPy
+\item \textbf{Backend:} Firebase Authentication, Firebase Firestore, Firebase Storage, SQL, FastAPI, Node.js, Express, Docker, MySQL, MongoDB, PostgreSQL (Neon)
+\item \textbf{Coursework:} Data Structures \& Algorithms, Operating Systems, Database Management Systems, Machine Learning, Artificial Intelligence, Computer Networks, Big Data Analytics, Data Warehouse \& Mining, Software Engineering
+\end{itemize}
+
+\end{document}

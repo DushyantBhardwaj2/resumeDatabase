@@ -6,28 +6,49 @@ on:
   pull_request:
     branches: [main]
 
-jobs:
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - run: npm ci
-      - run: npm run lint
+env:
+  NODE_VERSION: '22'
 
-  typecheck:
+jobs:
+  frontend:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
       - run: npm ci
+        working-directory: .
+      - run: npm run lint
+        working-directory: .
       - run: npx tsc --noEmit
+      - run: npx vitest run
+
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci
+        working-directory: .
+      - run: npx vitest run
+      - run: npm run build
+      - name: Verify template assets
+        run: |
+          test -f dist/infrastructure/latex/templates/nsut-canonical/template.tex
+          test -f dist/infrastructure/latex/templates/nsut-canonical/config.json
+          test -f dist/infrastructure/latex/templates/nsut-canonical/NSUT_logo.png
+          echo "Template assets verified"
 
   build:
     runs-on: ubuntu-latest
@@ -35,7 +56,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: 20
-          cache: npm
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
       - run: npm ci
-      - run: npm run build
+      - run: npm run build:frontend
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || 'http://localhost:8080' }}
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
+      - run: npm run build:backend
+      - name: Verify template assets
+        run: |
+          test -f backend/dist/infrastructure/latex/templates/nsut-canonical/template.tex
+          test -f backend/dist/infrastructure/latex/templates/nsut-canonical/config.json
+          test -f backend/dist/infrastructure/latex/templates/nsut-canonical/NSUT_logo.png
+          echo "Template assets verified"

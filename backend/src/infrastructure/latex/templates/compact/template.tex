@@ -1,0 +1,93 @@
+%% =============================================================================
+%% RESUMINT — Compact Resume Template
+%% 9pt font, tight margins, minimal spacing
+%% Placeholders wrapped in double curly braces: {{LABEL}}
+%% =============================================================================
+
+\documentclass[9pt]{article}
+\usepackage[letterpaper,margin=0.4in]{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{enumitem}
+\usepackage{palatino}
+\usepackage{tabularx}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+\usepackage{color}
+\usepackage{hyperref}
+\hypersetup{
+    hidelinks,
+    colorlinks=true,
+    urlcolor=black
+}
+
+\linespread{0.95}
+\setlist[itemize]{noitemsep, topsep=0pt, left=0pt}
+\pagestyle{empty}
+
+\newcommand{\resheading}[1]{\vspace{3pt} \noindent \textbf{\small\scshape{#1}} \vspace{1pt} \hrule \vspace{2pt}}
+\newcommand{\ressubheading}[3]{
+\begin{tabular*}{6.9in}{l @{\extracolsep{\fill}} r}
+    \textbf{#1} & \textit{[#2]} \\
+\end{tabular*}\vspace{-6pt}}
+
+\begin{document}
+
+%% HEADER
+\begin{center}
+    \textbf{\Large{{{FULL_NAME}}}}\\[2pt]
+    {{PHONE}} $|$
+    \href{mailto:{{EMAIL}}}{\textcolor{black}{{{EMAIL_DISPLAY}}}} $|$
+    \href{{{LINKEDIN_URL}}}{\textcolor{black}{LinkedIn}} $|$
+    \href{{{GITHUB_URL}}}{\textcolor{black}{GitHub}}
+\end{center}
+
+%% EDUCATION
+\resheading{EDUCATION}
+\begin{tabular*}{\textwidth}{@{}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}l@{\extracolsep{\fill}}r@{}}
+\textbf{Degree} & \textbf{Year} & \textbf{Institution} & \textbf{CGPA/\%} \\
+\midrule
+\textbf{{{EDU_DEGREE_1}}} & {{EDU_YEAR_1}} & {{EDU_INSTITUTION_1}} & \textbf{{{EDU_SCORE_1}}} \\
+\textbf{{{EDU_DEGREE_2}}} & {{EDU_YEAR_2}} & {{EDU_INSTITUTION_2}} & \textbf{{{EDU_SCORE_2}}} \\
+\textbf{{{EDU_DEGREE_3}}} & {{EDU_YEAR_3}} & {{EDU_INSTITUTION_3}} & \textbf{{{EDU_SCORE_3}}} \\
+\end{tabular*}
+
+%% EXPERIENCE
+\resheading{EXPERIENCE}
+\begin{itemize}
+\item \textbf{{{EXP_TITLE_1}}} \hfill {{EXP_DATES_1}}
+    \begin{itemize}[noitemsep]
+        \item {{EXP_BULLET_1_1}}
+    \end{itemize}
+\item \textbf{{{EXP_TITLE_2}}} \hfill {{EXP_DATES_2}}
+    \begin{itemize}[noitemsep]
+        \item {{EXP_BULLET_2_1}}
+    \end{itemize}
+\end{itemize}
+
+%% PROJECTS
+\resheading{PROJECTS}
+\begin{itemize}
+\item \textbf{{{PROJ_NAME_1}}} \hfill {{PROJ_DATES_1}}
+    \begin{itemize}[noitemsep]
+        \item {{PROJ_BULLET_1_1}}
+        \item {{PROJ_BULLET_1_2}}
+        \item \textbf{GitHub:} \href{{{PROJ_GITHUB_URL_1}}}{{{PROJ_GITHUB_LABEL_1}}}
+    \end{itemize}
+\item \textbf{{{PROJ_NAME_2}}} \hfill {{PROJ_DATES_2}}
+    \begin{itemize}[noitemsep]
+        \item {{PROJ_BULLET_2_1}}
+        \item {{PROJ_BULLET_2_2}}
+    \end{itemize}
+\end{itemize}
+
+%% TECHNICAL SKILLS
+\resheading{TECHNICAL SKILLS}
+\begin{itemize}
+\item \textbf{Languages:} {{SKILLS_LANGUAGES}}
+\item \textbf{Frameworks:} {{SKILLS_FRAMEWORKS}}
+\item \textbf{Tools:} {{SKILLS_TOOLS}}
+\end{itemize}
+
+\end{document}

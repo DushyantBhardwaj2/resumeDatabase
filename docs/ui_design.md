@@ -168,6 +168,62 @@ Location: `src/components/ui/badge.tsx`
 - **warning**: `bg-warning/10 text-warning`
 - **error**: `bg-error/10 text-error`
 
+### 3.5 Avatar
+
+Location: `src/components/ui/avatar.tsx`
+
+**Props**:
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `src` | `string \| null \| undefined` | — | Image URL |
+| `name` | `string` | — | Fallback initials (2 chars max) |
+| `size` | `"sm" \| "md" \| "lg"` | `"md"` | Size preset |
+
+Renders `<img>` if `src` is provided, otherwise shows a colored circle with initials from `getInitials(name)`.
+
+### 3.6 Dialog
+
+Location: `src/components/ui/dialog.tsx`
+
+A modal overlay with backdrop blur, close button, title, and description. Uses a controlled `open`/`onOpenChange` pattern. Contents are rendered in a centered card with `animate-scale-in`.
+
+### 3.7 Progress
+
+Location: `src/components/ui/progress.tsx`
+
+**Props**:
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `value` | `number` | `0` | Progress percentage (0–100) |
+| `max` | `number` | `100` | Maximum value |
+
+Renders a horizontal bar with a fill indicator.
+
+### 3.8 Separator
+
+Location: `src/components/ui/separator.tsx`
+
+A horizontal `<hr>` styled with `border-border`. Used between sections or list items.
+
+### 3.9 Skeleton
+
+Location: `src/components/ui/skeleton.tsx`
+
+**Props**:
+| Prop | Type | Default | Description |
+|------|------|---------|-------------|
+| `className` | `string` | `""` | Width/height/shape classes |
+
+Renders a pulsing placeholder (`animate-pulse rounded-md bg-muted`). Usage: `<Skeleton className="h-4 w-[200px]" />`.
+
+### 3.10 Tooltip
+
+Location: `src/components/ui/tooltip.tsx`
+
+A simple CSS-based tooltip on hover. Wraps children and shows the tooltip text on hover via a `group` + `group-hover` pattern. No JavaScript dependency.
+
+---
+
 ### 3.4 Card
 
 Location: `src/components/ui/card.tsx`
@@ -254,8 +310,24 @@ Use on: modals, floating panels, nav bars, sidebar cards.
 
 ## 7. Layout & Spacing
 
+### 7.1 Layout Architecture
+
+Three layout components in `src/components/layout/`:
+
+- **`AppLayout`** — Wraps authenticated pages. Renders `Sidebar` (desktop, fixed 228px) + `MobileNav` (mobile header + slide-in drawer) + fluid `<main>` with `lg:pl-[228px]`.
+- **`AuthLayout`** — Wraps auth pages (sign-in, redirect). Two-column split: left 55% form panel with logo + centered content, right 45% branded visual panel with mascot + tagline + feature chips (desktop only).
+- **`MobileNav`** — Fixed top header (h-14) with hamburger, centered logo, theme toggle. Opens slide-in drawer (`animate-slide-left`) with same nav structure as sidebar.
+
+### 7.2 Dashboard Navigation
+
+**Sidebar sections**:
+- **WORKSPACE**: Home (`/dashboard`), Tailor (`/tailor`), Profile (`/dashboard/profile`), History (`/history`)
+- **COMING SOON** (disabled, `opacity-45`): Resumes, Roles, Templates, ATS Score, Analytics
+- **Bottom strip**: Settings link, Appearance toggle (ThemeToggle), user avatar/name/email, Sign Out button
+
+### 7.3 Spacing
+
 - **Content max-width**: `max-w-4xl` (standard pages), `max-w-5xl` (wide pages like tailoring)
-- **Dashboard**: fixed sidebar (`w-64`) + fluid main area
 - **Page padding**: `p-4 lg:p-6` inside main, `px-6 py-12` for standalone pages
 - **Section spacing**: `space-y-6` or `space-y-8` between major sections
 - **Card grids**: `grid gap-4 sm:grid-cols-2 lg:grid-cols-4`

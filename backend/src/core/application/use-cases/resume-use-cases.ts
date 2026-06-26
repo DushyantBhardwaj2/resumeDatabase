@@ -1,8 +1,93 @@
-import type { Profile, TailoredOutput } from "../../domain/entities"
+import type { Profile, TailoredOutput, Experience, Project, VaultBullet } from "../../domain/entities"
 import type { IProfileRepository, ITailoredResumeRepository } from "../../domain/repositories"
 import type { IAIService, ISchema } from "../ports/ai-service"
 import type { IPDFParser } from "../ports/pdf-parser"
-import type { ILatexTemplateFiller } from "../ports/latex-compiler"
+import type { ILatexTemplateFiller, TemplateConfig } from "../ports/latex-compiler"
+
+type BulletSelection = {
+  selections: Record<string, string[]>
+  rationale: string
+}
+
+function applyTemplateConstraints(tailored: TailoredOutput, config: TemplateConfig): void {
+  const expConfig = config.placeholders.experience
+  const projConfig = config.placeholders.projects
+
+  // Truncate entries to maxEntries
+  if (tailored.experience.length > expConfig.maxEntries) {
+    tailored.experience = tailored.experience.slice(0, expConfig.maxEntries)
+  }
+  if (tailored.projects.length > projConfig.maxEntries) {
+    tailored.projects = tailored.projects.slice(0, projConfig.maxEntries)
+  }
+
+  // Truncate bullets per entry/project to maxBullets
+  for (const exp of tailored.experience) {
+    if (exp.vaultBullets.length > expConfig.maxBullets) {
+      exp.vaultBullets = exp.vaultBullets.slice(0, expConfig.maxBullets)
+    }
+  }
+  for (const proj of tailored.projects) {
+    if (proj.vaultBullets.length > projConfig.maxBullets) {
+      proj.vaultBullets = proj.vaultBullets.slice(0, projConfig.maxBullets)
+    }
+  }
+}
+
+function assignItemIds(profile: Profile): void {
+  for (const exp of profile.experience) {
+    const e = exp as unknown as Record<string, unknown>
+    if (!e.id) {
+      e.id = crypto.randomUUID()
+    }
+  }
+  for (const proj of profile.projects) {
+    const p = proj as unknown as Record<string, unknown>
+    if (!p.id) {
+      p.id = crypto.randomUUID()
+    }
+  }
+}
+
+function buildTailoredFromSelections(
+  profile: Profile,
+  selections: Record<string, string[]>
+): TailoredOutput {
+  const expMap = new Map<string, Experience>()
+  for (const exp of profile.experience) {
+    const id = (exp as unknown as Record<string, unknown>).id as string
+    const selectedIds = selections[id]
+    if (selectedIds && selectedIds.length > 0) {
+      expMap.set(id, {
+        ...exp,
+        vaultBullets: exp.vaultBullets.filter((b) => selectedIds.includes(b.id)),
+      })
+    } else {
+      expMap.set(id, { ...exp })
+    }
+  }
+
+  const projMap = new Map<string, Project>()
+  for (const proj of profile.projects) {
+    const id = (proj as unknown as Record<string, unknown>).id as string
+    const selectedIds = selections[id]
+    if (selectedIds && selectedIds.length > 0) {
+      projMap.set(id, {
+        ...proj,
+        vaultBullets: proj.vaultBullets.filter((b) => selectedIds.includes(b.id)),
+      })
+    } else {
+      projMap.set(id, { ...proj })
+    }
+  }
+
+  return {
+    summary: null,
+    experience: Array.from(expMap.values()),
+    projects: Array.from(projMap.values()),
+    skills: profile.skills,
+  }
+}
 
 export class ResumeUseCases {
   constructor(
@@ -13,8 +98,8 @@ export class ResumeUseCases {
     private latexTemplate: ILatexTemplateFiller,
     private parsePrompt: string,
     private parseSchema: ISchema<unknown>,
-    private tailorPrompt: string,
-    private tailorSchema: ISchema<unknown>
+    private bulletSelectorPrompt: string,
+    private bulletSelectorSchema: ISchema<unknown>
   ) {}
 
   async parseResume(buffer: Buffer): Promise<{ rawText: string; parsed: Profile }> {
@@ -25,15 +110,46 @@ export class ResumeUseCases {
 
   async tailorResume(
     userId: string,
-    input: { jobTitle: string; company: string; jobDescription: string }
+    input: { jobTitle: string; company: string; jobDescription: string },
+    templateId: string = 'nsut-canonical'
   ): Promise<{ jobTitle: string; company: string; original: Profile; tailored: TailoredOutput; latex: string }> {
     const profile = await this.profileRepo.findByUserId(userId)
     if (!profile) throw new Error("Profile not found. Complete onboarding first.")
 
-    const userContent = JSON.stringify({ ...input, candidateProfile: profile })
-    const tailored = await this.aiService.generateStructuredData(this.tailorPrompt, userContent, this.tailorSchema) as unknown as TailoredOutput
+    assignItemIds(profile)
+
+    // Bullet selection path: AI selects matching bullets from vault, built locally
+    const userContent = JSON.stringify({
+      jobDescription: input.jobDescription,
+      profile,
+    })
+    const selectionResult = await this.aiService.generateStructuredData(
+      this.bulletSelectorPrompt,
+      userContent,
+      this.bulletSelectorSchema
+    ) as unknown as BulletSelection
+
+    const tailored = buildTailoredFromSelections(profile, selectionResult.selections)
+
+    // Apply template config constraints (truncate entries/bullets)
+    const templateConfig = this.latexTemplate.getTemplateConfig(templateId)
+    applyTemplateConstraints(tailored, templateConfig)
+
+    // Generate summary via AI (optional)
+    try {
+      const summaryResult = await this.aiService.generateStructuredData(
+        "You are a resume summary writer. Given the job description and candidate profile, generate a 2-sentence professional summary. Output ONLY valid JSON: {\"summary\": string}",
+        JSON.stringify({ jobDescription: input.jobDescription, profile }),
+        { parse: (data: unknown) => data as { summary: string } }
+      )
+      const summary = (summaryResult as { summary?: string }).summary
+      if (summary) tailored.summary = summary
+    } catch {
+      // Summary generation is optional; proceed without it
+    }
 
     const latex = this.latexTemplate.fill(
+      templateId,
       profile.contact as unknown as Record<string, unknown>,
       profile.education as unknown as Array<Record<string, unknown>>,
       profile.experience as unknown as Array<Record<string, unknown>>,

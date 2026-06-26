@@ -166,17 +166,7 @@ Response:
 }
 ```
 
-**`POST /api/profile/save-bullets`**
-
-```json
-{
-  "section": "experience",
-  "sectionId": "experience-0",
-  "selectedBullets": [
-    "Developed and shipped new Search features using TypeScript and Go, serving 100M+ users",
-    "Reduced page load latency by 40% through optimized React component rendering and caching strategies"
-  ]
-}
+> **Note**: `POST /api/profile/save-bullets` was planned but NOT implemented. `PUT /api/profile` already supports partial section updates — the client merges accepted bullets into local state and calls `PUT /api/profile` to persist.
 ```
 
 ---

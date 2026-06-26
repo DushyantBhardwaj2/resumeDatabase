@@ -5,12 +5,14 @@
 | Layer | Choice |
 |-------|--------|
 | **Frontend** | Next.js 16.2.9 (App Router, Turbopack), TypeScript, Tailwind CSS v4 |
-| **Backend** | Next.js API Routes (serverless monorepo) |
-| **AI SDK** | Direct `fetch` to OpenCode Zen (`https://opencode.ai/zen/v1`) — OpenAI-compatible gateway. Model: `deepseek-v4-flash-free` (free tier) |
+| **Backend** | Express + tsx on Render (`server/`) |
+| **Auth** | Better Auth v1.6 (Google OAuth, `@nsut.ac.in` domain restriction, `nextCookies` plugin) |
 | **Database** | Supabase PostgreSQL via Prisma v7 ORM + `@prisma/adapter-pg` |
-| **Auth** | Better Auth (Google OAuth plugin, `@better-auth/prisma-adapter`, domain restriction via `databaseHooks`) |
+| **AI** | Direct `fetch` to OpenCode Zen (`https://opencode.ai/zen/v1`) — Model: `deepseek-v4-flash-free` |
 | **PDF Parsing** | `pdf-parse` v2 (text extraction) → OpenCode Zen AI (structured JSON extraction) |
-| **Hosting** | Vercel (planned) |
+| **Icons** | `@phosphor-icons/react` |
+| **Testing** | Vitest 4 + jsdom + React Testing Library |
+| **Hosting** | Vercel (frontend) + Render (backend) |
 
 ---
 
@@ -19,18 +21,24 @@
 ```
 User Browser
     │
-    ├── Next.js App (Frontend + API Routes)
+    ├── Vercel (Next.js 16 — Frontend + Auth routes)
     │       │
-    │       ├── Better Auth (Google OAuth, session management)
-    │       ├── Prisma v7 Client + PrismaPg adapter (database access)
-    │       ├── Direct fetch → OpenCode Zen (AI inference)
-    │       └── pdf-parse v2 (resume text extraction)
+    │       ├── AppLayout (Sidebar 228px + MobileNav drawer)
+    │       ├── Better Auth locally at /api/auth/* (same-domain cookies)
+    │       ├── Dashboard: Home, Profile, History, Tailor
+    │       ├── Coming Soon: Resumes, Roles, Templates, ATS Score, Analytics, Settings
+    │       └── 15 UI components (Button, Input, Card, Badge, Avatar, Dialog, etc.)
     │
-    ├── Supabase PostgreSQL
-    └── GitHub API (Phase 2)
+    ├── Render (Express — Backend API via /api/protected/*)
+    │       ├── Clean Architecture: domain → application → infrastructure
+    │       ├── LaTeX compilation (pdflatex)
+    │       └── Shared core layer (entities, use-cases, ports, persistence)
+    │
+    ├── Supabase PostgreSQL (via Prisma v7)
+    └── GitHub API (repo fetch, import)
 ```
 
-**Key principle**: Next.js API routes serve as the backend. The Vercel AI SDK (`ai` + `@ai-sdk/openai`) is installed but NOT used — a `RangeError: Invalid time value` bug in `ai@6.0.203` (crashes when API response lacks a `created` timestamp) forced a direct `fetch` approach. If the SDK is updated/fixed, consider migrating back for telemetry and unified interface.
+Vercel proxies `/api/*` to Render via `vercel.json` rewrites. Auth is handled **directly on Vercel** via Better Auth route handler (`src/app/api/auth/[...all]/route.ts`). This keeps session cookies on the same domain, eliminating cross-domain cookie issues.
 
 ---
 
@@ -91,54 +99,100 @@ User Browser
 
 ```
 resumemint/
+├── backend/                            # Hono backend (deployed on Render)
+│   ├── src/
+│   │   ├── index.ts                   # Hono server, CORS, session middleware
+│   │   ├── routes/                    # API route handlers
+│   │   ├── core/                      # Domain + application layers
+│   │   ├── infrastructure/            # AI, PDF, LaTeX, persistence
+│   │   ├── config/                    # Auth client/server config
+│   │   └── di/                        # Dependency injection
+│   ├── Dockerfile
+│   └── package.json
+├── server/                            # Alternative Express backend
+│   ├── src/
+│   │   ├── index.ts                   # Express server
+│   │   ├── middleware/                # Auth middleware
+│   │   └── routes/                    # API route handlers
+│   ├── Dockerfile
+│   └── package.json
 ├── prisma/
-│   ├── schema.prisma                   # 7 models (no datasource.url — Prisma v7)
-│   └── migrations/
-├── public/
-│   └── assets/
+│   ├── schema.prisma                  # 7 models (no datasource.url)
+│   └── prisma.config.ts               # v7 datasource URL config
 ├── docs/
-│   ├── ui_design.md                    # Design system spec (NEW)
-│   └── data_saving_planning.md         # Data philosophy + AI component spec (NEW)
+│   ├── ui_design.md                   # Design system spec
+│   └── data_saving_planning.md        # Data philosophy + AI component spec
 ├── src/
 │   ├── app/
-│   │   ├── layout.tsx                  # Updated: Inter + JetBrains Mono fonts
-│   │   ├── page.tsx                    # Landing page with Google Sign-In
-│   │   ├── globals.css                 # Tailwind v4 + Satoshi CDN + full design tokens
+│   │   ├── layout.tsx                 # Root layout: Satoshi, Inter, JetBrains Mono
+│   │   ├── page.tsx                   # Landing page with Google Sign-In
+│   │   ├── globals.css                # Tailwind v4 + design tokens + animations
 │   │   ├── access-denied/
-│   │   │   └── page.tsx                # NSUT-only restriction page
+│   │   │   └── page.tsx               # NSUT-only restriction page
 │   │   ├── onboarding/
-│   │   │   └── page.tsx                # Multi-step wizard (refactored)
+│   │   │   └── page.tsx               # Multi-step wizard
 │   │   ├── dashboard/
-│   │   │   └── page.tsx                # Post-onboarding dashboard
-│   │   ├── api/
-│   │   │   ├── auth/
-│   │   │   │   └── [...all]/route.ts   # Better Auth API handlers
-│   │   │   ├── resume/
-│   │   │   │   └── parse/route.ts      # POST: upload PDF → parse
-│   │   │   ├── profile/
-│   │   │   │   ├── save/route.ts       # POST: save initial profile
-│   │   │   │   └── save-bullets/route.ts # POST: save AI-generated bullets (NEW)
-│   │   │   └── ai/
-│   │   │       └── generate-bullets/route.ts # POST: AI bullet generation (NEW)
-│   │   ├── tailor/                     # Phase 3
-│   │   ├── history/                    # Phase 4
-│   │   └── loading.tsx
+│   │   │   ├── layout.tsx             # AppLayout wrapper
+│   │   │   ├── page.tsx               # Dashboard home
+│   │   │   ├── profile/page.tsx       # Profile editor
+│   │   │   ├── resumes/page.tsx       # (coming soon)
+│   │   │   ├── roles/page.tsx         # (coming soon)
+│   │   │   ├── templates/page.tsx     # (coming soon)
+│   │   │   ├── ats-score/page.tsx     # (coming soon)
+│   │   │   ├── analytics/page.tsx     # (coming soon)
+│   │   │   └── settings/page.tsx      # (coming soon)
+│   │   ├── auth/redirect/page.tsx     # OAuth redirect handler
+│   │   ├── tailor/
+│   │   │   └── page.tsx               # Resume tailoring interface
+│   │   ├── history/
+│   │   │   └── page.tsx               # History dashboard
+│   │   └── api/
+│   │       └── auth/[...all]/route.ts # Better Auth API handlers
 │   ├── components/
-│   │   ├── ui/                         # Base design system components
-│   │   │   ├── button.tsx              # (NEW) 4 variants, 3 sizes
-│   │   │   ├── input.tsx              # (NEW) Input + Textarea with label/error
-│   │   │   ├── badge.tsx              # (NEW) 6 color variants
-│   │   │   └── card.tsx               # (NEW) 3 variants, 4 padding options
-│   │   └── ai-assisted-content.tsx     # (NEW) Universal AI content component
+│   │   ├── layout/
+│   │   │   ├── app-layout.tsx         # Sidebar + mobile nav + main
+│   │   │   ├── sidebar.tsx            # Desktop fixed sidebar (228px)
+│   │   │   ├── mobile-nav.tsx         # Mobile header + slide-in drawer
+│   │   │   └── auth-layout.tsx        # Two-column auth page layout
+│   │   ├── ui/
+│   │   │   ├── button.tsx             # 4 variants, 3 sizes
+│   │   │   ├── input.tsx              # Input + Textarea with label/error
+│   │   │   ├── badge.tsx              # 6 color variants
+│   │   │   ├── card.tsx               # 3 variants, 4 padding options
+│   │   │   ├── avatar.tsx             # Image + initials fallback
+│   │   │   ├── dialog.tsx             # Modal overlay
+│   │   │   ├── progress.tsx           # Progress bar
+│   │   │   ├── separator.tsx          # Horizontal divider
+│   │   │   ├── skeleton.tsx           # Loading placeholder
+│   │   │   ├── textarea.tsx           # Textarea with label/error
+│   │   │   ├── tooltip.tsx            # CSS hover tooltip
+│   │   │   ├── field.tsx              # Shared field wrapper
+│   │   │   ├── section-card.tsx       # Section card layout
+│   │   │   ├── bullet-list.tsx        # Editable bullet list
+│   │   │   └── overleaf-button.tsx    # Overleaf export
+│   │   ├── sign-in-button.tsx         # Reusable sign-in (default + minimal)
+│   │   ├── theme-toggle.tsx           # Dark/light toggle
+│   │   └── ai-assisted-content.tsx    # Universal AI content component
 │   ├── lib/
-│   │   ├── prisma.ts                   # Prisma v7 singleton (PgAdapter)
-│   │   ├── auth.ts                     # Better Auth server config + getServerSession
-│   │   ├── auth-client.ts              # Better Auth React client
-│   │   ├── ai.ts                       # Direct fetch → OpenCode Zen + JSON extraction
-│   │   ├── pdf-parser.ts               # pdf-parse v2 + AI extraction pipeline
-│   │   └── validators.ts               # Re-exports from pdf-parser
-├── prisma.config.ts                    # Prisma v7 datasource URL config (required)
-├── .env.local                          # 7 env vars (DB, Auth, OAuth, API key)
+│   │   ├── auth.ts                    # Server-side session fetch
+│   │   ├── auth-client.ts             # Better Auth React client
+│   │   ├── fetch.ts                   # Cookie-forwarding fetch
+│   │   ├── utils.ts                   # cn, formatDate, getInitials, clamp, truncate
+│   │   ├── profile-utils.ts           # Profile completeness scoring
+│   │   ├── latex-template.ts          # LaTeX resume template filler
+│   │   └── config/                    # Shared config (prisma, etc.)
+│   └── config/
+│       ├── auth.ts                    # Better Auth server config
+│       └── auth-client.ts             # Better Auth client config
+├── tests/
+│   ├── sign-in-button.test.tsx        # Component test
+│   ├── auth-redirect.test.ts          # Redirect logic test
+│   └── auth-flow.test.ts              # Auth config contract test
+├── vitest.config.ts
+├── vitest.setup.ts
+├── render.yaml                        # Render deployment config
+├── vercel.json                        # Vercel deployment config
+├── .env.example
 ├── tsconfig.json
 ├── next.config.ts
 ├── package.json
@@ -150,23 +204,25 @@ resumemint/
 
 ## API Design
 
-| Method | Route | Phase | Purpose |
-|--------|-------|-------|---------|
-| * | `/api/auth/*` | 1 | Better Auth handlers (login, callback, session, logout) |
-| POST | `/api/resume/parse` | 1 | Upload PDF → extract text → call OpenCode Zen → return structured JSON |
-| POST | `/api/profile/save` | 1 | Save parsed profile data (first-time upsert) |
-| GET | `/api/profile` | 2 | Fetch user's full profile |
-| PUT | `/api/profile` | 2 | Update profile sections |
-| GET | `/api/integrations/github/repos` | 2 | Fetch public repos by username |
-| POST | `/api/profile/projects/github-import` | 2 | Import selected repos as projects |
-| POST | `/api/resume/tailor` | 3 | Accept JD + profile → AI tailoring → return tailored JSON |
-| POST | `/api/resume/export-pdf` | 3 | Compile tailored data into downloadable PDF |
-| GET | `/api/history` | 4 | List all tailored resumes |
-| GET | `/api/history/[id]` | 4 | Fetch single historical resume |
-| DELETE | `/api/history/[id]` | 4 | Delete a historical resume |
-| PUT | `/api/history/[id]/styling` | 4 | Update style config for a resume |
-| POST | `/api/ai/generate-bullets` | 5 | AI bullet generation from raw text |
-| POST | `/api/profile/save-bullets` | 5 | Persist selected AI-generated bullets |
+> All authenticated routes are under `/api/protected/*` on the Render backend. The Vercel frontend proxies `/api/*` to Render. Auth routes (`/api/auth/*`) are handled locally on Vercel.
+
+| Method | Route (proxy) | Backend Route | Purpose |
+|--------|------|------|---------|
+| * | `/api/auth/*` | — (local on Vercel) | Better Auth handlers (login, callback, session, logout) |
+| POST | `/api/protected/resume/parse` | `POST /api/protected/resume/parse` | Upload PDF → extract text → AI → structured JSON |
+| GET | `/api/protected/profile` | `GET /api/protected/profile` | Fetch user's full profile |
+| POST | `/api/protected/profile` | `POST /api/protected/profile` | Save profile upsert |
+| PUT | `/api/protected/profile` | `PUT /api/protected/profile` | Update profile sections |
+| GET | `/api/protected/integrations/github/repos` | `GET /api/protected/integrations/github/repos` | Fetch public repos by username |
+| POST | `/api/protected/profile/projects/github-import` | `POST /api/protected/profile/projects/github-import` | Import selected repos as projects |
+| POST | `/api/protected/resume/tailor` | `POST /api/protected/resume/tailor` | JD + profile → AI tailoring → tailored JSON |
+| POST | `/api/protected/resume/compile` | `POST /api/protected/resume/compile` | LaTeX compile → PDF download |
+| GET | `/api/protected/history` | `GET /api/history` | List all tailored resumes |
+| GET | `/api/protected/history/[id]` | `GET /api/history/[id]` | Fetch single historical resume |
+| DELETE | `/api/protected/history/[id]` | `DELETE /api/history/[id]` | Delete a historical resume |
+| PUT | `/api/protected/history/[id]/styling` | `PUT /api/history/[id]/styling` | Update style config for a resume |
+| POST | `/api/protected/ai/generate-bullets` | `POST /api/ai/generate-bullets` | AI bullet generation from raw text |
+| GET | `/api/health` | `GET /api/health` | Health check (no auth) |
 
 ---
 
@@ -369,9 +425,9 @@ resumemint/
 
 ### Phase 4: History, Templates & Polish ✅
 
-### Phase 5: Design System Overhaul & AI-Assisted Content Creation (In Progress)
+### Phase 5: Design System & AI-Assisted Content Creation ✅
 
-**Objective**: Refactor the entire UI layer with a proper design system (Satoshi/Inter fonts, glassmorphism, expanded palette). Build a universal AI-assisted content creation component that works across onboarding and profile management. Refactor onboarding into a multi-step wizard. Enhance the dashboard with AI-powered content creation.
+**Status**: 37/38 features complete (1 deferred — F5.3.9 persisted wizard progress)
 
 #### Step 5.1 — Design System Foundation ✅
 - Updated `globals.css` with expanded Tailwind v4 tokens (primary-light, accent-dark/light, warning, radius scale)
@@ -380,22 +436,23 @@ resumemint/
 - Created `docs/ui_design.md` and `docs/data_saving_planning.md`
 - `tsc --noEmit` + `npm run build` pass cleanly
 
-#### Step 5.2 — Universal AI Component (PLANNED)
-- `POST /api/ai/generate-bullets` — accepts raw text + section type → returns AI-generated bullet points
-- `AIAssistedContent` component — 3 modes: AI generation (textarea + generate button + checkbox selection), manual input, hybrid edit
-- `POST /api/profile/save-bullets` — persist selected bullets to profile
-- Reusable across experience, projects, skills sections
+#### Step 5.2 — Universal AI Component ✅
+- `POST /api/ai/generate-bullets` endpoint — accepts `{section, rawInput, context}`, returns structured bullets/skills/summary via OpenCode Zen
+- `AIAssistedContent` component — 3 modes: AI generation with checkbox selection, manual input, hybrid edit
+- Works for experience (bullet points), projects (bullet points), skills (categorized), summary (free text)
+- `PUT /api/profile` already supports partial section updates — no separate save-bullets endpoint needed
 
-#### Step 5.3 — Onboarding Multi-Step Wizard (PLANNED)
-- Refactor `src/app/onboarding/page.tsx` from single-step to multi-step wizard
-- Step 1: PDF upload & parse (existing)
-- Steps 2-4: Experience, Skills, GitHub via universal AI component
-- Step 5: Review & save
-- Each step skippable
+#### Step 5.3 — Onboarding Multi-Step Wizard ✅
+- Refactored from single-step parse→review to 5-step wizard with step indicator
+- Step 1: PDF upload & parse; Step 2: AI-assist experience; Step 3: AI-assist projects; Step 4: AI-assist skills; Step 5: Review & save
+- Back/Next/Skip per step, final review shows all editable sections
+- Persisted progress (F5.3.9) deferred — future enhancement
 
-#### Step 5.4 — Profile Dashboard Enhancement (PLANNED)
-- Integrate the universal AI component into Experience/Projects/Skills editors on the profile page
-- Allow AI-assisted bullet generation for any existing item
+#### Step 5.4 — Profile Dashboard AI Enhancement ✅
+- Sparkle icon (AI assist) added to each Experience and Project entry card
+- AIAssistedContent component opens inline within the entry when toggled
+- Skills section has AI categorization panel at the bottom
+- Accepted items merged into existing data, close AI panel on accept
 
 ---
 
@@ -404,16 +461,18 @@ resumemint/
 | Issue | Status |
 |-------|--------|
 | **Prisma v7 breaking changes** | `datasource.url` removed from schema → use `prisma.config.ts`. `PrismaClient` requires `adapter` option (`PrismaPg` from `@prisma/adapter-pg`). `prisma db push` works. |
-| **Better Auth import paths** | `toNextJsHandler` from `better-auth/integrations/next-js`, not `better-auth/next-js`. |
+| **Better Auth import paths** | `toNextJsHandler` from `better-auth/next-js` (v1.6). `nextCookies()` plugin required for Vercel. |
 | **pdf-parse v2 API** | `new PDFParse({data: buffer})` with `.getText()` method. Result is `{ text: string }`. Must call `.destroy()`. |
-| **AI SDK `RangeError: Invalid time value`** | `ai@6.0.203` crashes at `responseData.timestamp.toISOString()` when API response lacks a `created` timestamp. OpenCode Zen doesn't return one. **Workaround**: direct `fetch` instead of `generateText`/`generateObject`. |
-| **OpenCode Zen structured output** | API does NOT support `response_format: { type: "json_schema" }` or `{ type: "json_object" }`. Returns 500 error. **Workaround**: use `generateText` (now direct `fetch`) + manual JSON extraction + Zod validation. |
-| **Multiple lockfiles warning** | Fix by adding `turbopack.root` to `next.config.ts`. Currently benign. |
-| **Dev server background process** | `Start-Process` fails with EPERM in this shell. Use `cmd /c start /B cmd /c "..."` with `--%` to bypass PS parser. |
-| **Domain restriction error swallowed** | The hook throws a plain `Error`, not `APIError`. Better Auth catches it and returns generic `"unable to create user"` because `isAPIError()` returns `false`. Fix: import `APIError` from `better-auth` and throw `new APIError("FORBIDDEN", ...)`. |
-| **shadcn/ui** | Not used — replaced by custom `src/components/ui/` base components (Button, Input, Badge, Card). |
+| **AI SDK removed** | `ai`, `@ai-sdk/openai`, `@google/generative-ai` packages pruned (Phase 5). Direct `fetch` to OpenCode Zen. |
+| **OpenCode Zen structured output** | API does NOT support `response_format: { type: "json_schema" }` or `{ type: "json_object" }`. Returns 500 error. **Workaround**: direct `fetch` + manual JSON extraction + Zod validation. |
+| **Auth on Vercel** | Better Auth runs as a local API route on Vercel (`src/app/api/auth/[...all]/route.ts`) to keep cookies on the same domain. Render backend handles all other `/api/*` requests via proxy. |
+| **Vercel proxy** | `vercel.json` rewrites `/api/*` → Render URL. `/api/auth/*` takes precedence via file routes. |
+| **Domain restriction error swallowed** | The hook throws a plain `Error`, not `APIError`. Better Auth catches it and returns generic `"unable to create user"`. Fix pending: import `APIError` from `better-auth` and throw `new APIError("FORBIDDEN", ...)`. |
+| **shadcn/ui** | Not used — replaced by custom `src/components/ui/` base components (15 components). |
 | **Satoshi font** | Not on Google Fonts or npm/fontsource. Loaded via Fontshare CDN `@import` in `globals.css`. Falls back to `system-ui` if CDN unreachable. |
 | **JetBrains Mono** | Installed via `@fontsource-variable/jetbrains-mono` (npm) for variable font support. |
+| **Icons** | Using `@phosphor-icons/react` (not lucide-react). |
+| **Testing** | Vitest 4 + jsdom + React Testing Library. Run `npm test`. |
 
 ## Environment Variables
 

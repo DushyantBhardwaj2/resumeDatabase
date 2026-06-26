@@ -220,6 +220,16 @@
 - [x] **F5.4.4** — Reusable `AIAssistedContent` component shared across all sections
 - [x] **F5.4.5** — Ability to re-generate AI suggestions for existing items
 
+### 5.5 Frontend Refactor (Merged from resumeDatabase) ✅
+- [x] **F5.5.1** — New layout architecture: AppLayout, Sidebar (228px), MobileNav (drawer), AuthLayout (two-column)
+- [x] **F5.5.2** — New UI components: Avatar, Dialog, Progress, Separator, Skeleton, Textarea, Tooltip
+- [x] **F5.5.3** — New dashboard pages (gated as coming soon): Resumes, Roles, Templates, ATS Score, Analytics, Settings
+- [x] **F5.5.4** — Icons replaced with `@phosphor-icons/react`
+- [x] **F5.5.5** — Test setup: Vitest 4 + jsdom + React Testing Library (3 test files)
+- [x] **F5.5.6** — Reusable SignInButton component (default + minimal variants)
+- [x] **F5.5.7** — New lib files: `src/lib/auth.ts`, `src/lib/fetch.ts`, `src/lib/utils.ts`
+- [x] **F5.5.8** — Dark/light theme toggle integrated into sidebar + mobile nav
+
 ---
 
 ## Summary Counts
@@ -231,7 +241,8 @@
 | Phase 3: Resume Tailoring | 18 | 18/18 |
 | Phase 4: History & Polish | 23 | 23/23 |
 | Phase 5: Design System & AI Content | 38 | 37/38 |
-| **Total** | **122** | **121/122** |
+| Phase 5.5: Frontend Refactor | 8 | 8/8 |
+| **Total** | **130** | **129/130** |
 
 ---
 

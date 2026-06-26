@@ -1,6 +1,15 @@
 import type { IGitHubRepoRepository, IProfileRepository } from "../../domain/repositories"
 import type { IAIService, ISchema } from "../ports/ai-service"
-import type { Profile } from "../../domain/entities"
+import type { Profile, VaultBullet } from "../../domain/entities"
+
+function bulletsToVault(bullets: string[], isAIGenerated = true): VaultBullet[] {
+  return bullets.map((b) => ({
+    id: crypto.randomUUID(),
+    text: b,
+    keywords: [],
+    isAIGenerated,
+  }))
+}
 
 export class GithubUseCases {
   constructor(
@@ -15,7 +24,7 @@ export class GithubUseCases {
     userId: string,
     repos: Array<{ name: string; url: string; language: string | null }>
   ): Promise<{ imported: number; projects: Profile["projects"] }> {
-    const importedProjects: Array<{ title: string; techStack: string[]; bullets: string[]; url: string }> = []
+    const importedProjects: Profile["projects"] = []
 
     for (const repo of repos) {
       let bullets: string[] = []
@@ -31,16 +40,17 @@ export class GithubUseCases {
         bullets = [`Built and maintained ${repo.name} using ${repo.language ?? "various technologies"}.`]
       }
 
+      const vaultBullets = bulletsToVault(bullets)
       await this.githubRepo.upsertRepos(userId, [
         { repoName: repo.name, repoUrl: repo.url, techStack: repo.language ? [repo.language] : [], bulletsGenerated: bullets },
       ])
 
-      importedProjects.push({ title: repo.name, techStack: repo.language ? [repo.language] : [], bullets, url: repo.url })
+      importedProjects.push({ title: repo.name, techStack: repo.language ? [repo.language] : [], vaultBullets, url: repo.url })
     }
 
     const profile = await this.profileRepo.findByUserId(userId)
     const mergedProjects = [...importedProjects, ...(profile?.projects ?? [])]
-    await this.profileRepo.upsert(userId, { projects: mergedProjects as unknown as Profile["projects"] })
+    await this.profileRepo.upsert(userId, { projects: mergedProjects })
 
     return { imported: importedProjects.length, projects: mergedProjects }
   }

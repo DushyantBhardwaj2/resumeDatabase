@@ -1,0 +1,13 @@
+{
+  "id": "ats-clean",
+  "name": "ATS Clean",
+  "description": "Clean ATS-friendly template with Palatino font, standard margins",
+  "placeholders": {
+    "contact": ["FULL_NAME", "PHONE", "EMAIL", "EMAIL_DISPLAY", "LINKEDIN_URL", "LEETCODE_URL", "GITHUB_URL"],
+    "education": { "maxEntries": 3, "fields": ["EDU_DEGREE_N", "EDU_YEAR_N", "EDU_INSTITUTION_N", "EDU_SCORE_N"] },
+    "experience": { "maxEntries": 10, "maxBullets": 5, "fields": ["EXP_TITLE_N", "EXP_DATES_N", "EXP_TECHSTACK_N", "EXP_BULLET_N_M"] },
+    "projects": { "maxEntries": 10, "maxBullets": 5, "fields": ["PROJ_NAME_N", "PROJ_DATES_N", "PROJ_PURPOSE_N", "PROJ_TECHSTACK_N", "PROJ_BULLET_N_M", "PROJ_GITHUB_URL_N", "PROJ_GITHUB_LABEL_N"] },
+    "skills": ["SKILLS_LANGUAGES", "SKILLS_TOOLS", "SKILLS_FRAMEWORKS", "SKILLS_BACKEND", "SKILLS_COURSEWORK"]
+  },
+  "sections": ["contact", "education", "experience", "projects", "skills"]
+}

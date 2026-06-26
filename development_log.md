@@ -207,3 +207,28 @@
 ### Summary
 - Phase 5: 37/38 features complete (only F5.3.9 — persisted wizard progress — deferred)
 - Total: 121/122 — essentially MVP-complete
+
+## 2026-06-24 — Frontend Refactor Merged (from DushyantBhardwaj2/resumeDatabase)
+
+### New Layout Architecture
+- **AppLayout**: Desktop sidebar (228px) + mobile header/drawer + fluid main content
+- **Sidebar**: Fixed left panel with WORKSPACE (Home, Tailor, Profile, History) and COMING SOON (Resumes, Roles, Templates, ATS Score, Analytics) sections
+- **MobileNav**: Fixed top header with hamburger → slide-in drawer, same nav structure
+- **AuthLayout**: Two-column split (form left 55%, branded visual right 45%)
+
+### New UI Components
+- Avatar, Dialog, Progress, Separator, Skeleton, Textarea, Tooltip (in `src/components/ui/`)
+
+### New Dashboard Pages (gated as "coming soon")
+- `/dashboard/resumes`, `/dashboard/roles`, `/dashboard/templates`, `/dashboard/ats-score`, `/dashboard/analytics`, `/dashboard/settings`
+
+### Other Changes
+- Icons: lucide → `@phosphor-icons/react`
+- Tests: Vitest 4 + jsdom + RTL setup (3 test files)
+- New lib: `src/lib/auth.ts` (server session fetch), `src/lib/fetch.ts` (cookie forward), `src/lib/utils.ts` (cn, formatDate, getInitials, clamp, truncate)
+- Sign-in: extracted to reusable `SignInButton` component
+- CI: removed `npx prisma generate` from build job
+
+### Git Remotes Cleaned
+- Removed `origin` (GitLab), `github` (UtkarshDubeyGIT/Resumint), `personal` (dead)
+- Only `origin` → `https://github.com/DushyantBhardwaj2/resumeDatabase` remains

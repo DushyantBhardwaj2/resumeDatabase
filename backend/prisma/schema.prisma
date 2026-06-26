@@ -73,7 +73,7 @@ model Profile {
   projects      Json?
   skills        Json?
   leadership    Json?
-  certifications Json?
+  certificates Json?
   achievements  Json?
   extracurriculars Json?
   createdAt     DateTime @default(now())

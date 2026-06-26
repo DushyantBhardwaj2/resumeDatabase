@@ -1,0 +1,79 @@
+'use client'
+
+import { useState, useRef } from 'react'
+import { UploadSimple } from '@phosphor-icons/react'
+import { toast } from 'sonner'
+import { fetchApi } from '@/config/api-client'
+
+interface ResumeUploadWidgetProps {
+  onParsed?: (data: unknown) => void
+}
+
+export function ResumeUploadWidget({ onParsed }: ResumeUploadWidgetProps) {
+  const [dragging, setDragging] = useState(false)
+  const [parsing, setParsing] = useState(false)
+  const fileRef = useRef<HTMLInputElement>(null)
+
+  const parseFile = async (file: File) => {
+    if (!file.type.includes('pdf')) {
+      toast.error('Please upload a PDF file')
+      return
+    }
+    setParsing(true)
+    try {
+      const fd = new FormData()
+      fd.append('file', file)
+      const res = await fetchApi('/api/protected/resume/parse', { method: 'POST', body: fd })
+      const result = await res.json()
+      if (!res.ok) throw new Error(result.error || 'Failed to parse resume')
+      onParsed?.(result.parsed)
+      toast.success('Resume parsed successfully!')
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : 'Something went wrong')
+    } finally {
+      setParsing(false)
+    }
+  }
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+    setDragging(false)
+    const file = e.dataTransfer.files[0]
+    if (file) parseFile(file)
+  }
+
+  return (
+    <div className="mt-3">
+      <div
+        onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={onDrop}
+        onClick={() => !parsing && fileRef.current?.click()}
+        className={[
+          'border-2 border-dashed rounded-[var(--radius-lg)] p-6 text-center cursor-pointer transition-colors duration-200',
+          dragging ? 'border-brand bg-brand-light/40' : 'border-edge hover:border-brand',
+          parsing ? 'opacity-60 cursor-wait' : '',
+        ].join(' ')}
+      >
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".pdf,application/pdf"
+          className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) parseFile(f) }}
+        />
+        {parsing ? (
+          <div className="flex flex-col items-center gap-2">
+            <div className="h-8 w-8 rounded-full border-2 border-brand border-t-transparent animate-spin" />
+            <p className="text-xs text-content-muted">Parsing...</p>
+          </div>
+        ) : (
+          <>
+            <UploadSimple size={24} className="mx-auto text-content-subtle mb-2" />
+            <p className="text-xs text-content-muted">Drop PDF or click to browse</p>
+          </>
+        )}
+      </div>
+    </div>
+  )
+}

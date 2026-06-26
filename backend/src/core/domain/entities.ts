@@ -16,18 +16,26 @@ export interface Education {
   endYear: number | null
 }
 
+export type VaultBullet = {
+  id: string
+  text: string
+  category?: 'FRONTEND' | 'BACKEND' | 'DEVOPS' | 'LEADERSHIP' | 'GENERAL'
+  keywords: string[]
+  isAIGenerated: boolean
+}
+
 export interface Experience {
   company: string
   role: string
   startDate: string | null
   endDate: string | null
-  bullets: string[]
+  vaultBullets: VaultBullet[]
 }
 
 export interface Project {
   title: string
   techStack: string[]
-  bullets: string[]
+  vaultBullets: VaultBullet[]
   url: string | null
 }
 
@@ -37,12 +45,21 @@ export interface Skills {
   tools: string[]
 }
 
+export interface Certificate {
+  id: string
+  name: string
+  issuer: string
+  url: string
+  date?: string
+}
+
 export interface Profile {
   contact: Contact
   education: Education[]
   experience: Experience[]
   projects: Project[]
   skills: Skills
+  certificates: Certificate[]
   githubUsername: string | null
 }
 
