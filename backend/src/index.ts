@@ -122,6 +122,14 @@ app.post('/api/protected/resume/tailor', async (c) => {
 // Resume Parse API
 app.post('/api/protected/resume/parse', async (c) => {
   try {
+    const session = c.get('session')
+
+    // Check if user already has a profile — return existing data if so
+    const existing = await container.profileUseCases.getProfile(session.user.id)
+    if (existing) {
+      return c.json({ rawText: "", parsed: existing, fromDb: true })
+    }
+
     const body = await c.req.parseBody()
     const file = body['file']
     if (!file || !(file instanceof File)) {

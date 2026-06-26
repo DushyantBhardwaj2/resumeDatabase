@@ -27,7 +27,7 @@ export function ResumeUploadWidget({ onParsed }: ResumeUploadWidgetProps) {
       const result = await res.json()
       if (!res.ok) throw new Error(result.error || 'Failed to parse resume')
       onParsed?.(result.parsed)
-      toast.success('Resume parsed successfully!')
+      toast.success(result.fromDb ? 'Profile loaded from your data!' : 'Resume parsed successfully!')
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Something went wrong')
     } finally {

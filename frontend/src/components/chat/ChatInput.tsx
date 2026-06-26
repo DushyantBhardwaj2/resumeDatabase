@@ -12,12 +12,19 @@ interface ChatInputProps {
 }
 
 export function ChatInput({ onSend, disabled, placeholder }: ChatInputProps) {
-  const [text, setText] = useState(() => {
-    try { return localStorage.getItem(DRAFT_KEY) || '' } catch { return '' }
-  })
+  const [text, setText] = useState('')
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const hydratedRef = useRef(false)
+
+  // Hydrate draft from localStorage after mount to avoid SSR mismatch
+  useEffect(() => {
+    hydratedRef.current = true
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    try { setText(localStorage.getItem(DRAFT_KEY) || '') } catch { /* noop */ }
+  }, [])
 
   useEffect(() => {
+    if (!hydratedRef.current) return
     try {
       if (text) localStorage.setItem(DRAFT_KEY, text)
       else localStorage.removeItem(DRAFT_KEY)
