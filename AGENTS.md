@@ -64,6 +64,23 @@ Routes that do NOT require auth (e.g., `GET /api/health`) stay outside `/api/pro
 | `/onboarding` | Chat-driven profile creation (replaces old wizard) |
 | `/tailor/builder` | Split-screen chat + live PDF preview |
 
+### Bug Fixes — Phase 6.7 (2026-06-27)
+- **Bug #9** — `/onboarding` route bypasses auth check: session cookie check (`better-auth.` prefix) added in `proxy.ts`.
+- **Bug #10** — `INTERNAL_API_URL` added as primary env var across 4 server-side files.
+- **Bug #11** — Bullet keywords discarded during tailoring: `GenerateChatWorkspace.tsx` + `JDInputPanel.tsx` look up orig keywords via `origBullets.get(b.text)`.
+- **Bug #12** — Duplicate compile debounce: removed dead `LivePdfRenderer.tsx`.
+- **Bug #13** — GitHub repos not deduplicated: `existingUrls` Set filter added.
+- **Bug #14** — `/tailor/builder` page only redirected: deleted the page file.
+- **Bug #15** — Domain entities missing `id`: added `id: string` to Experience/Project entities.
+- **Bug #16** — Onboarding cookie SameSite: changed `Lax` → `None; Secure`.
+- **Bug #17** — Two competing `fetchWithSession`: consolidated; `lib/fetch.ts` re-exports from `api-client-server.ts`.
+- **Bug #18** — Two completeness calculations: backend computes + returns `completeness` in GET profile.
+- **Bug #19** — Outdated copyright: `2025` → `{new Date().getFullYear()}`.
+- **Hydration mismatch** — `useLocalStorage` read `localStorage` in `useState` init → server/client mismatch. Fixed: defer to `useEffect`, always start with `initialValue`.
+- **Onboarding parse error** — Rewrote `page.tsx` with clean encoding to fix `SyntaxError: Expected ','`.
+- **Zen API curl test false 500** — Windows `schannel` TLS renegotiation with Cloudflare causes false 500. Backend uses Node.js `fetch` (works fine). Verified with direct Node.js request.
+- **API key/model updated** — `OPENCODE_API_KEY` and model switched to `deepseek-v4-flash-free` using the opencode-local account key.
+
 ### Status
 - **Phase 1**: 22/22
 - **Phase 2**: 21/21
@@ -71,4 +88,5 @@ Routes that do NOT require auth (e.g., `GET /api/health`) stay outside `/api/pro
 - **Phase 4**: 23/23
 - **Phase 5**: 38/38
 - **Phase 6**: 20/20
+- **Phase 6.7 (Bug Fixes)**: 13 bugs + 3 infra fixes
 - **Total**: **142/142 — MVP + Chat Interface Complete**
