@@ -16,18 +16,6 @@ interface AppLayoutProps {
 
 export function AppLayout({ children, user }: AppLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useLocalStorage('sidebar-collapsed', false)
-  const [isDesktop, setIsDesktop] = useState(() =>
-    typeof window !== 'undefined' ? window.matchMedia('(min-width: 1024px)').matches : false
-  )
-
-  useEffect(() => {
-    const mq = window.matchMedia('(min-width: 1024px)')
-    const handler = (e: MediaQueryListEvent) => setIsDesktop(e.matches)
-    mq.addEventListener('change', handler)
-    return () => mq.removeEventListener('change', handler)
-  }, [])
-
-  const desktopPadding = isDesktop ? (sidebarCollapsed ? 56 : 228) : 0
 
   return (
     <div className="flex min-h-[100dvh] bg-surface">
@@ -50,8 +38,10 @@ export function AppLayout({ children, user }: AppLayoutProps) {
 
       {/* Main content */}
       <main
-        className="flex-1 min-h-[100dvh] transition-all duration-200"
-        style={{ paddingLeft: desktopPadding }}
+        className={[
+          'flex-1 min-h-[100dvh] transition-all duration-200',
+          sidebarCollapsed ? 'lg:pl-[56px]' : 'lg:pl-[228px]',
+        ].join(' ')}
       >
         {/* pt-14 accounts for fixed mobile header; removed on desktop */}
         <div className="pt-14 lg:pt-0">

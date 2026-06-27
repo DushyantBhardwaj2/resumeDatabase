@@ -12,50 +12,52 @@ interface DashboardChatClientProps {
 
 export function DashboardChatClient({ userName, stats, completeness }: DashboardChatClientProps) {
   const addMessage = useChatStore((s) => s.addMessage)
-  const clearChat = useChatStore((s) => s.clearChat)
+  const setMode = useChatStore((s) => s.setMode)
   const initRef = useRef(false)
 
   useEffect(() => {
     if (initRef.current) return
     initRef.current = true
-    clearChat()
+    setMode('DASHBOARD')
 
-    const welcome: ChatMessage = {
-      id: 'dash-welcome',
-      role: 'assistant',
-      content: `Welcome back, ${userName}! I'm your Resumint assistant. Here's your Career Vault at a glance.`,
-      widget: 'DASHBOARD_WELCOME',
-      meta: { name: userName },
+    if (!useChatStore.getState().messagesByMode['DASHBOARD']?.length) {
+      const welcome: ChatMessage = {
+        id: 'dash-welcome',
+        role: 'assistant',
+        content: `Welcome back, ${userName}! I'm your Resumint assistant. Here's your Career Vault at a glance.`,
+        widget: 'DASHBOARD_WELCOME',
+        meta: { name: userName },
+      }
+
+      const statsMsg: ChatMessage = {
+        id: 'dash-stats',
+        role: 'assistant',
+        content: '',
+        widget: 'DASHBOARD_STATS',
+        meta: stats as unknown as Record<string, unknown>,
+      }
+
+      const completenessMsg: ChatMessage = {
+        id: 'dash-completeness',
+        role: 'assistant',
+        content: '',
+        widget: 'DASHBOARD_COMPLETENESS',
+        meta: { completeness },
+      }
+
+      const actions: ChatMessage = {
+        id: 'dash-actions',
+        role: 'assistant',
+        content: 'Where would you like to go?',
+        widget: 'DASHBOARD_QUICK_ACTIONS',
+      }
+
+      addMessage(welcome)
+      addMessage(statsMsg)
+      addMessage(completenessMsg)
+      addMessage(actions)
     }
-
-    const statsMsg: ChatMessage = {
-      id: 'dash-stats',
-      role: 'assistant',
-      content: '',
-      widget: 'DASHBOARD_STATS',
-      meta: stats as unknown as Record<string, unknown>,
-    }
-
-    const completenessMsg: ChatMessage = {
-      id: 'dash-completeness',
-      role: 'assistant',
-      content: '',
-      widget: 'DASHBOARD_COMPLETENESS',
-      meta: { completeness },
-    }
-
-    const actions: ChatMessage = {
-      id: 'dash-actions',
-      role: 'assistant',
-      content: 'Where would you like to go?',
-      widget: 'DASHBOARD_QUICK_ACTIONS',
-    }
-
-    addMessage(welcome)
-    addMessage(statsMsg)
-    addMessage(completenessMsg)
-    addMessage(actions)
-  }, [addMessage, clearChat, userName, stats, completeness])
+  }, [addMessage, setMode, userName, stats, completeness])
 
   return (
     <div className="h-full flex flex-col">

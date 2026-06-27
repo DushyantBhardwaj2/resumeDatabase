@@ -8,7 +8,7 @@ export class OpenCodeZenAIService implements IAIService {
     }
 
     const controller = new AbortController()
-    const timeout = setTimeout(() => controller.abort(), 50_000)
+    const timeout = setTimeout(() => controller.abort(), 90_000)
 
     try {
       const response = await fetch("https://opencode.ai/zen/v1/chat/completions", {
@@ -56,8 +56,11 @@ export class OpenCodeZenAIService implements IAIService {
         throw new Error("AI returned invalid data format. Please try again.")
       }
     } catch (err: unknown) {
-      if (err instanceof DOMException && err.name === 'AbortError') {
-        throw new Error("AI request timed out after 50 seconds. Please try again with a shorter job description.")
+      const isAbort = err instanceof DOMException
+        ? err.name === 'AbortError'
+        : (err as Error)?.name === 'AbortError'
+      if (isAbort) {
+        throw new Error("AI request timed out after 30 seconds. Please try again with a shorter job description.")
       }
       throw err
     } finally {
@@ -66,18 +69,48 @@ export class OpenCodeZenAIService implements IAIService {
   }
 }
 
+function extractBalanced(text: string, open: string, close: string): string | null {
+  let depth = 0
+  let start = -1
+  let inString = false
+
+  for (let i = 0; i < text.length; i++) {
+    const ch = text[i]
+    if (ch === '"' && (i === 0 || text[i - 1] !== '\\')) {
+      inString = !inString
+      continue
+    }
+    if (!inString) {
+      if (ch === open) {
+        if (depth === 0) start = i
+        depth++
+      } else if (ch === close) {
+        depth--
+        if (depth === 0 && start !== -1) {
+          return text.slice(start, i + 1)
+        }
+      }
+    }
+  }
+  return null
+}
+
 function extractJson(text: string): string {
-  const match = text.match(/```(?:json)?\s*([\s\S]*?)```/)
-  if (match) return match[1].trim()
-  const braceStart = text.indexOf("{")
-  const braceEnd = text.lastIndexOf("}")
-  const bracketStart = text.indexOf("[")
-  if (braceStart !== -1 && braceEnd !== -1 && braceEnd > braceStart) {
-    return text.slice(braceStart, braceEnd + 1)
+  const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/)
+  if (codeBlockMatch) {
+    const candidate = codeBlockMatch[1].trim()
+    const fromBraces = extractBalanced(candidate, "{", "}")
+    if (fromBraces) return fromBraces
+    const fromBrackets = extractBalanced(candidate, "[", "]")
+    if (fromBrackets) return fromBrackets
+    return candidate
   }
-  if (bracketStart !== -1) {
-    const bracketEnd = text.lastIndexOf("]")
-    if (bracketEnd > bracketStart) return text.slice(bracketStart, bracketEnd + 1)
-  }
+
+  const fromBraces = extractBalanced(text, "{", "}")
+  if (fromBraces) return fromBraces
+
+  const fromBrackets = extractBalanced(text, "[", "]")
+  if (fromBrackets) return fromBrackets
+
   return text.trim()
 }

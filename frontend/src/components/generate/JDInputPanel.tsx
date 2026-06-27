@@ -4,20 +4,22 @@ import { useState } from 'react'
 import { useBuilderStore, type TemplateType } from '@/store/useBuilderStore'
 import { toast } from 'sonner'
 
+type VaultBulletData = { id: string; text: string; keywords?: string[] }
+
 type TailorResponse = {
   jobTitle: string
   company: string
   original: {
     contact: Record<string, string>
     education: Record<string, unknown>[]
-    experience: Array<{ id?: string; company: string; role: string; startDate?: string; endDate?: string; vaultBullets: Array<{ id: string; text: string }> }>
-    projects: Array<{ id?: string; title: string; url?: string; techStack: string[]; vaultBullets: Array<{ id: string; text: string }> }>
+    experience: Array<{ id?: string; company: string; role: string; startDate?: string; endDate?: string; vaultBullets: VaultBulletData[] }>
+    projects: Array<{ id?: string; title: string; url?: string; techStack: string[]; vaultBullets: VaultBulletData[] }>
     skills: { languages: string[]; frameworks: string[]; tools: string[] }
   }
   tailored: {
     summary: string | null
-    experience: Array<{ id?: string; company: string; role: string; vaultBullets: Array<{ id: string; text: string }> }>
-    projects: Array<{ id?: string; title: string; url?: string; techStack?: string[]; vaultBullets: Array<{ id: string; text: string }> }>
+    experience: Array<{ id?: string; company: string; role: string; vaultBullets: VaultBulletData[] }>
+    projects: Array<{ id?: string; title: string; url?: string; techStack?: string[]; vaultBullets: VaultBulletData[] }>
     skills: { languages: string[]; frameworks: string[]; tools: string[] }
   }
 }
@@ -74,6 +76,7 @@ export function JDInputPanel() {
         education: data.original.education,
         experience: data.tailored.experience.map((exp) => {
           const orig = originalExpMap.get(exp.company + '|' + exp.role)
+          const origBullets = new Map(orig?.vaultBullets.map((ob) => [ob.text, ob.keywords]) || [])
           return {
             id: exp.id || orig?.id || crypto.randomUUID(),
             company: exp.company,
@@ -84,13 +87,14 @@ export function JDInputPanel() {
             vaultBullets: exp.vaultBullets.map((b) => ({
               id: b.id || crypto.randomUUID(),
               text: b.text,
-              keywords: [],
+              keywords: origBullets.get(b.text) || [],
               isAIGenerated: true,
             })),
           }
         }),
         projects: data.tailored.projects.map((proj) => {
           const orig = originalProjMap.get(proj.title)
+          const origProjBullets = new Map(orig?.vaultBullets.map((ob) => [ob.text, ob.keywords]) || [])
           return {
             id: proj.id || orig?.id || crypto.randomUUID(),
             title: proj.title,
@@ -99,7 +103,7 @@ export function JDInputPanel() {
             vaultBullets: proj.vaultBullets.map((b) => ({
               id: b.id || crypto.randomUUID(),
               text: b.text,
-              keywords: [],
+              keywords: origProjBullets.get(b.text) || [],
               isAIGenerated: true,
             })),
           }

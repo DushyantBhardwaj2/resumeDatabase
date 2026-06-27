@@ -5,6 +5,8 @@ import { cors } from 'hono/cors'
 import { auth } from './config/auth'
 import { container } from './di/container'
 import { filterExperienceBySelection, filterProjectsBySelection } from './core/application/services/bullet-filter'
+import { computeCompleteness } from './infrastructure/profile-utils'
+import { z } from 'zod'
 
 type Variables = {
   session: { user: { id: string; email: string; name: string; image?: string }; session: { id: string; expiresAt: Date; ipAddress?: string; userAgent?: string } }
@@ -51,14 +53,18 @@ app.use('/api/protected/*', async (c, next) => {
 app.get('/api/protected/profile', async (c) => {
   const session = c.get('session')
   const profile = await container.profileUseCases.getProfile(session.user.id)
-  return c.json(profile || null)
+  if (!profile) return c.json(null)
+  return c.json({ ...profile, completeness: computeCompleteness(profile) })
 })
 
 app.post('/api/protected/profile', async (c) => {
   const session = c.get('session')
   const body = await c.req.json()
   const { rawText, parsed: data } = body
-  const profile = await container.profileUseCases.saveFromOnboarding(session.user.id, rawText || "", data || {})
+  const profile = await container.profileUseCases.saveFromOnboarding(
+    session.user.id, rawText || "", data || {},
+    { name: session.user.name, email: session.user.email }
+  )
   return c.json(profile)
 })
 
@@ -156,19 +162,61 @@ app.post('/api/protected/resume/compile', async (c) => {
   return c.json({ message: "Not implemented in backend yet" }, 501)
 })
 
+const vaultBulletSchema = z.object({
+  id: z.string().max(100),
+  text: z.string().max(5000),
+  category: z.enum(['FRONTEND', 'BACKEND', 'DEVOPS', 'LEADERSHIP', 'GENERAL']).optional(),
+  keywords: z.array(z.string().max(100)).max(50).default([]),
+  isAIGenerated: z.boolean().default(false),
+})
+
+const compileLiveSchema = z.object({
+  templateId: z.enum(['nsut-canonical', 'ats-clean', 'modern', 'compact']),
+  selectedBulletIds: z.record(z.string().max(100), z.array(z.string().max(100)).max(200)).optional().default({}),
+  profile: z.object({
+    contact: z.record(z.string(), z.string().max(1000)).optional().nullable(),
+    education: z.array(z.record(z.string(), z.unknown())).max(10).optional().nullable(),
+    experience: z.array(z.object({
+      id: z.string().max(100).optional(),
+      company: z.string().max(500),
+      role: z.string().max(500),
+      startDate: z.string().max(100).nullable().optional(),
+      endDate: z.string().max(100).nullable().optional(),
+      current: z.boolean().optional(),
+      vaultBullets: z.array(vaultBulletSchema).max(200).optional().default([]),
+    }).passthrough()).max(20).optional().nullable(),
+    projects: z.array(z.object({
+      id: z.string().max(100).optional(),
+      title: z.string().max(500),
+      url: z.string().max(2000).nullable().optional(),
+      techStack: z.array(z.string().max(200)).max(50).optional().default([]),
+      vaultBullets: z.array(vaultBulletSchema).max(200).optional().default([]),
+    }).passthrough()).max(20).optional().nullable(),
+    skills: z.object({
+      languages: z.array(z.string().max(200)).max(100).optional().default([]),
+      frameworks: z.array(z.string().max(200)).max(100).optional().default([]),
+      tools: z.array(z.string().max(200)).max(100).optional().default([]),
+    }).optional().nullable(),
+  }).passthrough(),
+})
+
 // Live Compile (debounced, filtered by selected bullets)
 app.post('/api/protected/resume/compile-live', async (c) => {
-  const { profile, selectedBulletIds, templateId } = await c.req.json()
+  const rawBody = await c.req.json()
+  const parsed = compileLiveSchema.safeParse(rawBody)
 
-  if (!profile) {
-    return c.json({ error: "Profile is required" }, 400)
+  if (!parsed.success) {
+    const errors = parsed.error.flatten()
+    return c.json({ error: 'Validation failed', details: errors.fieldErrors }, 400)
   }
 
-  const filteredExperience = filterExperienceBySelection(profile.experience, selectedBulletIds)
-  const filteredProjects = filterProjectsBySelection(profile.projects, selectedBulletIds)
+  const { profile, selectedBulletIds, templateId: safeTemplateId } = parsed.data
+
+  const filteredExperience = filterExperienceBySelection(profile.experience || [], selectedBulletIds)
+  const filteredProjects = filterProjectsBySelection(profile.projects || [], selectedBulletIds)
 
   const latexSource = container.latexTemplate.fill(
-    templateId || 'nsut-canonical',
+    safeTemplateId,
     profile.contact || null,
     profile.education || null,
     filteredExperience,
@@ -182,7 +230,7 @@ app.post('/api/protected/resume/compile-live', async (c) => {
   )
 
   try {
-    const { execSync } = require('child_process')
+    const { execFileSync } = require('child_process')
     const { writeFileSync, unlinkSync, mkdtempSync, copyFileSync, existsSync } = require('fs')
     const { join } = require('path')
     const { tmpdir } = require('os')
@@ -195,13 +243,17 @@ app.post('/api/protected/resume/compile-live', async (c) => {
 
     // Copy NSUT_logo.png from template directory into temp compile dir
     const templatesDir = join(__dirname, 'infrastructure', 'latex', 'templates')
-    const logoPath = join(templatesDir, templateId || 'nsut-canonical', 'NSUT_logo.png')
+    const logoPath = join(templatesDir, safeTemplateId, 'NSUT_logo.png')
     if (existsSync(logoPath)) {
       copyFileSync(logoPath, join(tempDir, 'NSUT_logo.png'))
     }
 
     writeFileSync(texPath, latexSource, 'utf-8')
-    execSync(`pdflatex -interaction=nonstopmode -output-directory="${tempDir}" "${texPath}"`, {
+    execFileSync('pdflatex', [
+      '-interaction=nonstopmode',
+      `-output-directory=${tempDir}`,
+      texPath
+    ], {
       timeout: 30000,
       stdio: 'pipe',
     })

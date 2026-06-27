@@ -156,7 +156,7 @@ export default function LandingPage() {
       {/* Footer */}
       <footer className="py-8 border-t border-edge px-6">
         <div className="flex justify-between items-center max-w-6xl mx-auto text-sm text-content-subtle">
-          <span>© 2025 Resumint</span>
+          <span>© {new Date().getFullYear()} Resumint</span>
           <span>Built for NSUT</span>
         </div>
       </footer>

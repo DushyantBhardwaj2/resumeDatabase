@@ -101,6 +101,8 @@ export const SECTION_SCHEMAS: Record<string, ISchema<unknown>> = {
 
 export const parsedResumeSchema = z.object({
   contact: z.object({
+    name: z.string().nullable(),
+    email: z.string().nullable(),
     phone: z.string().nullable(),
     linkedin: z.string().nullable(),
     github: z.string().nullable(),

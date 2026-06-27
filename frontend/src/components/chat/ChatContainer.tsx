@@ -5,7 +5,7 @@ import { useChatStore } from '@/store/useChatStore'
 import { MessageBubble } from './MessageBubble'
 import { ChatInput } from './ChatInput'
 
-type ChatContainerMode = 'ONBOARDING' | 'BUILDER' | 'DASHBOARD' | 'TAILOR'
+type ChatContainerMode = 'ONBOARDING' | 'BUILDER' | 'DASHBOARD' | 'TAILOR' | 'PROFILE'
 
 interface ChatContainerProps {
   mode: ChatContainerMode
@@ -14,11 +14,13 @@ interface ChatContainerProps {
 }
 
 export function ChatContainer({ mode, renderWidget, renderInput }: ChatContainerProps) {
-  const messages = useChatStore((s) => s.messages)
+  const messagesByMode = useChatStore((s) => s.messagesByMode)
+  const storeMode = useChatStore((s) => s.mode)
   const isTyping = useChatStore((s) => s.isTyping)
   const sendMessage = useChatStore((s) => s.sendMessage)
   const setMode = useChatStore((s) => s.setMode)
   const scrollRef = useRef<HTMLDivElement>(null)
+  const messages = messagesByMode[storeMode] || []
 
   useEffect(() => {
     setMode(mode)

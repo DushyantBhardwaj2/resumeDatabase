@@ -34,7 +34,7 @@ const SECTION_ICONS: Record<SectionName, React.ElementType> = {
 
 export default function ProfilePage() {
   const addMessage = useChatStore((s) => s.addMessage)
-  const clearChat = useChatStore((s) => s.clearChat)
+  const setMode = useChatStore((s) => s.setMode)
   const sendMessage = useChatStore((s) => s.sendMessage)
   const initRef = useRef(false)
   const [profile, setProfile] = useState<ProfileData>(getEmptyProfile)
@@ -110,31 +110,33 @@ export default function ProfilePage() {
   useEffect(() => {
     if (initRef.current || loading) return
     initRef.current = true
-    clearChat()
+    setMode('PROFILE')
 
-    const counts = countSectionItems(profile)
-    const overview = [
-      `${counts.contact} contact`,
-      `${counts.education} education`,
-      `${counts.experience} experience entries`,
-      `${counts.projects} projects`,
-      `${counts.skills} skills`,
-      `${counts.certificates} certificates`,
-    ].join(' · ')
+    if (!useChatStore.getState().messagesByMode['PROFILE']?.length) {
+      const counts = countSectionItems(profile)
+      const overview = [
+        `${counts.contact} contact`,
+        `${counts.education} education`,
+        `${counts.experience} experience entries`,
+        `${counts.projects} projects`,
+        `${counts.skills} skills`,
+        `${counts.certificates} certificates`,
+      ].join(' · ')
 
-    addMessage({
-      id: 'profile-greeting',
-      role: 'assistant',
-      content: `Here's your Career Vault profile.\n${overview}\n\nTap a section below to edit it, or type what you want to change.`,
-    })
+      addMessage({
+        id: 'profile-greeting',
+        role: 'assistant',
+        content: `Here's your Career Vault profile.\n${overview}\n\nTap a section below to edit it, or type what you want to change.`,
+      })
 
-    addMessage({
-      id: 'profile-sections',
-      role: 'assistant',
-      content: 'Which section would you like to edit?',
-      widget: 'PROFILE_SECTIONS',
-    })
-  }, [addMessage, clearChat, loading, profile])
+      addMessage({
+        id: 'profile-sections',
+        role: 'assistant',
+        content: 'Which section would you like to edit?',
+        widget: 'PROFILE_SECTIONS',
+      })
+    }
+  }, [addMessage, loading, profile, setMode])
 
   const handleEditSection = useCallback((section: SectionName) => {
     setEditingSection(section)
@@ -246,7 +248,7 @@ export default function ProfilePage() {
     <div className="h-full flex flex-col max-w-3xl mx-auto px-4 pt-8 pb-4">
       <div className="flex-1 overflow-hidden">
         <ChatContainer
-          mode="DASHBOARD"
+          mode="PROFILE"
           renderWidget={handleRenderWidget}
           renderInput={false}
         />

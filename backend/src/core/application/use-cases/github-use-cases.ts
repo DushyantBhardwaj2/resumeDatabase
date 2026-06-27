@@ -45,11 +45,12 @@ export class GithubUseCases {
         { repoName: repo.name, repoUrl: repo.url, techStack: repo.language ? [repo.language] : [], bulletsGenerated: bullets },
       ])
 
-      importedProjects.push({ title: repo.name, techStack: repo.language ? [repo.language] : [], vaultBullets, url: repo.url })
+      importedProjects.push({ id: crypto.randomUUID(), title: repo.name, techStack: repo.language ? [repo.language] : [], vaultBullets, url: repo.url })
     }
 
     const profile = await this.profileRepo.findByUserId(userId)
-    const mergedProjects = [...importedProjects, ...(profile?.projects ?? [])]
+    const existingUrls = new Set(profile?.projects?.map((p) => p.url) ?? [])
+    const mergedProjects = [...importedProjects.filter((p) => !existingUrls.has(p.url)), ...(profile?.projects ?? [])]
     await this.profileRepo.upsert(userId, { projects: mergedProjects })
 
     return { imported: importedProjects.length, projects: mergedProjects }

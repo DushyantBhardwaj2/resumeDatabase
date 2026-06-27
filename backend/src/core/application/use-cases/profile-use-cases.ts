@@ -12,7 +12,12 @@ export class ProfileUseCases {
     return this.repo.upsert(userId, data)
   }
 
-  async saveFromOnboarding(userId: string, rawText: string, parsed: Profile): Promise<Profile> {
+  async saveFromOnboarding(userId: string, rawText: string, parsed: Profile, userInfo?: { name?: string | null; email?: string | null }): Promise<Profile> {
+    if (userInfo) {
+      if (!parsed.contact) parsed.contact = { name: null, email: null, phone: null, linkedin: null, github: null, leetcode: null, portfolio: null }
+      if (!parsed.contact.name) parsed.contact.name = userInfo.name || null
+      if (!parsed.contact.email) parsed.contact.email = userInfo.email || null
+    }
     return this.repo.saveRaw(userId, rawText, parsed)
   }
 }

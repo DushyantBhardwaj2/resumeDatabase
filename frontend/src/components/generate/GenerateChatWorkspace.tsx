@@ -15,9 +15,11 @@ import type { TemplateType } from '@/store/useBuilderStore'
 type ChatEntry = {
   id: string
   role: 'assistant' | 'user'
-  type: 'greeting' | 'job-details-form' | 'user-jd' | 'generating' | 'checklist'
+  type: 'greeting' | 'job-details-form' | 'user-jd' | 'generating' | 'checklist' | 'error'
   content?: string
 }
+
+type VaultBulletData = { id: string; text: string; keywords?: string[] }
 
 type TailorResponse = {
   jobTitle: string
@@ -25,14 +27,14 @@ type TailorResponse = {
   original: {
     contact: Record<string, string>
     education: Record<string, unknown>[]
-    experience: Array<{ id?: string; company: string; role: string; startDate?: string; endDate?: string; vaultBullets: Array<{ id: string; text: string }> }>
-    projects: Array<{ id?: string; title: string; url?: string; techStack: string[]; vaultBullets: Array<{ id: string; text: string }> }>
+    experience: Array<{ id?: string; company: string; role: string; startDate?: string; endDate?: string; vaultBullets: VaultBulletData[] }>
+    projects: Array<{ id?: string; title: string; url?: string; techStack: string[]; vaultBullets: VaultBulletData[] }>
     skills: { languages: string[]; frameworks: string[]; tools: string[] }
   }
   tailored: {
     summary: string | null
-    experience: Array<{ id?: string; company: string; role: string; vaultBullets: Array<{ id: string; text: string }> }>
-    projects: Array<{ id?: string; title: string; url?: string; techStack?: string[]; vaultBullets: Array<{ id: string; text: string }> }>
+    experience: Array<{ id?: string; company: string; role: string; vaultBullets: VaultBulletData[] }>
+    projects: Array<{ id?: string; title: string; url?: string; techStack?: string[]; vaultBullets: VaultBulletData[] }>
     skills: { languages: string[]; frameworks: string[]; tools: string[] }
   }
 }
@@ -137,6 +139,7 @@ export function GenerateChatWorkspace() {
         education: data.original.education,
         experience: data.tailored.experience.map((exp) => {
           const orig = originalExpMap.get(exp.company + '|' + exp.role)
+          const origBullets = new Map(orig?.vaultBullets.map((ob) => [ob.text, ob.keywords]) || [])
           return {
             id: exp.id || orig?.id || crypto.randomUUID(),
             company: exp.company,
@@ -147,13 +150,14 @@ export function GenerateChatWorkspace() {
             vaultBullets: exp.vaultBullets.map((b) => ({
               id: b.id || crypto.randomUUID(),
               text: b.text,
-              keywords: [],
+              keywords: origBullets.get(b.text) || [],
               isAIGenerated: true,
             })),
           }
         }),
         projects: data.tailored.projects.map((proj) => {
           const orig = originalProjMap.get(proj.title)
+          const origProjBullets = new Map(orig?.vaultBullets.map((ob) => [ob.text, ob.keywords]) || [])
           return {
             id: proj.id || orig?.id || crypto.randomUUID(),
             title: proj.title,
@@ -162,7 +166,7 @@ export function GenerateChatWorkspace() {
             vaultBullets: proj.vaultBullets.map((b) => ({
               id: b.id || crypto.randomUUID(),
               text: b.text,
-              keywords: [],
+              keywords: origProjBullets.get(b.text) || [],
               isAIGenerated: true,
             })),
           }
@@ -215,7 +219,7 @@ export function GenerateChatWorkspace() {
       // Remove generating message and add an error entry
       setEntries((prev) => [
         ...prev.filter((e) => e.type !== 'generating'),
-        { id: 'error-' + Date.now(), role: 'assistant', type: 'generating', content: isTimeout ? 'Timed out. Try a shorter description.' : 'Generation failed. Please try again.' },
+        { id: 'error-' + Date.now(), role: 'assistant', type: 'error', content: isTimeout ? 'The AI took too long. Try a shorter job description.' : 'Generation failed. Please try again.' },
       ])
       return
     } finally {
@@ -329,6 +333,17 @@ export function GenerateChatWorkspace() {
               <div key={entry.id} className="flex items-center gap-3 text-content-muted text-sm ml-11">
                 <span className="w-4 h-4 rounded-full border-2 border-brand border-t-transparent animate-spin" />
                 Matching your Career Vault bullets...
+              </div>
+            )
+          }
+
+          if (entry.type === 'error') {
+            return (
+              <div key={entry.id} className="flex items-start gap-3 ml-11">
+                <div className="h-6 w-6 rounded-full bg-error/10 flex items-center justify-center shrink-0 mt-0.5">
+                  <span className="text-[10px] text-error font-bold">!</span>
+                </div>
+                <p className="text-xs text-error leading-relaxed">{entry.content}</p>
               </div>
             )
           }

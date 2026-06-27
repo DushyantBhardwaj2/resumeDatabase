@@ -87,9 +87,9 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
     const safeProjects = projects || []
     const safeSkills = skills || { languages: [], frameworks: [], tools: [] }
 
-    const name = typeof safeContact.name === "string" ? safeContact.name : ""
+    const name = typeof safeContact.name === "string" && safeContact.name.length > 0 ? safeContact.name : "User"
     const phone = typeof safeContact.phone === "string" ? safeContact.phone : ""
-    const email = typeof safeContact.email === "string" ? safeContact.email : ""
+    const email = typeof safeContact.email === "string" && safeContact.email.length > 0 ? safeContact.email : "email@example.com"
     const linkedin = typeof safeContact.linkedin === "string" ? safeContact.linkedin : ""
     const leetcode = typeof safeContact.leetcode === "string" ? safeContact.leetcode : ""
     const github = typeof safeContact.github === "string" ? safeContact.github : ""
@@ -133,7 +133,7 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
         const dates = exp.dates
           ? esc(String(exp.dates))
           : exp.startDate
-            ? esc(`${String(exp.startDate)}${exp.endDate ? ` -- ${String(exp.endDate)}"` : ""}`)
+            ? esc(`${String(exp.startDate)}${exp.endDate ? ` -- ${String(exp.endDate)}` : ""}`)
             : ""
         tex = tex.replace(new RegExp(`\\{\\{EXP_DATES_${i}\\}\\}`, "g"), dates)
         const tech = (exp.techStack as string[]) || []

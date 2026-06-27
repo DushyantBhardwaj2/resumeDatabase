@@ -25,6 +25,7 @@ export type VaultBullet = {
 }
 
 export interface Experience {
+  id: string
   company: string
   role: string
   startDate: string | null
@@ -33,6 +34,7 @@ export interface Experience {
 }
 
 export interface Project {
+  id: string
   title: string
   techStack: string[]
   vaultBullets: VaultBullet[]

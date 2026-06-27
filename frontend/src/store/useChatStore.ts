@@ -18,13 +18,14 @@ export type OnboardingPhase =
   | 'REVIEW_CONTACT_AND_CERTS'
   | 'COMPLETE'
 
-type ChatMode = 'ONBOARDING' | 'BUILDER' | 'DASHBOARD' | 'TAILOR'
+export type ChatMode = 'ONBOARDING' | 'BUILDER' | 'DASHBOARD' | 'TAILOR' | 'PROFILE'
 
 interface ChatStore {
-  messages: ChatMessage[]
+  messagesByMode: Record<ChatMode, ChatMessage[]>
   currentPhase: OnboardingPhase
   isTyping: boolean
   mode: ChatMode
+  extractedData: Record<string, unknown>
 
   addMessage: (msg: ChatMessage) => void
   setTyping: (typing: boolean) => void
@@ -34,14 +35,28 @@ interface ChatStore {
   sendMessage: (text: string) => Promise<void>
 }
 
+const initialModeMessages: Record<ChatMode, ChatMessage[]> = {
+  ONBOARDING: [],
+  BUILDER: [],
+  DASHBOARD: [],
+  TAILOR: [],
+  PROFILE: [],
+}
+
 export const useChatStore = create<ChatStore>((set, get) => ({
-  messages: [],
+  messagesByMode: { ...initialModeMessages },
   currentPhase: 'GREETING',
   isTyping: false,
   mode: 'ONBOARDING',
+  extractedData: {},
 
   addMessage: (msg) =>
-    set((state) => ({ messages: [...state.messages, msg] })),
+    set((state) => ({
+      messagesByMode: {
+        ...state.messagesByMode,
+        [state.mode]: [...(state.messagesByMode[state.mode] || []), msg],
+      },
+    })),
 
   setTyping: (typing) => set({ isTyping: typing }),
 
@@ -49,17 +64,32 @@ export const useChatStore = create<ChatStore>((set, get) => ({
 
   setMode: (mode) => set({ mode }),
 
-  clearChat: () => set({ messages: [], currentPhase: 'GREETING', isTyping: false }),
+  clearChat: () =>
+    set((state) => ({
+      messagesByMode: {
+        ...state.messagesByMode,
+        [state.mode]: [],
+      },
+      currentPhase: state.mode === 'ONBOARDING' ? 'GREETING' : state.currentPhase,
+      extractedData: state.mode === 'ONBOARDING' ? {} : state.extractedData,
+    })),
 
   sendMessage: async (text) => {
-    const { messages, currentPhase, mode } = get()
+    const { messagesByMode, currentPhase, mode } = get()
+    const modeMessages = messagesByMode[mode] || []
 
     const userMsg: ChatMessage = {
       id: Date.now(),
       role: 'user',
       content: text,
     }
-    set((state) => ({ messages: [...state.messages, userMsg], isTyping: true }))
+    set((state) => ({
+      messagesByMode: {
+        ...state.messagesByMode,
+        [mode]: [...(state.messagesByMode[mode] || []), userMsg],
+      },
+      isTyping: true,
+    }))
 
     try {
       const res = await fetch('/api/protected/chat/interact', {
@@ -67,7 +97,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
         body: JSON.stringify({
-          messages: [...messages, userMsg].map((m) => ({
+          messages: [...modeMessages, userMsg].map((m) => ({
             role: m.role,
             content: m.content,
           })),
@@ -88,23 +118,29 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       }
 
       set((state) => ({
-        messages: [...state.messages, assistantMsg],
+        messagesByMode: {
+          ...state.messagesByMode,
+          [mode]: [...(state.messagesByMode[mode] || []), assistantMsg],
+        },
         isTyping: false,
+        extractedData: data.extractedData
+          ? { ...state.extractedData, ...data.extractedData }
+          : state.extractedData,
         currentPhase: data.intent === 'NAVIGATE' && data.targetWidget
           ? mapWidgetToPhase(data.targetWidget)
           : state.currentPhase,
       }))
     } catch {
       set((state) => ({
-        messages: [
-          ...state.messages,
-          {
+        messagesByMode: {
+          ...state.messagesByMode,
+          [mode]: [...(state.messagesByMode[mode] || []), {
             id: Date.now() + 1,
             role: 'assistant',
             content: "Sorry, I couldn't process that. Please try again.",
             widget: null,
-          },
-        ],
+          }],
+        },
         isTyping: false,
       }))
     }

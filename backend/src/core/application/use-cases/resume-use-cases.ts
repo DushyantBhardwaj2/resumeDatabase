@@ -119,9 +119,23 @@ export class ResumeUseCases {
     assignItemIds(profile)
 
     // Bullet selection path: AI selects matching bullets from vault, built locally
+    // Send only what the AI needs — strip heavy metadata to reduce latency
+    const compactProfile = {
+      experience: profile.experience.map((e) => ({
+        id: (e as unknown as Record<string, unknown>).id as string,
+        role: e.role,
+        company: e.company,
+        vaultBullets: e.vaultBullets.map((b) => ({ id: b.id, text: b.text, keywords: b.keywords })),
+      })),
+      projects: profile.projects.map((p) => ({
+        id: (p as unknown as Record<string, unknown>).id as string,
+        title: p.title,
+        vaultBullets: p.vaultBullets.map((b) => ({ id: b.id, text: b.text, keywords: b.keywords })),
+      })),
+    }
     const userContent = JSON.stringify({
       jobDescription: input.jobDescription,
-      profile,
+      profile: compactProfile,
     })
     const selectionResult = await this.aiService.generateStructuredData(
       this.bulletSelectorPrompt,
@@ -135,18 +149,14 @@ export class ResumeUseCases {
     const templateConfig = this.latexTemplate.getTemplateConfig(templateId)
     applyTemplateConstraints(tailored, templateConfig)
 
-    // Generate summary via AI (optional)
-    try {
-      const summaryResult = await this.aiService.generateStructuredData(
-        "You are a resume summary writer. Given the job description and candidate profile, generate a 2-sentence professional summary. Output ONLY valid JSON: {\"summary\": string}",
-        JSON.stringify({ jobDescription: input.jobDescription, profile }),
-        { parse: (data: unknown) => data as { summary: string } }
-      )
-      const summary = (summaryResult as { summary?: string }).summary
-      if (summary) tailored.summary = summary
-    } catch {
-      // Summary generation is optional; proceed without it
-    }
+    // Generate summary via AI (optional, in parallel)
+    const summaryPromise = this.aiService.generateStructuredData(
+      "You are a resume summary writer. Given the job description and candidate profile, generate a 2-sentence professional summary. Output ONLY valid JSON: {\"summary\": string}",
+      JSON.stringify({ jobDescription: input.jobDescription, profile: compactProfile }),
+      { parse: (data: unknown) => data as { summary: string } }
+    ).then((r) => (r as { summary?: string }).summary).catch(() => null)
+    const summary = await summaryPromise
+    if (summary) tailored.summary = summary
 
     const latex = this.latexTemplate.fill(
       templateId,

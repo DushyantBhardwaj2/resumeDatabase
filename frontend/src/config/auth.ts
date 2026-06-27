@@ -5,7 +5,7 @@ export async function getServerSession() {
     const h = await nextHeaders()
     const cookie = h.get("cookie") || ""
     
-    const apiUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
+    const apiUrl = process.env.INTERNAL_API_URL || process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080"
     const res = await fetch(`${apiUrl}/api/auth/get-session`, {
       headers: { cookie },
       cache: 'no-store'
