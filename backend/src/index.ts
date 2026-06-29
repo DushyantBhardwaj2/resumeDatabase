@@ -174,7 +174,7 @@ const compileLiveSchema = z.object({
   templateId: z.enum(['nsut-canonical', 'ats-clean', 'modern', 'compact']),
   selectedBulletIds: z.record(z.string().max(100), z.array(z.string().max(100)).max(200)).optional().default({}),
   profile: z.object({
-    contact: z.record(z.string(), z.string().max(1000)).optional().nullable(),
+    contact: z.record(z.string(), z.string().max(1000).nullable()).optional().nullable(),
     education: z.array(z.record(z.string(), z.unknown())).max(10).optional().nullable(),
     experience: z.array(z.object({
       id: z.string().max(100).optional(),

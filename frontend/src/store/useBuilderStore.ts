@@ -140,13 +140,17 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile, selectedBulletIds, templateId: template }),
       })
-      if (!res.ok) throw new Error('Compilation failed')
+      if (!res.ok) {
+        const errBody = await res.json().catch(() => ({ error: 'Compilation failed' }))
+        throw new Error(errBody.details ? `Validation: ${JSON.stringify(errBody.details)}` : (errBody.error || 'Compilation failed'))
+      }
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
       const prev = get().pdfUrl
       if (prev) URL.revokeObjectURL(prev)
       set({ pdfUrl: url, status: 'ready' })
-    } catch {
+    } catch (e) {
+      console.error('Compile failed:', e instanceof Error ? e.message : e)
       set({ status: 'error' })
     } finally {
       set({ isCompiling: false })
