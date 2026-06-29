@@ -229,17 +229,17 @@ app.post('/api/protected/resume/compile-live', async (c) => {
     }
   )
 
+  const { join } = require('path')
+  const { tmpdir } = require('os')
+  const { randomUUID } = require('crypto')
+  const jobId = randomUUID()
+  const tempDir = (() => { try { return require('fs').mkdtempSync(join(tmpdir(), 'latex-')) } catch { return '' } })()
+  const texPath = tempDir ? join(tempDir, `${jobId}.tex`) : ''
+  const pdfPath = tempDir ? join(tempDir, `${jobId}.pdf`) : ''
+
   try {
     const { execFileSync } = require('child_process')
-    const { writeFileSync, unlinkSync, mkdtempSync, copyFileSync, existsSync } = require('fs')
-    const { join } = require('path')
-    const { tmpdir } = require('os')
-    const { randomUUID } = require('crypto')
-
-    const jobId = randomUUID()
-    const tempDir = mkdtempSync(join(tmpdir(), 'latex-'))
-    const texPath = join(tempDir, `${jobId}.tex`)
-    const pdfPath = join(tempDir, `${jobId}.pdf`)
+    const { writeFileSync, unlinkSync, copyFileSync, existsSync } = require('fs')
 
     // Copy NSUT_logo.png from template directory into temp compile dir
     const templatesDir = join(__dirname, 'infrastructure', 'latex', 'templates')
@@ -279,7 +279,9 @@ app.post('/api/protected/resume/compile-live', async (c) => {
     console.error('PDF compilation error:', details)
     if (err.stderr) console.error('STDERR:', err.stderr.toString())
     const stderr = err.stderr ? err.stderr.toString().slice(0, 2000) : ''
-    return c.json({ error: 'PDF compilation failed. Check your LaTeX template.', details, stderr }, 500)
+    let logTail = ''
+    try { const { readFileSync } = require('fs'); logTail = readFileSync(texPath.replace(/\.tex$/, '.log'), 'utf-8').slice(-3000) } catch {}
+    return c.json({ error: 'PDF compilation failed. Check your LaTeX template.', details, stderr, logTail }, 500)
   }
 })
 
