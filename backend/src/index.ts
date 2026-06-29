@@ -278,7 +278,8 @@ app.post('/api/protected/resume/compile-live', async (c) => {
     const details = err.message || String(err)
     console.error('PDF compilation error:', details)
     if (err.stderr) console.error('STDERR:', err.stderr.toString())
-    return c.json({ error: 'PDF compilation failed. Check your LaTeX template.', details }, 500)
+    const stderr = err.stderr ? err.stderr.toString().slice(0, 2000) : ''
+    return c.json({ error: 'PDF compilation failed. Check your LaTeX template.', details, stderr }, 500)
   }
 })
 
