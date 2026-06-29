@@ -31,7 +31,7 @@ export function proxy(request: NextRequest) {
   }
 
   if (pathname.startsWith(ONBOARDING_ROUTE)) {
-    const hasSession = request.cookies.getAll().some((c) => c.name.startsWith('better-auth.'))
+    const hasSession = request.cookies.getAll().some((c) => c.name.startsWith('better-auth.') || c.name.startsWith('__Secure-better-auth.'))
     if (!hasSession) {
       return NextResponse.redirect(new URL('/', request.url))
     }
