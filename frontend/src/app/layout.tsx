@@ -28,6 +28,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning className={jetbrainsMono.variable}>
+      <head>
+        <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@variable&display=swap" />
+        <link rel="stylesheet" href="https://api.fontshare.com/v2/css?f[]=satoshi@variable&display=swap" />
+      </head>
       <body className="antialiased bg-surface text-content">
         <ThemeProvider
           attribute="class"

@@ -1,6 +1,4 @@
-/* ── Fonts (Fontshare CDN) ──────────────────────────────────────────────── */
-@import url('https://api.fontshare.com/v2/css?f[]=cabinet-grotesk@variable&display=swap');
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@variable&display=swap');
+/* ── Fonts: loaded via <link> in layout.tsx to avoid CORB ──────────────── */
 @import "tailwindcss";
 
 /* ── Design Tokens — Light Mode ─────────────────────────────────────────── */
