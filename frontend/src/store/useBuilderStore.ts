@@ -142,7 +142,8 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
       })
       if (!res.ok) {
         const errBody = await res.json().catch(() => ({ error: 'Compilation failed' }))
-        throw new Error(errBody.details ? `Validation: ${JSON.stringify(errBody.details)}` : (errBody.error || 'Compilation failed'))
+        const laMsg = errBody.stderr ? errBody.stderr.slice(0, 500).split('\n')[0] : ''
+        throw new Error(laMsg || errBody.details || errBody.error || 'Compilation failed')
       }
       const blob = await res.blob()
       const url = URL.createObjectURL(blob)
