@@ -249,15 +249,20 @@ app.post('/api/protected/resume/compile-live', async (c) => {
     }
 
     writeFileSync(texPath, latexSource, 'utf-8')
-    execFileSync('pdflatex', [
-      '-interaction=nonstopmode',
-      `-output-directory=${tempDir}`,
-      texPath
-    ], {
-      timeout: 30000,
-      stdio: 'pipe',
-    })
+    try {
+      execFileSync('pdflatex', [
+        '-interaction=nonstopmode',
+        `-output-directory=${tempDir}`,
+        texPath
+      ], {
+        timeout: 30000,
+        stdio: 'pipe',
+      })
+    } catch {
+      // pdflatex exits non-zero even when PDF is generated (LaTeX warnings)
+    }
 
+    if (!existsSync(pdfPath)) throw new Error('pdflatex: output PDF not found')
     const pdfBuffer = require('fs').readFileSync(pdfPath)
 
     try {
