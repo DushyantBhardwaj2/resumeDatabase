@@ -277,11 +277,22 @@ app.post('/api/protected/resume/compile-live', async (c) => {
   } catch (err: any) {
     const details = err.message || String(err)
     console.error('PDF compilation error:', details)
-    if (err.stderr) console.error('STDERR:', err.stderr.toString())
     const stderr = err.stderr ? err.stderr.toString().slice(0, 2000) : ''
+    const stdout = err.stdout ? err.stdout.toString().slice(0, 2000) : ''
     let logTail = ''
-    try { const { readFileSync } = require('fs'); logTail = readFileSync(texPath.replace(/\.tex$/, '.log'), 'utf-8').slice(-3000) } catch {}
-    return c.json({ error: 'PDF compilation failed. Check your LaTeX template.', details, stderr, logTail }, 500)
+    let texContent = ''
+    try {
+      const { readFileSync, readdirSync } = require('fs')
+      if (texPath) {
+        texContent = readFileSync(texPath, 'utf-8').slice(0, 3000)
+        const logPath = texPath.replace(/\.tex$/, '.log')
+        try { logTail = readFileSync(logPath, 'utf-8').slice(-3000) } catch {}
+      }
+      const files = tempDir ? readdirSync(tempDir).join(', ') : ''
+      return c.json({ error: 'PDF compilation failed. Check your LaTeX template.', details, stderr, stdout, logTail, texContent, tempFiles: files }, 500)
+    } catch (e2: any) {
+      return c.json({ error: 'PDF compilation failed.', details, stderr, stdout, logTail, texContent, readError: e2.message }, 500)
+    }
   }
 })
 
