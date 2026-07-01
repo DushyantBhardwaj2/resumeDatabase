@@ -1,40 +1,7 @@
 import { create } from 'zustand'
 import { api } from '@/config/api-client'
 
-export type VaultBullet = {
-  id: string
-  text: string
-  category?: 'FRONTEND' | 'BACKEND' | 'DEVOPS' | 'LEADERSHIP' | 'GENERAL'
-  keywords: string[]
-  isAIGenerated: boolean
-}
-
-export type ExperienceItem = {
-  id: string
-  company: string
-  role: string
-  startDate: string
-  endDate: string
-  current: boolean
-  vaultBullets: VaultBullet[]
-}
-
-export type ProjectItem = {
-  id: string
-  title: string
-  url: string
-  techStack: string[]
-  vaultBullets: VaultBullet[]
-}
-
-export type Profile = {
-  contact: Record<string, string>
-  education: Record<string, unknown>[]
-  experience: ExperienceItem[]
-  projects: ProjectItem[]
-  skills: { languages: string[]; frameworks: string[]; tools: string[] }
-}
-
+import type { Profile, Experience as ExperienceItem, Project as ProjectItem, VaultBullet } from '@resumint/shared'
 export type BuilderSelections = Record<string, string[]>
 
 export type DocumentType = 'resume' | 'cv' | 'both'

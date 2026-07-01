@@ -8,6 +8,7 @@ import { PdfPreviewPanel } from '@/components/generate/PdfPreviewPanel'
 import { Splitter } from '@/components/ui/splitter'
 import { useLocalStorage } from '@/lib/use-local-storage'
 import { clamp } from '@/lib/utils'
+import { normalizeProfile } from '@/lib/normalize-profile'
 import { toast } from 'sonner'
 
 const MIN_CENTER_PX = 360
@@ -98,39 +99,7 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
         setJobDescription(data.jobDescription || '')
 
         const original = td.original
-        setProfile({
-          contact: original.contact || {},
-          education: original.education || [],
-          experience: (original.experience || []).map((e: Record<string, unknown>) => ({
-            id: (e.id as string) || crypto.randomUUID(),
-            company: (e.company as string) || '',
-            role: (e.role as string) || '',
-            startDate: (e.startDate as string) || '',
-            endDate: (e.endDate as string) || '',
-            current: (e.current as boolean) || false,
-            vaultBullets: ((e.vaultBullets || []) as Array<Record<string, unknown>>).map((b) => ({
-              id: (b.id as string) || crypto.randomUUID(),
-              text: (b.text as string) || '',
-              keywords: (b.keywords as string[]) || [],
-              category: b.category as string | undefined,
-              isAIGenerated: (b.isAIGenerated as boolean) || false,
-            })),
-          })),
-          projects: (original.projects || []).map((p: Record<string, unknown>) => ({
-            id: (p.id as string) || crypto.randomUUID(),
-            title: (p.title as string) || '',
-            url: (p.url as string) || '',
-            techStack: (p.techStack as string[]) || [],
-            vaultBullets: ((p.vaultBullets || []) as Array<Record<string, unknown>>).map((b) => ({
-              id: (b.id as string) || crypto.randomUUID(),
-              text: (b.text as string) || '',
-              keywords: (b.keywords as string[]) || [],
-              category: b.category as string | undefined,
-              isAIGenerated: (b.isAIGenerated as boolean) || false,
-            })),
-          })),
-          skills: original.skills || { languages: [], frameworks: [], tools: [] },
-        })
+        setProfile(normalizeProfile(original))
 
         const selections: Record<string, string[]> = {}
         for (const exp of (td.tailored?.experience || [])) {

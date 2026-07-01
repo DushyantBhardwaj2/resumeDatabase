@@ -5,7 +5,7 @@ import { api } from '@/config/api-client'
 import {
   Plus, Trash, Sparkle, X,
 } from '@phosphor-icons/react'
-import type { ProfileData, SectionName, VaultBullet } from '@/lib/profile-types'
+import type { Profile, SectionName, VaultBullet } from '@resumint/shared'
 
 function genIdFn(): string {
   return crypto.randomUUID()
@@ -180,7 +180,7 @@ function VaultBulletEditor({
 
 // ── Contact Editor ───────────────────────────────────────────────
 
-function ContactEditor({ data, onChange }: { data: ProfileData; onChange: (d: ProfileData) => void }) {
+function ContactEditor({ data, onChange }: { data: Profile; onChange: (d: Profile) => void }) {
   const c = data.contact
   const set = (field: string, val: string) =>
     onChange({ ...data, contact: { ...c, [field]: val } })
@@ -211,13 +211,13 @@ function ContactEditor({ data, onChange }: { data: ProfileData; onChange: (d: Pr
 
 // ── Education Editor ─────────────────────────────────────────────
 
-function EducationEditor({ data, onChange }: { data: ProfileData; onChange: (d: ProfileData) => void }) {
+function EducationEditor({ data, onChange }: { data: Profile; onChange: (d: Profile) => void }) {
   const items = data.education
-  const setItems = (items: ProfileData['education']) => onChange({ ...data, education: items })
-  const updateItem = (idx: number, patch: Partial<ProfileData['education'][0]>) =>
+  const setItems = (items: Profile['education']) => onChange({ ...data, education: items })
+  const updateItem = (idx: number, patch: Partial<Profile['education'][0]>) =>
     setItems(items.map((e, i) => (i === idx ? { ...e, ...patch } : e)))
   const addItem = () =>
-    setItems([...items, { school: '', degree: '', gpa: '', startYear: '', endYear: '' }])
+    setItems([...items, { school: '', degree: '', gpa: null, startYear: null, endYear: null }])
   const removeItem = (idx: number) => setItems(items.filter((_, i) => i !== idx))
 
   if (items.length === 0) {
@@ -249,17 +249,17 @@ function EducationEditor({ data, onChange }: { data: ProfileData; onChange: (d: 
             </div>
             <div>
               <label className="text-[10px] text-content-muted block">GPA</label>
-              <input value={edu.gpa} onChange={(e) => updateItem(idx, { gpa: e.target.value })}
+              <input value={edu.gpa ?? ''} onChange={(e) => updateItem(idx, { gpa: e.target.value || null })}
                 className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="8.5" />
             </div>
             <div>
               <label className="text-[10px] text-content-muted block">Start Year</label>
-              <input value={edu.startYear} onChange={(e) => updateItem(idx, { startYear: e.target.value })}
+              <input value={edu.startYear ?? ''} onChange={(e) => updateItem(idx, { startYear: e.target.value ? Number(e.target.value) : null })}
                 className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="2020" />
             </div>
             <div>
               <label className="text-[10px] text-content-muted block">End Year</label>
-              <input value={edu.endYear} onChange={(e) => updateItem(idx, { endYear: e.target.value })}
+              <input value={edu.endYear ?? ''} onChange={(e) => updateItem(idx, { endYear: e.target.value ? Number(e.target.value) : null })}
                 className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="2024" />
             </div>
           </div>
@@ -279,13 +279,13 @@ function EducationEditor({ data, onChange }: { data: ProfileData; onChange: (d: 
 
 // ── Experience Editor ────────────────────────────────────────────
 
-function ExperienceEditor({ data, onChange }: { data: ProfileData; onChange: (d: ProfileData) => void }) {
+function ExperienceEditor({ data, onChange }: { data: Profile; onChange: (d: Profile) => void }) {
   const items = data.experience
-  const setItems = (items: ProfileData['experience']) => onChange({ ...data, experience: items })
-  const updateItem = (idx: number, patch: Partial<ProfileData['experience'][0]>) =>
+  const setItems = (items: Profile['experience']) => onChange({ ...data, experience: items })
+  const updateItem = (idx: number, patch: Partial<Profile['experience'][0]>) =>
     setItems(items.map((e, i) => (i === idx ? { ...e, ...patch } : e)))
   const addItem = () =>
-    setItems([...items, { id: genIdFn(), company: '', role: '', startDate: '', endDate: '', current: false, vaultBullets: [] }])
+    setItems([...items, { id: genIdFn(), company: '', role: '', startDate: null, endDate: null, current: false, vaultBullets: [] }])
   const removeItem = (idx: number) => setItems(items.filter((_, i) => i !== idx))
 
   if (items.length === 0) {
@@ -317,13 +317,13 @@ function ExperienceEditor({ data, onChange }: { data: ProfileData; onChange: (d:
             </div>
             <div>
               <label className="text-[10px] text-content-muted block">Start</label>
-              <input value={exp.startDate} onChange={(e) => updateItem(idx, { startDate: e.target.value })}
+              <input value={exp.startDate ?? ''} onChange={(e) => updateItem(idx, { startDate: e.target.value || null })}
                 className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="Jun 2024" />
             </div>
             <div>
               <label className="text-[10px] text-content-muted block">End</label>
               <div className="flex items-center gap-2">
-                <input value={exp.endDate} onChange={(e) => updateItem(idx, { endDate: e.target.value })} disabled={exp.current}
+                <input value={exp.endDate ?? ''} onChange={(e) => updateItem(idx, { endDate: e.target.value || null })} disabled={exp.current}
                   className="flex-1 h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand disabled:opacity-40" placeholder="Aug 2024" />
                 <label className="flex items-center gap-1 text-[10px] text-content-muted cursor-pointer shrink-0">
                   <input type="checkbox" checked={exp.current} onChange={(e) => updateItem(idx, { current: e.target.checked })}
@@ -353,13 +353,13 @@ function ExperienceEditor({ data, onChange }: { data: ProfileData; onChange: (d:
 
 // ── Projects Editor ──────────────────────────────────────────────
 
-function ProjectsEditor({ data, onChange }: { data: ProfileData; onChange: (d: ProfileData) => void }) {
+function ProjectsEditor({ data, onChange }: { data: Profile; onChange: (d: Profile) => void }) {
   const items = data.projects
-  const setItems = (items: ProfileData['projects']) => onChange({ ...data, projects: items })
-  const updateItem = (idx: number, patch: Partial<ProfileData['projects'][0]>) =>
+  const setItems = (items: Profile['projects']) => onChange({ ...data, projects: items })
+  const updateItem = (idx: number, patch: Partial<Profile['projects'][0]>) =>
     setItems(items.map((p, i) => (i === idx ? { ...p, ...patch } : p)))
   const addItem = () =>
-    setItems([...items, { id: genIdFn(), title: '', url: '', techStack: [], vaultBullets: [] }])
+    setItems([...items, { id: genIdFn(), title: '', url: null, techStack: [], vaultBullets: [] }])
   const removeItem = (idx: number) => setItems(items.filter((_, i) => i !== idx))
 
   if (items.length === 0) {
@@ -386,7 +386,7 @@ function ProjectsEditor({ data, onChange }: { data: ProfileData; onChange: (d: P
             </div>
             <div>
               <label className="text-[10px] text-content-muted block">URL</label>
-              <input value={proj.url} onChange={(e) => updateItem(idx, { url: e.target.value })}
+              <input value={proj.url ?? ''} onChange={(e) => updateItem(idx, { url: e.target.value || null })}
                 className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="github.com/you/proj" />
             </div>
           </div>
@@ -418,7 +418,7 @@ function ProjectsEditor({ data, onChange }: { data: ProfileData; onChange: (d: P
 
 // ── Skills Editor ────────────────────────────────────────────────
 
-function SkillsEditor({ data, onChange }: { data: ProfileData; onChange: (d: ProfileData) => void }) {
+function SkillsEditor({ data, onChange }: { data: Profile; onChange: (d: Profile) => void }) {
   const s = data.skills
   const setSkills = (patch: Partial<typeof s>) => onChange({ ...data, skills: { ...s, ...patch } })
   return (
@@ -453,10 +453,10 @@ function SkillsEditor({ data, onChange }: { data: ProfileData; onChange: (d: Pro
 
 // ── Certificates Editor ──────────────────────────────────────────
 
-function CertificatesEditor({ data, onChange }: { data: ProfileData; onChange: (d: ProfileData) => void }) {
+function CertificatesEditor({ data, onChange }: { data: Profile; onChange: (d: Profile) => void }) {
   const items = data.certificates
-  const setItems = (items: ProfileData['certificates']) => onChange({ ...data, certificates: items })
-  const updateItem = (idx: number, patch: Partial<ProfileData['certificates'][0]>) =>
+  const setItems = (items: Profile['certificates']) => onChange({ ...data, certificates: items })
+  const updateItem = (idx: number, patch: Partial<Profile['certificates'][0]>) =>
     setItems(items.map((c, i) => (i === idx ? { ...c, ...patch } : c)))
   const addItem = () =>
     setItems([...items, { id: genIdFn(), name: '', issuer: '', url: '', date: '' }])
@@ -518,8 +518,8 @@ function CertificatesEditor({ data, onChange }: { data: ProfileData; onChange: (
 
 interface ProfileSectionEditorProps {
   section: SectionName
-  data: ProfileData
-  onChange: (updated: ProfileData) => void
+  data: Profile
+  onChange: (updated: Profile) => void
 }
 
 export function ProfileSectionEditor({ section, data, onChange }: ProfileSectionEditorProps) {

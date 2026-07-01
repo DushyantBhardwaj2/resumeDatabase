@@ -2,7 +2,7 @@
 
 import { create } from 'zustand'
 import { toast } from 'sonner'
-import type { ProfileData, Experience, Project, Education, Certificate, Skills, Contact } from '@/lib/profile-types'
+import type { Profile, Experience, Project, Education, Certificate, Skills, Contact } from '@resumint/shared'
 import { normalizeProfile, getEmptyProfile } from '@/lib/normalize-profile'
 import { api } from '@/config/api-client'
 
@@ -11,14 +11,14 @@ export const DRAFT_KEY = 'profile-draft'
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'
 
 interface ProfileStore {
-  profile: ProfileData
-  originalProfile: ProfileData | null
+  profile: Profile
+  originalProfile: Profile | null
   loading: boolean
   saving: SaveState
 
   loadProfile: () => Promise<void>
   saveProfile: () => Promise<void>
-  updateProfile: (updated: ProfileData) => void
+  updateProfile: (profile: Profile) => void
   isDirty: () => boolean
 
   addProject: (item: Project) => void

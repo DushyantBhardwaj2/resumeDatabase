@@ -1,4 +1,4 @@
-import type { ProfileData, VaultBullet } from './profile-types'
+import type { Profile, VaultBullet } from '@resumint/shared'
 
 function genId(): string {
   return crypto.randomUUID()
@@ -22,7 +22,7 @@ function normalizeBullets(bullets: unknown): VaultBullet[] {
   }))
 }
 
-export function normalizeProfile(raw: unknown): ProfileData {
+export function normalizeProfile(raw: unknown): Profile {
   if (!raw || typeof raw !== 'object') return getEmptyProfile()
 
   const r = raw as Record<string, unknown>
@@ -58,15 +58,24 @@ export function normalizeProfile(raw: unknown): ProfileData {
   }
 }
 
-function normalizeEducation(edu: unknown): ProfileData['education'] {
+function parseYear(year: unknown): number | null {
+  if (typeof year === 'number') return year;
+  if (typeof year === 'string' && year.trim() !== '') {
+    const parsed = parseInt(year, 10);
+    if (!isNaN(parsed)) return parsed;
+  }
+  return null;
+}
+
+function normalizeEducation(edu: unknown): Profile['education'] {
   if (!edu) return []
   if (Array.isArray(edu)) {
     return edu.map((e) => ({
       school: typeof e.school === 'string' ? e.school : '',
       degree: typeof e.degree === 'string' ? e.degree : '',
-      gpa: typeof e.gpa === 'string' ? e.gpa : '',
-      startYear: typeof e.startYear === 'string' ? e.startYear : String(e.startYear ?? ''),
-      endYear: typeof e.endYear === 'string' ? e.endYear : String(e.endYear ?? ''),
+      gpa: typeof e.gpa === 'string' ? e.gpa : null,
+      startYear: parseYear(e.startYear),
+      endYear: parseYear(e.endYear),
     }))
   }
   if (typeof edu === 'object' && edu !== null) {
@@ -74,33 +83,33 @@ function normalizeEducation(edu: unknown): ProfileData['education'] {
     return [{
       school: typeof e.school === 'string' ? e.school : typeof e.university === 'string' ? e.university : '',
       degree: typeof e.degree === 'string' ? e.degree : '',
-      gpa: typeof e.gpa === 'string' ? e.gpa : typeof e.grade === 'string' ? e.grade : '',
-      startYear: typeof e.startYear === 'string' ? e.startYear : String(e.startYear ?? ''),
-      endYear: typeof e.endYear === 'string' ? e.endYear : String(e.endYear ?? ''),
+      gpa: typeof e.gpa === 'string' ? e.gpa : typeof e.grade === 'string' ? e.grade : null,
+      startYear: parseYear(e.startYear),
+      endYear: parseYear(e.endYear),
     }]
   }
   return []
 }
 
-function normalizeExperienceArray(exp: unknown): ProfileData['experience'] {
+function normalizeExperienceArray(exp: unknown): Profile['experience'] {
   if (!exp || !Array.isArray(exp)) return []
   return exp.map((e) => ({
     id: typeof e.id === 'string' ? e.id : genId(),
     company: typeof e.company === 'string' ? e.company : '',
     role: typeof e.role === 'string' ? e.role : '',
-    startDate: typeof e.startDate === 'string' ? e.startDate : '',
-    endDate: typeof e.endDate === 'string' ? e.endDate : '',
+    startDate: typeof e.startDate === 'string' ? e.startDate : null,
+    endDate: typeof e.endDate === 'string' ? e.endDate : null,
     current: e.current === true,
     vaultBullets: normalizeBullets(e.vaultBullets ?? e.bullets),
   }))
 }
 
-function normalizeProjectArray(proj: unknown): ProfileData['projects'] {
+function normalizeProjectArray(proj: unknown): Profile['projects'] {
   if (!proj || !Array.isArray(proj)) return []
   return proj.map((p) => ({
     id: typeof p.id === 'string' ? p.id : genId(),
     title: typeof p.title === 'string' ? p.title : '',
-    url: typeof p.url === 'string' ? p.url : '',
+    url: typeof p.url === 'string' ? p.url : null,
     techStack: normalizeTechStack(p.techStack),
     vaultBullets: normalizeBullets(p.vaultBullets ?? p.bullets),
   }))
@@ -113,7 +122,7 @@ function normalizeTechStack(ts: unknown): string[] {
   return []
 }
 
-function normalizeCertificates(certs: unknown): ProfileData['certificates'] {
+function normalizeCertificates(certs: unknown): Profile['certificates'] {
   if (!certs || !Array.isArray(certs)) return []
   return certs.map((c) => ({
     id: typeof c.id === 'string' ? c.id : genId(),
@@ -124,7 +133,7 @@ function normalizeCertificates(certs: unknown): ProfileData['certificates'] {
   }))
 }
 
-export function getEmptyProfile(): ProfileData {
+export function getEmptyProfile(): Profile {
   return {
     contact: { name: '', email: '', phone: '', linkedin: '', github: '', leetcode: '', portfolio: '' },
     education: [],
@@ -136,7 +145,7 @@ export function getEmptyProfile(): ProfileData {
   }
 }
 
-export function countSectionItems(data: ProfileData): Record<string, number> {
+export function countSectionItems(data: Profile): Record<string, number> {
   return {
     contact: data.contact.name || data.contact.email || data.contact.phone ? 1 : 0,
     education: data.education.length,
@@ -146,3 +155,4 @@ export function countSectionItems(data: ProfileData): Record<string, number> {
     certificates: data.certificates.length,
   }
 }
+

@@ -15,8 +15,8 @@ import { useChatStore } from '@/store/useChatStore'
 import { useProfileStore } from '@/store/useProfileStore'
 import { ProfileSectionEditor } from '@/components/chat/widgets/ProfileSectionEditor'
 import { ProfileGenerationCard, type GeneratedDataType } from './ProfileGenerationCard'
-import type { SectionName, ProfileData } from '@/lib/profile-types'
-import { SECTION_LABELS, SECTION_ORDER } from '@/lib/profile-types'
+import type { SectionName, Profile } from '@resumint/shared'
+import { SECTION_LABELS, SECTION_ORDER } from '@resumint/shared'
 import { countSectionItems } from '@/lib/normalize-profile'
 
 const SECTION_ICONS: Record<SectionName, React.ElementType> = {
@@ -84,7 +84,7 @@ export function ProfileChatWorkspace() {
     })
   }, [addMessage])
 
-  const handleProfileChange = useCallback((updated: ProfileData) => {
+  const handleProfileChange = useCallback((updated: Profile) => {
     updateProfile(updated)
   }, [updateProfile])
 
