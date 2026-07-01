@@ -1,0 +1,31 @@
+# docker-compose.yml — local development services
+#
+# Usage:
+#   docker-compose up -d redis        # Start Redis only
+#   docker-compose up -d              # Start all services
+#   docker-compose down               # Stop all services
+#   docker-compose down -v            # Stop + remove volumes
+#
+# The backend and frontend still run natively with `npm run dev`.
+# Redis is the only service that needs Docker locally.
+
+services:
+  redis:
+    image: redis:7-alpine
+    container_name: resumint-redis
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+    # Enable AOF persistence so jobs survive Redis restarts
+    command: redis-server --appendonly yes --maxmemory 128mb --maxmemory-policy allkeys-lru
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  redis-data:
+    driver: local

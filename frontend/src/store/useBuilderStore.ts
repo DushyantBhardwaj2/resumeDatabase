@@ -38,7 +38,7 @@ export type BuilderSelections = Record<string, string[]>
 
 export type DocumentType = 'resume' | 'cv' | 'both'
 export type TemplateType = 'ats-clean' | 'modern' | 'compact' | 'nsut-canonical'
-export type GenerationStatus = 'idle' | 'selecting' | 'compiling' | 'ready' | 'error'
+export type GenerationStatus = 'idle' | 'selecting' | 'queued' | 'compiling' | 'ready' | 'error'
 
 export type CurrentStage = 'idle' | 'collecting' | 'generating' | 'reviewing' | 'compiling' | 'ready' | 'error'
 
@@ -73,6 +73,10 @@ interface BuilderStore {
   revokePdfUrl: () => void
   reset: () => void
 }
+
+// Module-level AbortController — cancels in-flight polling when a newer
+// compile is triggered before the previous one finishes.
+let compileAbortController: AbortController | null = null
 
 export const useBuilderStore = create<BuilderStore>((set, get) => ({
   profile: null,
@@ -132,25 +136,74 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   triggerCompile: async () => {
     const { profile, selectedBulletIds, template } = get()
     if (!profile) return
-    set({ isCompiling: true, status: 'compiling' })
+
+    // Cancel any previous polling loop that's still running
+    if (compileAbortController) compileAbortController.abort()
+    compileAbortController = new AbortController()
+    const { signal } = compileAbortController
+
+    set({ isCompiling: true, status: 'queued' })
+
     try {
-      const res = await fetch('/api/protected/resume/compile-live', {
+      // ── Step 1: Enqueue the job ────────────────────────────────────────────
+      const enqueueRes = await fetch('/api/protected/resume/compile-live', {
         method: 'POST',
         credentials: 'include',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ profile, selectedBulletIds, templateId: template }),
+        signal,
       })
-      if (!res.ok) {
-        const errBody = await res.json().catch(() => ({ error: 'Compilation failed' }))
-        const laMsg = errBody.stderr ? errBody.stderr.slice(0, 500).split('\n')[0] : ''
-        throw new Error(laMsg || errBody.details || errBody.error || 'Compilation failed')
+      if (!enqueueRes.ok) {
+        const errBody = await enqueueRes.json().catch(() => ({ error: 'Compilation failed' }))
+        throw new Error(errBody.error || 'Failed to queue compilation')
       }
-      const blob = await res.blob()
-      const url = URL.createObjectURL(blob)
-      const prev = get().pdfUrl
-      if (prev) URL.revokeObjectURL(prev)
-      set({ pdfUrl: url, status: 'ready' })
+      const { jobId } = await enqueueRes.json() as { jobId: string }
+
+      // ── Step 2: Poll status (600 ms interval, max 36 s) ───────────────────
+      const MAX_POLLS = 60
+      for (let i = 0; i < MAX_POLLS; i++) {
+        // Wait before polling (except on first iteration to allow fast jobs)
+        await new Promise<void>((resolve, reject) => {
+          const timer = setTimeout(resolve, 600)
+          signal.addEventListener('abort', () => { clearTimeout(timer); reject(new DOMException('Aborted', 'AbortError')) })
+        })
+
+        const statusRes = await fetch(`/api/protected/resume/compile-status/${jobId}`, {
+          credentials: 'include',
+          signal,
+        })
+        if (!statusRes.ok) throw new Error('Status check failed')
+
+        const { status: jobStatus, error } = await statusRes.json() as { status: string; error?: string }
+
+        if (jobStatus === 'active') {
+          set({ status: 'compiling' })
+        } else if (jobStatus === 'completed') {
+          // ── Step 3: Fetch the PDF blob ────────────────────────────────────
+          const resultRes = await fetch(`/api/protected/resume/compile-result/${jobId}`, {
+            credentials: 'include',
+            signal,
+          })
+          if (!resultRes.ok) throw new Error('Failed to retrieve compiled PDF')
+
+          const blob = await resultRes.blob()
+          const url = URL.createObjectURL(blob)
+          const prev = get().pdfUrl
+          if (prev) URL.revokeObjectURL(prev)
+          set({ pdfUrl: url, status: 'ready' })
+          return
+        } else if (jobStatus === 'failed') {
+          throw new Error(error || 'PDF compilation failed')
+        }
+        // 'queued' → continue polling
+      }
+
+      throw new Error('Compilation timed out — please try again')
     } catch (e) {
+      if (e instanceof DOMException && e.name === 'AbortError') {
+        // Silently discard — a newer compile was triggered
+        return
+      }
       console.error('Compile failed:', e instanceof Error ? e.message : e)
       set({ status: 'error' })
     } finally {
