@@ -29,7 +29,6 @@ export default function OnboardingPage() {
         if (res.ok) {
           const profile = await res.json()
           if (profile && profile.contact) {
-            document.cookie = 'onboarding_complete=true; path=/; max-age=31536000; SameSite=None; Secure'
             router.replace('/dashboard')
             return
           }
@@ -71,7 +70,6 @@ export default function OnboardingPage() {
           json: { parsed: extractedData as any },
         })
         if (!res.ok) throw new Error()
-        document.cookie = 'onboarding_complete=true; path=/; max-age=31536000; SameSite=None; Secure'
         toast.success('Profile created! Welcome to Resumint.')
         router.push('/dashboard')
       } catch {

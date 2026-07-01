@@ -23,7 +23,7 @@ const frontendUrl = process.env.VERCEL_FRONTEND_URL || 'http://localhost:3000'
 app.use('*', cors({
   origin: (origin) => {
     if (!origin) return frontendUrl;
-    if (origin.endsWith('.vercel.app') || origin.includes('localhost')) {
+    if (origin === frontendUrl || origin.includes('localhost')) {
       return origin;
     }
     return frontendUrl;
