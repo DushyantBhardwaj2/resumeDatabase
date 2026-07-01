@@ -131,4 +131,5 @@ class Container {
 
 }
 
+export type { Container }
 export const container = new Container()

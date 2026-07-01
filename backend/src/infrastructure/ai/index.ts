@@ -69,7 +69,7 @@ export class OpenCodeZenAIService implements IAIService {
   }
 }
 
-function extractBalanced(text: string, open: string, close: string): string | null {
+export function extractBalanced(text: string, open: string, close: string): string | null {
   let depth = 0
   let start = -1
   let inString = false
@@ -95,7 +95,7 @@ function extractBalanced(text: string, open: string, close: string): string | nu
   return null
 }
 
-function extractJson(text: string): string {
+export function extractJson(text: string): string {
   const codeBlockMatch = text.match(/```(?:json)?\s*([\s\S]*?)```/)
   if (codeBlockMatch) {
     const candidate = codeBlockMatch[1].trim()
