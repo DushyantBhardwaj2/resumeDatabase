@@ -1,0 +1,131 @@
+'use client'
+
+import { create } from 'zustand'
+import { toast } from 'sonner'
+import type { ProfileData, Experience, Project, Education, Certificate, Skills, Contact } from '@/lib/profile-types'
+import { normalizeProfile, getEmptyProfile } from '@/lib/normalize-profile'
+
+export const DRAFT_KEY = 'profile-draft'
+
+type SaveState = 'idle' | 'saving' | 'saved' | 'error'
+
+interface ProfileStore {
+  profile: ProfileData
+  originalProfile: ProfileData | null
+  loading: boolean
+  saving: SaveState
+
+  loadProfile: () => Promise<void>
+  saveProfile: () => Promise<void>
+  updateProfile: (updated: ProfileData) => void
+  isDirty: () => boolean
+
+  addProject: (item: Project) => void
+  addExperience: (item: Experience) => void
+  addEducation: (item: Education) => void
+  addCertificate: (item: Certificate) => void
+  updateContact: (contact: Contact) => void
+  updateSkills: (skills: Skills) => void
+}
+
+export const useProfileStore = create<ProfileStore>((set, get) => ({
+  profile: getEmptyProfile(),
+  originalProfile: null,
+  loading: true,
+  saving: 'idle',
+
+  loadProfile: async () => {
+    set({ loading: true })
+    try {
+      const res = await fetch('/api/protected/profile', { credentials: 'include' })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      const normalized = normalizeProfile(data)
+      set({ profile: normalized, originalProfile: structuredClone(normalized) })
+    } catch {
+      toast.error('Failed to load profile')
+    } finally {
+      set({ loading: false })
+    }
+  },
+
+  saveProfile: async () => {
+    const { profile, originalProfile } = get()
+    if (!originalProfile) return
+    if (JSON.stringify(profile) === JSON.stringify(originalProfile)) return
+    set({ saving: 'saving' })
+    try {
+      const res = await fetch('/api/protected/profile', {
+        method: 'PATCH',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(profile),
+      })
+      if (!res.ok) throw new Error()
+      const data = await res.json()
+      const normalized = normalizeProfile(data)
+      set({ profile: normalized, originalProfile: structuredClone(normalized), saving: 'saved' })
+      localStorage.removeItem(DRAFT_KEY)
+      setTimeout(() => set({ saving: 'idle' }), 2000)
+      toast.success('Profile saved')
+    } catch {
+      set({ saving: 'error' })
+      toast.error('Failed to save profile')
+    }
+  },
+
+  updateProfile: (updated) => {
+    set({ profile: updated })
+    try {
+      localStorage.setItem(DRAFT_KEY, JSON.stringify(updated))
+    } catch { /* ignore */ }
+  },
+
+  isDirty: () => {
+    const { profile, originalProfile } = get()
+    if (!originalProfile) return false
+    return JSON.stringify(profile) !== JSON.stringify(originalProfile)
+  },
+
+  addProject: (item) => {
+    const { profile } = get()
+    const updated = { ...profile, projects: [...profile.projects, item] }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  addExperience: (item) => {
+    const { profile } = get()
+    const updated = { ...profile, experience: [...profile.experience, item] }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  addEducation: (item) => {
+    const { profile } = get()
+    const updated = { ...profile, education: [...profile.education, item] }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  addCertificate: (item) => {
+    const { profile } = get()
+    const updated = { ...profile, certificates: [...profile.certificates, item] }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  updateContact: (contact) => {
+    const { profile } = get()
+    const updated = { ...profile, contact }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  updateSkills: (skills) => {
+    const { profile } = get()
+    const updated = { ...profile, skills }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+}))

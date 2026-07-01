@@ -25,9 +25,10 @@ export type TargetWidget =
   | "CERTIFICATES"
   | "REVIEW"
   | "UPLOAD_DROPZONE"
+  | "PROFILE_GENERATOR"
   | null
 
-export type ChatIntent = "PROVIDE_DATA" | "NAVIGATE" | "GENERAL_CHAT"
+export type ChatIntent = "PROVIDE_DATA" | "NAVIGATE" | "GENERAL_CHAT" | "GENERATE_PROFILE_DATA"
 
 export type ChatInteractRequest = {
   messages: ChatMessage[]

@@ -9,7 +9,7 @@ type ChatContainerMode = 'ONBOARDING' | 'BUILDER' | 'DASHBOARD' | 'TAILOR' | 'PR
 
 interface ChatContainerProps {
   mode: ChatContainerMode
-  renderWidget?: ((widget: string | null | undefined) => ReactNode) | null
+  renderWidget?: ((widget: string | null | undefined, meta?: Record<string, unknown>) => ReactNode) | null
   renderInput?: false
 }
 

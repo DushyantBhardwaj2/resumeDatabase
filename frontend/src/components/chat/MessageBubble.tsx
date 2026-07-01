@@ -11,14 +11,14 @@ import { DashboardQuickActionsWidget } from './widgets/DashboardQuickActionsWidg
 
 interface MessageBubbleProps {
   message: ChatMessage
-  renderWidget?: ((widget: string | null | undefined) => ReactNode) | null
+  renderWidget?: ((widget: string | null | undefined, meta?: Record<string, unknown>) => ReactNode) | null
 }
 
 export function MessageBubble({ message, renderWidget }: MessageBubbleProps) {
   const isUser = message.role === 'user'
 
   const hasCustomWidget = message.widget && renderWidget
-  const customWidget = hasCustomWidget ? renderWidget!(message.widget) : null
+  const customWidget = hasCustomWidget ? renderWidget!(message.widget, message.meta) : null
   if (customWidget) {
     return (
       <div className="flex w-full justify-start animate-fade-up">
