@@ -42,10 +42,10 @@ export function AIAssistedContent({
         const err = (await res.json()) as Record<string, string>
         throw new Error(err.error || 'Failed to generate content')
       }
-      const data = (await res.json()) as { summary?: string; bullets?: string[] }
+      const data = (await res.json()) as any
 
       if (section === "summary") {
-        setGenerated(data.summary)
+        setGenerated(data.summary || "")
         setMode("review")
         return
       }
