@@ -1,7 +1,5 @@
-import { auth } from '@/lib/auth'
-import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import { serverApi } from '@/config/api-client-server'
+import { serverApi, getServerSession } from '@/config/api-client-server'
 import { DashboardChatClient } from './dashboard-chat-client'
 
 type SkillsData = {
@@ -24,7 +22,7 @@ type ProfileData = {
 }
 
 export default async function DashboardPage() {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const session = await getServerSession()
   if (!session) redirect('/')
 
   let profile: ProfileData & { completeness?: number } | null = null

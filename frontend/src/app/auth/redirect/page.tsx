@@ -1,6 +1,5 @@
-import { getServerSession } from "@/config/auth"
+import { getServerSession, serverApi } from "@/config/api-client-server"
 import { redirect } from "next/navigation"
-import { serverApi } from "@/config/api-client-server"
 
 export default async function AuthRedirectPage(props: {
   searchParams?: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>

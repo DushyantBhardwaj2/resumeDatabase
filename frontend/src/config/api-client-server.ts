@@ -37,3 +37,38 @@ export const serverApi = hc<AppType>(getApiUrl(), {
     return fetch(input, { ...init, headers: merged })
   }
 })
+
+export type Session = {
+  user: {
+    id: string
+    name: string
+    email: string
+    image?: string | null
+  }
+  session: {
+    id: string
+    expiresAt: Date
+  }
+} | null
+
+export async function getServerSession(): Promise<Session> {
+  try {
+    const res = await fetchWithSession('/api/auth/get-session', { cache: 'no-store' })
+    if (!res.ok) return null
+    return await res.json()
+  } catch (error) {
+    console.error("getServerSession error:", error)
+    return null
+  }
+}
+
+export async function hasProfile(): Promise<boolean> {
+  try {
+    const res = await serverApi.api.protected.profile.$get()
+    if (!res.ok) return false
+    const data = await res.json()
+    return !!data
+  } catch {
+    return false
+  }
+}

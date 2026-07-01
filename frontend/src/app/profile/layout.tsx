@@ -1,10 +1,9 @@
 import { AppLayout } from '@/components/layout/app-layout'
-import { auth } from '@/lib/auth'
-import { headers } from 'next/headers'
+import { getServerSession } from '@/config/api-client-server'
 import { redirect } from 'next/navigation'
 
 export default async function ProfileLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const session = await getServerSession()
   if (!session) redirect('/')
   return (
     <AppLayout user={session.user}>

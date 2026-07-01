@@ -1,15 +1,13 @@
 import { AppLayout } from '@/components/layout/app-layout'
-import { auth } from '@/lib/auth'
-import { headers } from 'next/headers'
+import { getServerSession, hasProfile } from '@/config/api-client-server'
 import { redirect } from 'next/navigation'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const reqHeaders = await headers()
-  const session = await auth.api.getSession({ headers: reqHeaders })
+  const session = await getServerSession()
   if (!session) redirect('/')
   
-  const hasProfile = await auth.api.hasProfile({ headers: reqHeaders })
-  if (!hasProfile) redirect('/onboarding')
+  const hasProf = await hasProfile()
+  if (!hasProf) redirect('/onboarding')
   return (
     <AppLayout user={session.user}>
       {children}
