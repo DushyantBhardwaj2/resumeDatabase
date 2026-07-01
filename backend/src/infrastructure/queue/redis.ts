@@ -7,7 +7,7 @@ const rawUrl = process.env.REDIS_URL ?? 'redis://localhost:6379'
 // create its own internal ioredis connections without us handing it an IORedis
 // instance. This avoids the TypeScript incompatibility that arises when BullMQ
 // bundles its own ioredis copy that differs from the one in our node_modules.
-function parseRedisUrl(url: string): { host: string; port: number; password?: string; db?: number; tls?: object } {
+export function parseRedisUrl(url: string): { host: string; port: number; password?: string; db?: number; tls?: object } {
   try {
     const u = new URL(url)
     const opts: ReturnType<typeof parseRedisUrl> = {

@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { api } from '@/config/api-client'
 
-import type { Profile, Experience as ExperienceItem, Project as ProjectItem, VaultBullet } from '@resumint/shared'
+import type { Profile } from '@resumint/shared'
 export type BuilderSelections = Record<string, string[]>
 
 export type DocumentType = 'resume' | 'cv' | 'both'

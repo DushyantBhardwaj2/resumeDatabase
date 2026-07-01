@@ -1,6 +1,6 @@
 import { useState, useCallback } from 'react'
 import { api } from '@/config/api-client'
-import { useBuilderStore, type TemplateType } from '@/store/useBuilderStore'
+import { useBuilderStore } from '@/store/useBuilderStore'
 import { normalizeProfile } from '@/lib/normalize-profile'
 import { toast } from 'sonner'
 
