@@ -6,7 +6,7 @@ import path from 'path';
 if (process.env.VERCEL) {
   console.log('Detected Vercel environment. Installing root dependencies and generating Prisma client...');
   try {
-    execSync('npm install', { cwd: path.join(process.cwd(), '..'), stdio: 'inherit' });
+    execSync('npm install --include=dev', { cwd: path.join(process.cwd(), '..'), stdio: 'inherit' });
     execSync('npx prisma generate --schema=backend/prisma/schema.prisma', { cwd: path.join(process.cwd(), '..'), stdio: 'inherit' });
     console.log('Root dependencies installed and Prisma client generated successfully.');
   } catch (error) {
