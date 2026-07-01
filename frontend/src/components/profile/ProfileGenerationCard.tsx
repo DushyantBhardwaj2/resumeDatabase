@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { Check, PencilLine, Sparkle, X } from '@phosphor-icons/react'
+import { Check, PencilLine, Sparkle } from '@phosphor-icons/react'
 import type { VaultBullet, Experience, Project, Education, Certificate } from '@/lib/profile-types'
 import { useProfileStore } from '@/store/useProfileStore'
 
@@ -18,8 +18,11 @@ interface ProfileGenerationCardProps {
 }
 
 export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCardProps) {
+  const safeBullets = Array.isArray((data as any).bullets) ? (data as any).bullets as VaultBullet[] : []
   const [selectedBullets, setSelectedBullets] = useState<Set<string>>(
-    new Set(data.type === 'PROJECT' || data.type === 'EXPERIENCE' ? data.bullets.map((b) => b.id) : [])
+    new Set((data.type === 'PROJECT' || data.type === 'EXPERIENCE') && safeBullets.length > 0
+      ? safeBullets.map((b) => b.id)
+      : [])
   )
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -44,10 +47,10 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
         case 'PROJECT': {
           const project: Project = {
             id: genId(),
-            title: data.title,
-            url: data.url || '',
-            techStack: data.techStack || [],
-            vaultBullets: data.bullets.filter((b) => selectedBullets.has(b.id)),
+            title: (data as any).title || '',
+            url: (data as any).url || '',
+            techStack: Array.isArray((data as any).techStack) ? (data as any).techStack : [],
+            vaultBullets: safeBullets.filter((b) => selectedBullets.has(b.id)),
           }
           store.addProject(project)
           break
@@ -55,12 +58,12 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
         case 'EXPERIENCE': {
           const exp: Experience = {
             id: genId(),
-            company: data.company,
-            role: data.role,
-            startDate: data.startDate || '',
-            endDate: data.endDate || '',
-            current: data.current || false,
-            vaultBullets: data.bullets.filter((b) => selectedBullets.has(b.id)),
+            company: (data as any).company || '',
+            role: (data as any).role || '',
+            startDate: (data as any).startDate || '',
+            endDate: (data as any).endDate || '',
+            current: Boolean((data as any).current),
+            vaultBullets: safeBullets.filter((b) => selectedBullets.has(b.id)),
           }
           store.addExperience(exp)
           break
@@ -111,26 +114,25 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
     )
   }
 
-  const showBullets = data.type === 'PROJECT' || data.type === 'EXPERIENCE'
+  const d = data as any
+  const showBullets = d.type === 'PROJECT' || d.type === 'EXPERIENCE'
 
   return (
     <div className="mt-3 rounded-[var(--radius-md)] border border-edge bg-surface overflow-hidden">
-      {/* Header */}
       <div className="flex items-center gap-2 px-3 py-2 bg-card border-b border-edge">
         <Sparkle size={14} className="text-brand" weight="fill" />
         <span className="text-xs font-medium text-content">
-          {data.type === 'PROJECT' && `Project: ${data.title}`}
-          {data.type === 'EXPERIENCE' && `${data.role} @ ${data.company}`}
-          {data.type === 'EDUCATION' && `${data.degree} @ ${data.school}`}
-          {data.type === 'CERTIFICATE' && data.name}
-          {data.type === 'SKILLS' && 'Technical Skills'}
+          {d.type === 'PROJECT' && `Project: ${d.title || ''}`}
+          {d.type === 'EXPERIENCE' && `${d.role || ''} @ ${d.company || ''}`}
+          {d.type === 'EDUCATION' && `${d.degree || ''} @ ${d.school || ''}`}
+          {d.type === 'CERTIFICATE' && (d.name || 'Certificate')}
+          {d.type === 'SKILLS' && 'Technical Skills'}
         </span>
       </div>
 
-      {/* Bullet points */}
       {showBullets && (
         <div className="px-3 py-2 space-y-1 max-h-48 overflow-y-auto">
-          {data.bullets.map((b, idx) => (
+          {safeBullets.map((b) => (
             <label
               key={b.id}
               className={[
@@ -152,28 +154,27 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
         </div>
       )}
 
-      {/* Education / Certificate / Skills preview */}
-      {data.type === 'EDUCATION' && (
+      {d.type === 'EDUCATION' && (
         <div className="px-3 py-2 text-xs text-content-muted space-y-0.5">
-          <p><span className="text-content">School:</span> {data.school}</p>
-          <p><span className="text-content">Degree:</span> {data.degree}</p>
-          {data.gpa && <p><span className="text-content">GPA:</span> {data.gpa}</p>}
-          {data.startYear && <p><span className="text-content">Years:</span> {data.startYear}{data.endYear ? ` - ${data.endYear}` : ''}</p>}
+          <p><span className="text-content">School:</span> {d.school || ''}</p>
+          <p><span className="text-content">Degree:</span> {d.degree || ''}</p>
+          {d.gpa && <p><span className="text-content">GPA:</span> {d.gpa}</p>}
+          {d.startYear && <p><span className="text-content">Years:</span> {d.startYear}{d.endYear ? ` - ${d.endYear}` : ''}</p>}
         </div>
       )}
 
-      {data.type === 'CERTIFICATE' && (
+      {d.type === 'CERTIFICATE' && (
         <div className="px-3 py-2 text-xs text-content-muted space-y-0.5">
-          <p><span className="text-content">Issuer:</span> {data.issuer}</p>
-          {data.date && <p><span className="text-content">Date:</span> {data.date}</p>}
+          <p><span className="text-content">Issuer:</span> {d.issuer || ''}</p>
+          {d.date && <p><span className="text-content">Date:</span> {d.date}</p>}
         </div>
       )}
 
-      {data.type === 'SKILLS' && (
+      {d.type === 'SKILLS' && (
         <div className="px-3 py-2 space-y-1.5">
           {(['languages', 'frameworks', 'tools'] as const).map((cat) => {
-            const items = data[cat]
-            if (!items?.length) return null
+            const items = Array.isArray(d[cat]) ? d[cat] : []
+            if (!items.length) return null
             return (
               <div key={cat} className="flex flex-wrap gap-1">
                 <span className="text-[10px] text-content-muted capitalize mr-1">{cat}:</span>
@@ -188,11 +189,10 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
         </div>
       )}
 
-      {/* Actions */}
       <div className="flex items-center gap-2 px-3 py-2 border-t border-edge">
         {showBullets && selectedBullets.size > 0 && (
           <span className="text-[10px] text-content-muted mr-auto">
-            {selectedBullets.size} / {data.bullets.length} selected
+            {selectedBullets.size} / {safeBullets.length} selected
           </span>
         )}
         <button
