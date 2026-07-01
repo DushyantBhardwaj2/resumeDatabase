@@ -99,11 +99,14 @@ app.use('/api/protected/history', generalRateLimiter)
 
 // ── Mount Sub-Routers ─────────────────────────────────────────────────────────
 
-app.route('/api/protected/profile', profileRouter)
-app.route('/api/protected/resume', resumeRouter)
-app.route('/api/protected/ai', aiRouter)
-app.route('/api/protected/chat', chatRouter)
-app.route('/api/protected/history', historyRouter)
+const routes = app
+  .route('/api/protected/profile', profileRouter)
+  .route('/api/protected/resume', resumeRouter)
+  .route('/api/protected/ai', aiRouter)
+  .route('/api/protected/chat', chatRouter)
+  .route('/api/protected/history', historyRouter)
+
+export type AppType = typeof routes
 
 // ── Server Start ──────────────────────────────────────────────────────────────
 

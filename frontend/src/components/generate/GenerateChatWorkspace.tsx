@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
+import { api } from '@/config/api-client'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { toast } from 'sonner'
 import {
@@ -118,17 +119,19 @@ export function GenerateChatWorkspace() {
     setJobDescription(trimmed)
 
     try {
-      const res = await fetch('/api/protected/resume/tailor', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title, company: comp, description: trimmed, templateId: templateValue }),
+      const res = await api.api.protected.resume.tailor.$post({
+        json: {
+          jobTitle: title,
+          company: comp,
+          jobDescription: trimmed,
+          templateId: templateValue,
+        }
       })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
+        const err = (await res.json().catch(() => ({}))) as any
         throw new Error(err.error || 'Generation failed')
       }
-      const data: TailorResponse = await res.json()
+      const data: TailorResponse = (await res.json()) as unknown as TailorResponse
 
       // Merge original contact/education with tailored experience/projects/skills
       const originalExpMap = new Map(data.original.experience.map((e) => [e.company + '|' + e.role, e]))

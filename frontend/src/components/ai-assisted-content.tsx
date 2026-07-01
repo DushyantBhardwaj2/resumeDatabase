@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { fetchApi } from "@/config/api-client"
+import { api } from "@/config/api-client"
 import { Button } from "@/components/ui/button"
 
 type SectionType = "experience" | "projects" | "skills" | "summary"
@@ -35,16 +35,14 @@ export function AIAssistedContent({
     setLoading(true)
     setError(null)
     try {
-      const res = await fetchApi("/api/protected/ai/generate-bullets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ section, rawInput, context }),
+      const res = await api.api.protected.ai['generate-bullets'].$post({
+        json: { section, rawInput, context },
       })
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || "Generation failed")
+        const err = (await res.json()) as any
+        throw new Error(err?.error || "Generation failed")
       }
-      const data = await res.json()
+      const data = (await res.json()) as any
 
       if (section === "summary") {
         setGenerated(data.summary)

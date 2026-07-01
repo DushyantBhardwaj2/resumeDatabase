@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { api } from '@/config/api-client'
 import {
   Plus, Trash, Sparkle, X,
 } from '@phosphor-icons/react'
@@ -86,11 +87,8 @@ function VaultBulletEditor({
     const bullet = bullets[idx]
     if (!bullet.text.trim()) return
     try {
-      const res = await fetch('/api/protected/ai/expand-vault', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ content: bullet.text, count: 8 }),
+      const res = await api.api.protected.ai['expand-vault'].$post({
+        json: { content: bullet.text, count: 8 }
       })
       if (!res.ok) return
       const data = await res.json()

@@ -4,6 +4,7 @@ import { create } from 'zustand'
 import { toast } from 'sonner'
 import type { ProfileData, Experience, Project, Education, Certificate, Skills, Contact } from '@/lib/profile-types'
 import { normalizeProfile, getEmptyProfile } from '@/lib/normalize-profile'
+import { api } from '@/config/api-client'
 
 export const DRAFT_KEY = 'profile-draft'
 
@@ -37,7 +38,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
   loadProfile: async () => {
     set({ loading: true })
     try {
-      const res = await fetch('/api/protected/profile', { credentials: 'include' })
+      const res = await api.api.protected.profile.$get()
       if (!res.ok) throw new Error()
       const data = await res.json()
       const normalized = normalizeProfile(data)
@@ -55,11 +56,8 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     if (JSON.stringify(profile) === JSON.stringify(originalProfile)) return
     set({ saving: 'saving' })
     try {
-      const res = await fetch('/api/protected/profile', {
-        method: 'PATCH',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(profile),
+      const res = await api.api.protected.profile.$patch({
+        json: profile,
       })
       if (!res.ok) throw new Error()
       const data = await res.json()

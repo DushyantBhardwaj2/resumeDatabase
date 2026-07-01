@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-import { fetchApi } from '@/config/api-client'
+import { api } from '@/config/api-client'
 import { ChatContainer } from '@/components/chat/ChatContainer'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { useChatStore } from '@/store/useChatStore'
@@ -25,7 +25,7 @@ export default function OnboardingPage() {
 
     ;(async () => {
       try {
-        const res = await fetchApi('/api/protected/profile')
+        const res = await api.api.protected.profile.$get()
         if (res.ok) {
           const profile = await res.json()
           if (profile && profile.contact) {
@@ -66,10 +66,8 @@ export default function OnboardingPage() {
     ;(async () => {
       setCompleting(true)
       try {
-        const res = await fetchApi('/api/protected/profile', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ parsed: extractedData }),
+        const res = await api.api.protected.profile.$post({
+          json: { parsed: extractedData as any },
         })
         if (!res.ok) throw new Error()
         document.cookie = 'onboarding_complete=true; path=/; max-age=31536000; SameSite=None; Secure'
