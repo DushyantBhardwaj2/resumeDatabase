@@ -42,7 +42,14 @@ export function AIAssistedContent({
         const err = (await res.json()) as Record<string, string>
         throw new Error(err.error || 'Failed to generate content')
       }
-      const data = (await res.json()) as any
+      const data = (await res.json()) as {
+        summary?: string
+        bullets?: string[]
+        languages?: string[]
+        frameworks?: string[]
+        tools?: string[]
+        vaultBullets?: { text: string }[]
+      }
 
       if (section === "summary") {
         setGenerated(data.summary || "")
@@ -52,9 +59,9 @@ export function AIAssistedContent({
 
       if (section === "skills") {
         const all = [
-          ...data.languages.map((s: string) => `Language: ${s}`),
-          ...data.frameworks.map((s: string) => `Framework: ${s}`),
-          ...data.tools.map((s: string) => `Tool: ${s}`),
+          ...(data.languages || []).map((s: string) => `Language: ${s}`),
+          ...(data.frameworks || []).map((s: string) => `Framework: ${s}`),
+          ...(data.tools || []).map((s: string) => `Tool: ${s}`),
         ]
         setGenerated(all)
         setSelected(new Set(all.map((_, i) => i)))
