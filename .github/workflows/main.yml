@@ -16,8 +16,8 @@ jobs:
         uses: the-pr-agent/pr-agent@main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          config.model: "openrouter/free"
-          config.fallback_models: '["openrouter/free"]'
+          config.model: "nvidia/nemotron-3-super-120b-a12b:free"
+          config.fallback_models: '["openai/gpt-oss-120b:free"]'
           config.custom_model_max_tokens: "20000"
           OPENROUTER.KEY: ${{ secrets.OPENROUTER_KEY }}
           github_action_config.auto_review: "true"
