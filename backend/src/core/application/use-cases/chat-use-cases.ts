@@ -60,10 +60,38 @@ export class ChatUseCases {
     request: ChatInteractRequest
   ): Promise<ChatInteractResponse> {
     const systemPrompt = `${this.chatIntentPrompt}\n\nThe user is currently in phase: ${request.currentState?.phase ?? "GREETING"}.`
-    const messagesForAI = request.messages
+    let messagesForAI = request.messages
       .filter((m) => m.role !== "system")
       .map((m) => `${m.role === "assistant" ? "Assistant" : "User"}: ${m.content}`)
       .join("\n")
+
+    // --- NEW LOGIC: URL Interception and Scanning ---
+    const lastUserMsg = request.messages.filter((m) => m.role === 'user').pop();
+    if (lastUserMsg) {
+      const urlRegex = /(https?:\/\/[^\s]+)/g;
+      const urls = lastUserMsg.content.match(urlRegex);
+
+      if (urls && urls.length > 0) {
+        for (const url of urls) {
+          try {
+            const jinaRes = await fetch(`https://r.jina.ai/${url}`, {
+              headers: { 
+                "Accept": "text/plain",
+                "X-No-Cache": "true" 
+              }
+            });
+            if (jinaRes.ok) {
+              const content = await jinaRes.text();
+              const truncated = content.slice(0, 30000); 
+              messagesForAI += `\n\n[System Context: The user provided a URL (${url}). Here is its scraped content for you to analyze and generate points from:\n${truncated}]`;
+            }
+          } catch (error) {
+             console.error(`Failed to fetch URL context for ${url}:`, error);
+          }
+        }
+      }
+    }
+    // --- END NEW LOGIC ---
 
     try {
       const result = await this.aiService.generateStructuredData(
