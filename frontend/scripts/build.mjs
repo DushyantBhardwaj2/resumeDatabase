@@ -18,7 +18,7 @@ if (process.env.VERCEL) {
 console.log('Running Next.js build...');
 try {
   execSync('next build', { stdio: 'inherit' });
-} catch (error) {
+} catch {
   console.error('Next.js build failed.');
   process.exit(1);
 }

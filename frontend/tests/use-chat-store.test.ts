@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest'
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { useChatStore } from '@/store/useChatStore'
 
 function getStore() {
@@ -138,7 +138,7 @@ describe('mapWidgetToPhase mappings', () => {
           targetWidget: widget,
           extractedData: {},
         }),
-      } as any)
+      } as unknown as Response)
 
       await getStore().sendMessage('test')
       expect(getStore().currentPhase).toBe(expectedPhase)
@@ -154,7 +154,7 @@ describe('mapWidgetToPhase mappings', () => {
         targetWidget: 'UNKNOWN_WIDGET',
         extractedData: {},
       }),
-    } as any)
+    } as unknown as Response)
 
     useChatStore.setState({ currentPhase: 'REVIEW_SKILLS' })
     await getStore().sendMessage('test')
