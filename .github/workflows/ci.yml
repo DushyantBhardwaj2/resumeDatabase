@@ -27,6 +27,10 @@ jobs:
         working-directory: .
       - run: npx tsc --noEmit
       - run: npx vitest run
+      - run: npm run build
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || 'http://localhost:8080' }}
+          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
 
   backend:
     runs-on: ubuntu-latest
@@ -48,25 +52,3 @@ jobs:
           test -f dist/infrastructure/latex/templates/nsut-canonical/template.tex
           test -f dist/infrastructure/latex/templates/nsut-canonical/config.json
           test -f dist/infrastructure/latex/templates/nsut-canonical/NSUT_logo.png
-          echo "Template assets verified"
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build:frontend
-        env:
-          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || 'http://localhost:8080' }}
-          NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'http://localhost:3000' }}
-      - run: npm run build:backend
-      - name: Verify template assets
-        run: |
-          test -f backend/dist/infrastructure/latex/templates/nsut-canonical/template.tex
-          test -f backend/dist/infrastructure/latex/templates/nsut-canonical/config.json
-          test -f backend/dist/infrastructure/latex/templates/nsut-canonical/NSUT_logo.png
-          echo "Template assets verified"
