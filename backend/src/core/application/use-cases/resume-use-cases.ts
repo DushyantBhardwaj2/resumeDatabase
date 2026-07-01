@@ -34,19 +34,18 @@ function applyTemplateConstraints(tailored: TailoredOutput, config: TemplateConf
   }
 }
 
-function assignItemIds(profile: Profile): void {
-  for (const exp of profile.experience) {
-    const e = exp as unknown as Record<string, unknown>
-    if (!e.id) {
-      e.id = crypto.randomUUID()
-    }
-  }
-  for (const proj of profile.projects) {
-    const p = proj as unknown as Record<string, unknown>
-    if (!p.id) {
-      p.id = crypto.randomUUID()
-    }
-  }
+function assignItemIds(profile: Profile): Profile {
+  return {
+    ...profile,
+    experience: profile.experience.map((exp) => {
+      const e = exp as unknown as Record<string, unknown>
+      return e.id ? exp : { ...exp, id: crypto.randomUUID() }
+    }),
+    projects: profile.projects.map((proj) => {
+      const p = proj as unknown as Record<string, unknown>
+      return p.id ? proj : { ...proj, id: crypto.randomUUID() }
+    }),
+  } as Profile
 }
 
 function buildTailoredFromSelections(
@@ -113,10 +112,10 @@ export class ResumeUseCases {
     input: { jobTitle: string; company: string; jobDescription: string },
     templateId: string = 'nsut-canonical'
   ): Promise<{ jobTitle: string; company: string; original: Profile; tailored: TailoredOutput; latex: string }> {
-    const profile = await this.profileRepo.findByUserId(userId)
+    let profile = await this.profileRepo.findByUserId(userId)
     if (!profile) throw new Error("Profile not found. Complete onboarding first.")
 
-    assignItemIds(profile)
+    profile = assignItemIds(profile)
 
     // Bullet selection path: AI selects matching bullets from vault, built locally
     // Send only what the AI needs — strip heavy metadata to reduce latency

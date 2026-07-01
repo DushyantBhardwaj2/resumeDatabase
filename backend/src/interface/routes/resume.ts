@@ -29,20 +29,20 @@ const compileLiveSchema = z.object({
       endDate: z.string().max(100).nullable().optional(),
       current: z.boolean().optional(),
       vaultBullets: z.array(vaultBulletSchema).max(200).optional().default([]),
-    }).passthrough()).max(20).optional().nullable(),
+    })).max(20).optional().nullable(),
     projects: z.array(z.object({
       id: z.string().max(100).optional(),
       title: z.string().max(500),
       url: z.string().max(2000).nullable().optional(),
       techStack: z.array(z.string().max(200)).max(50).optional().default([]),
       vaultBullets: z.array(vaultBulletSchema).max(200).optional().default([]),
-    }).passthrough()).max(20).optional().nullable(),
+    })).max(20).optional().nullable(),
     skills: z.object({
       languages: z.array(z.string().max(200)).max(100).optional().default([]),
       frameworks: z.array(z.string().max(200)).max(100).optional().default([]),
       tools: z.array(z.string().max(200)).max(100).optional().default([]),
     }).optional().nullable(),
-  }).passthrough(),
+  }),
 })
 
 export const resumeRouter = new Hono<{ Variables: Variables }>()
