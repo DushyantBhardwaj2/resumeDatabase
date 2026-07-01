@@ -67,6 +67,7 @@ export default function OnboardingPage() {
       setCompleting(true)
       try {
         const res = await api.api.protected.profile.$post({
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
           json: { parsed: extractedData as any },
         })
         if (!res.ok) throw new Error()

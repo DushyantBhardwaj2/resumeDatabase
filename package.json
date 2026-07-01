@@ -19,6 +19,8 @@
     "test": "npm run test:frontend && npm run test:backend",
     "typecheck:frontend": "npm run typecheck --workspace=frontend",
     "typecheck": "npm run typecheck:frontend",
-    "test:smoke": "node scripts/smoke-test.mjs"
+    "test:smoke": "node scripts/smoke-test.mjs",
+    "postinstall": "npm run db:generate",
+    "db:generate": "npx prisma generate --schema=backend/prisma/schema.prisma"
   }
 }

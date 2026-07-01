@@ -89,6 +89,7 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
       try {
         const res = await api.api.protected.history[':id'].$get({ param: { id: id as string } })
         if (!res.ok) return
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const data = (await res.json()) as any
         const td = data.tailoredData
 

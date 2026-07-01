@@ -147,13 +147,13 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
 
     try {
       // ── Step 1: Enqueue the job ────────────────────────────────────────────
-      const enqueueRes = await (api.api.protected.resume as any)['compile-live'].$post({
+      const enqueueRes = await api.api.protected.resume['compile-live'].$post({
         json: { profile, selectedBulletIds, templateId: template },
       }, { init: { signal } })
       
       if (!enqueueRes.ok) {
         const errBody = await enqueueRes.json().catch(() => ({ error: 'Compilation failed' }))
-        throw new Error((errBody as any).error || 'Failed to queue compilation')
+        throw new Error((errBody as Record<string, string>).error || 'Failed to queue compilation')
       }
       const { jobId } = await enqueueRes.json()
 
@@ -166,7 +166,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
           signal.addEventListener('abort', () => { clearTimeout(timer); reject(new DOMException('Aborted', 'AbortError')) })
         })
 
-        const statusRes = await (api.api.protected.resume as any)['compile-status'][':jobId'].$get({
+        const statusRes = await api.api.protected.resume['compile-status'][':jobId'].$get({
           param: { jobId }
         }, { init: { signal } })
         
@@ -178,7 +178,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
           set({ status: 'compiling' })
         } else if (jobStatus === 'completed') {
           // ── Step 3: Fetch the PDF blob ────────────────────────────────────
-          const resultRes = await (api.api.protected.resume as any)['compile-result'][':jobId'].$get({
+          const resultRes = await api.api.protected.resume['compile-result'][':jobId'].$get({
             param: { jobId }
           }, { init: { signal } })
           if (!resultRes.ok) throw new Error('Failed to retrieve compiled PDF')

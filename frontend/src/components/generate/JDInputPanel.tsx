@@ -58,7 +58,7 @@ export function JDInputPanel() {
         json: { title: title.trim(), company: company.trim(), description: description.trim(), templateId: template },
       })
       if (!res.ok) {
-        const err = (await res.json().catch(() => ({}))) as any
+        const err = (await res.json().catch(() => ({}))) as Record<string, string>
         throw new Error(err.error || 'Generation failed')
       }
       const data: TailorResponse = (await res.json()) as unknown as TailorResponse

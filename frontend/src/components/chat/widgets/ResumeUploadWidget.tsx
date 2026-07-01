@@ -22,8 +22,8 @@ export function ResumeUploadWidget({ onParsed }: ResumeUploadWidgetProps) {
     setParsing(true)
     try {
       const res = await api.api.protected.resume.parse.$post({ form: { file } })
-      const result = (await res.json()) as any
-      if (!res.ok) throw new Error((result as any).error || 'Failed to parse resume')
+      const result = (await res.json()) as Record<string, unknown>
+      if (!res.ok) throw new Error((result.error as string) || 'Failed to parse resume')
       onParsed?.(result.parsed)
       toast.success(result.fromDb ? 'Profile loaded from your data!' : 'Resume parsed successfully!')
     } catch (e) {

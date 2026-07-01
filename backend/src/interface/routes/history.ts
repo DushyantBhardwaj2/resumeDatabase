@@ -1,4 +1,6 @@
 import { Hono } from 'hono'
+import { z } from 'zod'
+import { zValidator } from '@hono/zod-validator'
 import { container } from '../../di/container'
 import type { Variables } from '../types'
 
@@ -21,7 +23,7 @@ export const historyRouter = new Hono<{ Variables: Variables }>()
     await container.historyUseCases.delete(id, session.user.id)
     return c.json({ success: true })
   })
-  .patch('/:id', async (c) => {
+  .patch('/:id', zValidator('json', z.any()), async (c) => {
     const session = c.get('session')
     const id = c.req.param('id')
     const body = await c.req.json()
@@ -29,7 +31,7 @@ export const historyRouter = new Hono<{ Variables: Variables }>()
     await container.historyUseCases.updateStyling(id, session.user.id, body)
     return c.json({ success: true })
   })
-  .put('/:id/styling', async (c) => {
+  .put('/:id/styling', zValidator('json', z.any()), async (c) => {
     const session = c.get('session')
     const id = c.req.param('id')
     const styling = await c.req.json()

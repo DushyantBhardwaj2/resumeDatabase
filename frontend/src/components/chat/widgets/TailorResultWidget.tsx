@@ -89,7 +89,7 @@ export function TailorResultWidget({ result, onReset }: TailorResultWidgetProps)
       const res = await api.api.protected.history[':id'].$patch({
         param: { id: data.id },
         json: data,
-      } as any)
+      })
       if (!res.ok) throw new Error()
       toast.success('Changes saved')
       setDirty(false)

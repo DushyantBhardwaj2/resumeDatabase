@@ -39,10 +39,10 @@ export function AIAssistedContent({
         json: { section, rawInput, context },
       })
       if (!res.ok) {
-        const err = (await res.json()) as any
-        throw new Error(err?.error || "Generation failed")
+        const err = (await res.json()) as Record<string, string>
+        throw new Error(err.error || 'Failed to generate content')
       }
-      const data = (await res.json()) as any
+      const data = (await res.json()) as { summary?: string; bullets?: string[] }
 
       if (section === "summary") {
         setGenerated(data.summary)
