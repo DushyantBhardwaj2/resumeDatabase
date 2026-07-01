@@ -1,5 +1,5 @@
 {
-  "buildCommand": "next build",
+  "buildCommand": "node scripts/build.mjs",
   "installCommand": "npm install",
   "framework": "nextjs",
   "outputDirectory": ".next",
