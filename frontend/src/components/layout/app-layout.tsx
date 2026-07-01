@@ -15,7 +15,7 @@ interface AppLayoutProps {
 }
 
 export function AppLayout({ children, user }: AppLayoutProps) {
-  const [sidebarCollapsed, setSidebarCollapsed] = useLocalStorage('sidebar-collapsed', false)
+  const [sidebarCollapsed, setSidebarCollapsed] = useLocalStorage('sidebar-collapsed', true)
 
   return (
     <div className="flex min-h-[100dvh] bg-surface">
