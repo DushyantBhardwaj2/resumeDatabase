@@ -1,16 +1,19 @@
 name: Custom PR Agent (OpenRouter)
+
 on:
   pull_request:
     types: [opened, reopened, ready_for_review]
   issue_comment:
+
 jobs:
   pr_agent_job:
     if: ${{ github.event.sender.type != 'Bot' }}
-    runs-on: ubuntu-lates
+    runs-on: ubuntu-latest
     permissions:
       issues: write
       pull-requests: write
       contents: write
+
     steps:
       - name: PR Agent action step
         uses: the-pr-agent/pr-agent@main
@@ -19,7 +22,7 @@ jobs:
           config.model: "nvidia/nemotron-3-super-120b-a12b:free"
           config.fallback_models: '["openai/gpt-oss-120b:free"]'
           config.custom_model_max_tokens: "20000"
-          OPENROUTER.KEY: ${{ secrets.OPENROUTER_KEY }}
+          OPENROUTER_KEY: ${{ secrets.OPENROUTER_KEY }}
           github_action_config.auto_review: "true"
           github_action_config.auto_describe: "true"
           github_action_config.auto_improve: "true"
