@@ -9,7 +9,7 @@ export function DashboardQuickActionsWidget() {
       label: 'Edit Profile',
       description: 'Update your details',
       icon: UserCircle,
-      href: '/dashboard/profile',
+      href: '/profile',
       variant: 'secondary' as const,
     },
     {

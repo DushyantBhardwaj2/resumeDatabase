@@ -32,7 +32,7 @@ type NavItemDef = {
 
 const navItems: NavItemDef[] = [
   { icon: Sparkle, label: 'Generate', href: '/tailor' },
-  { icon: UserCircle, label: 'Profile Builder', href: '/dashboard/profile' },
+  { icon: UserCircle, label: 'Profile Builder', href: '/profile' },
   { icon: ClockCounterClockwise, label: 'History', href: '/history' },
   { icon: Lightbulb, label: 'Tips', href: '/tips' },
 ]

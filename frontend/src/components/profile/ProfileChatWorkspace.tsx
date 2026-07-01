@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState, useCallback, useMemo, startTransition } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import {
   ChatCircleDots,
   EnvelopeSimple,
@@ -33,7 +33,6 @@ export function ProfileChatWorkspace() {
   const setMode = useChatStore((s) => s.setMode)
   const sendMessage = useChatStore((s) => s.sendMessage)
   const profile = useProfileStore((s) => s.profile)
-  const loadProfile = useProfileStore((s) => s.loadProfile)
   const saveProfile = useProfileStore((s) => s.saveProfile)
   const updateProfile = useProfileStore((s) => s.updateProfile)
   const isDirty = useProfileStore((s) => s.isDirty)
@@ -42,13 +41,6 @@ export function ProfileChatWorkspace() {
   const initRef = useRef(false)
   const [editingSection, setEditingSection] = useState<SectionName | null>(null)
   const [userInput, setUserInput] = useState('')
-
-  // Load profile on mount
-  useEffect(() => {
-    startTransition(() => {
-      loadProfile()
-    })
-  }, [loadProfile])
 
   // Init chat on mount
   useEffect(() => {
