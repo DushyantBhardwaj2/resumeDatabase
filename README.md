@@ -1,6 +1,6 @@
 # Resumint
 
-AI-powered resume tailoring platform for NSUT students.
+AI-powered quick resume and CV tailoring platform for NSUT students.
 
 ## Architecture
 
