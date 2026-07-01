@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { fetchApi } from "@/config/api-client"
+import { api } from "@/config/api-client"
 import { Button } from "@/components/ui/button"
 
 type SectionType = "experience" | "projects" | "skills" | "summary"
@@ -35,28 +35,33 @@ export function AIAssistedContent({
     setLoading(true)
     setError(null)
     try {
-      const res = await fetchApi("/api/protected/ai/generate-bullets", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ section, rawInput, context }),
+      const res = await api.api.protected.ai['generate-bullets'].$post({
+        json: { section, rawInput, context },
       })
       if (!res.ok) {
-        const err = await res.json()
-        throw new Error(err.error || "Generation failed")
+        const err = (await res.json()) as Record<string, string>
+        throw new Error(err.error || 'Failed to generate content')
       }
-      const data = await res.json()
+      const data = (await res.json()) as {
+        summary?: string
+        bullets?: string[]
+        languages?: string[]
+        frameworks?: string[]
+        tools?: string[]
+        vaultBullets?: { text: string }[]
+      }
 
       if (section === "summary") {
-        setGenerated(data.summary)
+        setGenerated(data.summary || "")
         setMode("review")
         return
       }
 
       if (section === "skills") {
         const all = [
-          ...data.languages.map((s: string) => `Language: ${s}`),
-          ...data.frameworks.map((s: string) => `Framework: ${s}`),
-          ...data.tools.map((s: string) => `Tool: ${s}`),
+          ...(data.languages || []).map((s: string) => `Language: ${s}`),
+          ...(data.frameworks || []).map((s: string) => `Framework: ${s}`),
+          ...(data.tools || []).map((s: string) => `Tool: ${s}`),
         ]
         setGenerated(all)
         setSelected(new Set(all.map((_, i) => i)))

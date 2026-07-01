@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useCallback } from 'react'
+import { api } from '@/config/api-client'
 import { PencilSimple, Check, ArrowClockwise } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 
@@ -85,10 +86,9 @@ export function TailorResultWidget({ result, onReset }: TailorResultWidgetProps)
 
   const handleSave = useCallback(async () => {
     try {
-      const res = await fetch(`/api/protected/history/${data.id}`, {
-        method: 'PATCH', credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data),
+      const res = await api.api.protected.history[':id'].$patch({
+        param: { id: data.id },
+        json: data,
       })
       if (!res.ok) throw new Error()
       toast.success('Changes saved')

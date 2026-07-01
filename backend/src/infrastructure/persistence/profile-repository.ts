@@ -2,6 +2,7 @@ import { prisma } from "../../config/prisma"
 import type { Profile, Experience, Project, VaultBullet } from "../../core/domain/entities"
 import type { IProfileRepository } from "../../core/domain/repositories"
 import type { Prisma } from "@prisma/client"
+import { z } from "zod"
 
 function toJson(value: unknown): Prisma.InputJsonValue {
   return value as Prisma.InputJsonValue
@@ -36,19 +37,83 @@ function migrateProjects(raw: unknown): Project[] {
   }))
 }
 
+// ── Zod Schemas for resilient DB reads ────────────────────────────────────────
+
+const contactSchema = z.object({
+  name: z.string().nullable().catch(null),
+  email: z.string().nullable().catch(null),
+  phone: z.string().nullable().catch(null),
+  linkedin: z.string().nullable().catch(null),
+  github: z.string().nullable().catch(null),
+  leetcode: z.string().nullable().catch(null),
+  portfolio: z.string().nullable().catch(null),
+}).catch({ name: null, email: null, phone: null, linkedin: null, github: null, leetcode: null, portfolio: null })
+
+const educationSchema = z.object({
+  school: z.string().catch(""),
+  degree: z.string().catch(""),
+  gpa: z.string().nullable().catch(null),
+  startYear: z.number().nullable().catch(null),
+  endYear: z.number().nullable().catch(null),
+})
+
+const vaultBulletSchema = z.object({
+  id: z.string().catch(() => crypto.randomUUID()),
+  text: z.string().catch(""),
+  category: z.enum(['FRONTEND', 'BACKEND', 'DEVOPS', 'LEADERSHIP', 'GENERAL']).optional(),
+  keywords: z.array(z.string()).catch([]),
+  isAIGenerated: z.boolean().catch(false),
+})
+
+const experienceSchema = z.object({
+  id: z.string().catch(() => crypto.randomUUID()),
+  company: z.string().catch(""),
+  role: z.string().catch(""),
+  startDate: z.string().nullable().catch(null),
+  endDate: z.string().nullable().catch(null),
+  vaultBullets: z.array(vaultBulletSchema).catch([]),
+})
+
+const projectSchema = z.object({
+  id: z.string().catch(() => crypto.randomUUID()),
+  title: z.string().catch(""),
+  techStack: z.array(z.string()).catch([]),
+  vaultBullets: z.array(vaultBulletSchema).catch([]),
+  url: z.string().nullable().catch(null),
+})
+
+const skillsSchema = z.object({
+  languages: z.array(z.string()).catch([]),
+  frameworks: z.array(z.string()).catch([]),
+  tools: z.array(z.string()).catch([]),
+}).catch({ languages: [], frameworks: [], tools: [] })
+
+const certificateSchema = z.object({
+  id: z.string().catch(() => crypto.randomUUID()),
+  name: z.string().catch(""),
+  issuer: z.string().catch(""),
+  url: z.string().catch(""),
+  date: z.string().optional(),
+})
+
+// Safe mapper to ensure drift doesn't crash the app
+function mapRowToProfile(row: any): Profile {
+  return {
+    contact: contactSchema.parse(row.contact || {}),
+    education: z.array(educationSchema).catch([]).parse(row.education || []),
+    experience: z.array(experienceSchema).catch([]).parse(migrateExperience(row.experience)),
+    projects: z.array(projectSchema).catch([]).parse(migrateProjects(row.projects)),
+    skills: skillsSchema.parse(row.skills || {}),
+    certificates: z.array(certificateSchema).catch([]).parse(row.certificates || []),
+    githubUsername: typeof row.githubUsername === 'string' ? row.githubUsername : null,
+  }
+}
+
 export class ProfileRepository implements IProfileRepository {
   async findByUserId(userId: string): Promise<Profile | null> {
     const row = await prisma.profile.findUnique({ where: { userId } })
     if (!row) return null
-    return {
-      contact: row.contact as unknown as Profile["contact"],
-      education: row.education as unknown as Profile["education"],
-      experience: migrateExperience(row.experience),
-      projects: migrateProjects(row.projects),
-      skills: row.skills as unknown as Profile["skills"],
-      certificates: (row.certificates as unknown as Profile["certificates"]) ?? [],
-      githubUsername: row.githubUsername,
-    }
+    return mapRowToProfile(row)
   }
 
   async upsert(userId: string, data: Partial<Profile>): Promise<Profile> {
@@ -68,15 +133,7 @@ export class ProfileRepository implements IProfileRepository {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       update: updateData as any,
     })
-    return {
-      contact: row.contact as unknown as Profile["contact"],
-      education: row.education as unknown as Profile["education"],
-      experience: migrateExperience(row.experience),
-      projects: migrateProjects(row.projects),
-      skills: row.skills as unknown as Profile["skills"],
-      certificates: (row.certificates as unknown as Profile["certificates"]) ?? [],
-      githubUsername: row.githubUsername,
-    }
+    return mapRowToProfile(row)
   }
 
   async saveRaw(userId: string, rawText: string, parsed: Profile): Promise<Profile> {
@@ -96,14 +153,6 @@ export class ProfileRepository implements IProfileRepository {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       update: data as any,
     })
-    return {
-      contact: row.contact as unknown as Profile["contact"],
-      education: row.education as unknown as Profile["education"],
-      experience: migrateExperience(row.experience),
-      projects: migrateProjects(row.projects),
-      skills: row.skills as unknown as Profile["skills"],
-      certificates: (row.certificates as unknown as Profile["certificates"]) ?? [],
-      githubUsername: row.githubUsername,
-    }
+    return mapRowToProfile(row)
   }
 }

@@ -1,5 +1,5 @@
 import { create } from 'zustand'
-
+import { api } from '@/config/api-client'
 export type ChatMessage = {
   id: string | number
   role: 'user' | 'assistant' | 'system'
@@ -92,18 +92,15 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }))
 
     try {
-      const res = await fetch('/api/protected/chat/interact', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({
+      const res = await api.api.protected.chat.interact.$post({
+        json: {
           messages: [...modeMessages, userMsg].map((m) => ({
             role: m.role,
             content: m.content,
           })),
           currentState: { phase: currentPhase },
           mode,
-        }),
+        },
       })
 
       if (!res.ok) throw new Error('Chat request failed')

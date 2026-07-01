@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import { api } from '@/config/api-client'
 import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
 import { Avatar } from '@/components/ui/avatar'
@@ -92,7 +93,7 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
   useEffect(() => {
     ;(async () => {
       try {
-        const res = await fetch('/api/protected/history', { credentials: 'include' })
+        const res = await api.api.protected.history.$get()
         if (res.ok) {
           const data: HistoryItem[] = await res.json()
           setHistoryItems(data.slice(0, 5))

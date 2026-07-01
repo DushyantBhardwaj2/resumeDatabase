@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, use, useRef, useCallback } from 'react'
+import { api } from '@/config/api-client'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { GenerateChatWorkspace } from '@/components/generate/GenerateChatWorkspace'
 import { PdfPreviewPanel } from '@/components/generate/PdfPreviewPanel'
@@ -86,9 +87,10 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
 
     async function loadClone() {
       try {
-        const res = await fetch(`/api/protected/history/${id}`, { credentials: 'include' })
+        const res = await api.api.protected.history[':id'].$get({ param: { id: id as string } })
         if (!res.ok) return
-        const data = await res.json()
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const data = (await res.json()) as any
         const td = data.tailoredData
 
         setJobTitle(td.jobTitle || '')

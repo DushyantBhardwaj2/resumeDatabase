@@ -83,8 +83,7 @@ export const pdfWorker = new Worker<PdfJobData>(
       // Runs even when an error is thrown — prevents temp file accumulation
       // even if the PDF is missing or Redis write fails.
       try {
-        for (const f of readdirSync(tempDir)) unlinkSync(join(tempDir, f))
-        rmSync(tempDir, { recursive: true })
+        rmSync(tempDir, { recursive: true, force: true })
       } catch { /* best-effort; OS will eventually reclaim /tmp */ }
     }
   },

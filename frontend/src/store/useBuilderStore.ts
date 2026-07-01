@@ -1,4 +1,5 @@
 import { create } from 'zustand'
+import { api } from '@/config/api-client'
 
 export type VaultBullet = {
   id: string
@@ -146,18 +147,15 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
 
     try {
       // ── Step 1: Enqueue the job ────────────────────────────────────────────
-      const enqueueRes = await fetch('/api/protected/resume/compile-live', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ profile, selectedBulletIds, templateId: template }),
-        signal,
-      })
+      const enqueueRes = await api.api.protected.resume['compile-live'].$post({
+        json: { profile, selectedBulletIds, templateId: template },
+      }, { init: { signal } })
+      
       if (!enqueueRes.ok) {
         const errBody = await enqueueRes.json().catch(() => ({ error: 'Compilation failed' }))
-        throw new Error(errBody.error || 'Failed to queue compilation')
+        throw new Error((errBody as Record<string, string>).error || 'Failed to queue compilation')
       }
-      const { jobId } = await enqueueRes.json() as { jobId: string }
+      const { jobId } = await enqueueRes.json()
 
       // ── Step 2: Poll status (600 ms interval, max 36 s) ───────────────────
       const MAX_POLLS = 60
@@ -168,22 +166,21 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
           signal.addEventListener('abort', () => { clearTimeout(timer); reject(new DOMException('Aborted', 'AbortError')) })
         })
 
-        const statusRes = await fetch(`/api/protected/resume/compile-status/${jobId}`, {
-          credentials: 'include',
-          signal,
-        })
+        const statusRes = await api.api.protected.resume['compile-status'][':jobId'].$get({
+          param: { jobId }
+        }, { init: { signal } })
+        
         if (!statusRes.ok) throw new Error('Status check failed')
 
-        const { status: jobStatus, error } = await statusRes.json() as { status: string; error?: string }
+        const { status: jobStatus, error } = await statusRes.json()
 
         if (jobStatus === 'active') {
           set({ status: 'compiling' })
         } else if (jobStatus === 'completed') {
           // ── Step 3: Fetch the PDF blob ────────────────────────────────────
-          const resultRes = await fetch(`/api/protected/resume/compile-result/${jobId}`, {
-            credentials: 'include',
-            signal,
-          })
+          const resultRes = await api.api.protected.resume['compile-result'][':jobId'].$get({
+            param: { jobId }
+          }, { init: { signal } })
           if (!resultRes.ok) throw new Error('Failed to retrieve compiled PDF')
 
           const blob = await resultRes.blob()

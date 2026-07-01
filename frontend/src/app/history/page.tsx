@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Clock, Trash, MagnifyingGlass } from '@phosphor-icons/react';
 import { toast } from 'sonner';
+import { api } from '@/config/api-client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 
@@ -79,9 +80,8 @@ function HistoryRow({
     if (confirmTimer.current) clearTimeout(confirmTimer.current);
     setDeleting(true);
     try {
-      const res = await fetch(`/api/protected/history/${item.id}`, {
-        method: 'DELETE',
-        credentials: 'include',
+      const res = await api.api.protected.history[':id'].$delete({
+        param: { id: item.id }
       });
       if (!res.ok) throw new Error();
       onDelete(item.id);
@@ -187,7 +187,7 @@ export default function HistoryPage() {
   useEffect(() => {
     (async () => {
       try {
-        const res = await fetch('/api/protected/history', { credentials: 'include' });
+        const res = await api.api.protected.history.$get();
         if (!res.ok) throw new Error();
         const data = await res.json();
         setItems(data);

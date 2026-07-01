@@ -3,7 +3,7 @@
 import { useState, useRef } from 'react'
 import { UploadSimple } from '@phosphor-icons/react'
 import { toast } from 'sonner'
-import { fetchApi } from '@/config/api-client'
+import { api } from '@/config/api-client'
 
 interface ResumeUploadWidgetProps {
   onParsed?: (data: unknown) => void
@@ -21,11 +21,9 @@ export function ResumeUploadWidget({ onParsed }: ResumeUploadWidgetProps) {
     }
     setParsing(true)
     try {
-      const fd = new FormData()
-      fd.append('file', file)
-      const res = await fetchApi('/api/protected/resume/parse', { method: 'POST', body: fd })
-      const result = await res.json()
-      if (!res.ok) throw new Error(result.error || 'Failed to parse resume')
+      const res = await api.api.protected.resume.parse.$post({ form: { file } })
+      const result = (await res.json()) as Record<string, unknown>
+      if (!res.ok) throw new Error((result.error as string) || 'Failed to parse resume')
       onParsed?.(result.parsed)
       toast.success(result.fromDb ? 'Profile loaded from your data!' : 'Resume parsed successfully!')
     } catch (e) {

@@ -1,6 +1,6 @@
 import { getServerSession } from "@/config/auth"
 import { redirect } from "next/navigation"
-import { fetchWithSession } from "@/config/api-client-server"
+import { serverApi } from "@/config/api-client-server"
 
 export default async function AuthRedirectPage(props: {
   searchParams?: Promise<Record<string, string | string[] | undefined>> | Record<string, string | string[] | undefined>
@@ -23,7 +23,7 @@ export default async function AuthRedirectPage(props: {
 
   let profile = null
   try {
-    const res = await fetchWithSession('/api/protected/profile')
+    const res = await serverApi.api.protected.profile.$get()
     if (res.ok) profile = await res.json()
   } catch (e) {
     console.error("Failed to fetch profile:", e)

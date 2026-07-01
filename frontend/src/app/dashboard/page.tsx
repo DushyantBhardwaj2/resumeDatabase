@@ -1,7 +1,7 @@
 import { auth } from '@/lib/auth'
 import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
-import fetchWithSession from '@/lib/fetch'
+import { serverApi } from '@/config/api-client-server'
 import { DashboardChatClient } from './dashboard-chat-client'
 
 type SkillsData = {
@@ -16,10 +16,10 @@ type ProfileData = {
   projects: unknown[]
   skills: SkillsData
   contact: {
-    phone?: string
-    linkedin?: string
-    github?: string
-    portfolio?: string
+    phone?: string | null
+    linkedin?: string | null
+    github?: string | null
+    portfolio?: string | null
   }
 }
 
@@ -29,7 +29,7 @@ export default async function DashboardPage() {
 
   let profile: ProfileData & { completeness?: number } | null = null
   try {
-    const res = await fetchWithSession('/api/protected/profile')
+    const res = await serverApi.api.protected.profile.$get()
     if (res.ok) {
       profile = await res.json()
     }

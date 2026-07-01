@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { api } from '@/config/api-client'
 import { useBuilderStore, type TemplateType } from '@/store/useBuilderStore'
 import { toast } from 'sonner'
 
@@ -53,17 +54,14 @@ export function JDInputPanel() {
     setGenerating(true)
     setStatus('selecting')
     try {
-      const res = await fetch('/api/protected/resume/tailor', {
-        method: 'POST',
-        credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ title: title.trim(), company: company.trim(), description: description.trim(), templateId: template }),
+      const res = await api.api.protected.resume.tailor.$post({
+        json: { title: title.trim(), company: company.trim(), description: description.trim(), templateId: template },
       })
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}))
+        const err = (await res.json().catch(() => ({}))) as Record<string, string>
         throw new Error(err.error || 'Generation failed')
       }
-      const data: TailorResponse = await res.json()
+      const data: TailorResponse = (await res.json()) as unknown as TailorResponse
       setJobDescription(description.trim())
 
       // Merge original contact/education with tailored experience/projects/skills
