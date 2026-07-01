@@ -115,6 +115,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         role: 'assistant',
         content: data.reply,
         widget: data.targetWidget,
+        meta: data.extractedData && typeof data.extractedData === 'object' && Object.keys(data.extractedData).length > 0
+          ? { generatedData: data.extractedData }
+          : undefined,
       }
 
       set((state) => ({

@@ -105,26 +105,8 @@ export function ProfileChatWorkspace() {
 
   const handleChatSubmit = useCallback(async (text: string) => {
     if (!text.trim()) return
-    const lower = text.toLowerCase()
-
-    const sectionKeywords: [RegExp, SectionName][] = [
-      [/contact|email|phone|linkedin/, 'contact'],
-      [/education|school|college|university|degree/, 'education'],
-      [/experience|internship|job|work|company/, 'experience'],
-      [/project|github|repo/, 'projects'],
-      [/skill|language|framework|tool|tech stack/, 'skills'],
-      [/certificate|certification|credential/, 'certificates'],
-    ]
-
-    for (const [regex, section] of sectionKeywords) {
-      if (regex.test(lower)) {
-        handleEditSection(section)
-        return
-      }
-    }
-
     await sendMessage(text)
-  }, [handleEditSection, sendMessage])
+  }, [sendMessage])
 
   const handleRenderWidget = useCallback((widget: string | null | undefined, meta?: Record<string, unknown>) => {
     if (widget === 'PROFILE_SECTIONS') {

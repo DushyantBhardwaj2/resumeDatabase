@@ -17,9 +17,9 @@ import type {
 import { z } from "zod"
 
 const chatInteractAISchema = z.object({
-  intent: z.enum(["PROVIDE_DATA", "NAVIGATE", "GENERAL_CHAT"]),
+  intent: z.enum(["PROVIDE_DATA", "NAVIGATE", "GENERAL_CHAT", "GENERATE_PROFILE_DATA"]),
   targetWidget: z.enum([
-    "CONTACT", "EXPERIENCE", "PROJECTS", "SKILLS", "CERTIFICATES", "REVIEW", "UPLOAD_DROPZONE",
+    "CONTACT", "EXPERIENCE", "PROJECTS", "SKILLS", "CERTIFICATES", "REVIEW", "UPLOAD_DROPZONE", "PROFILE_GENERATOR",
   ]).nullable().default(null),
   reply: z.string(),
   extractedData: z.record(z.string(), z.unknown()).optional().default({}),
