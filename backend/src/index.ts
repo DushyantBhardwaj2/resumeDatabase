@@ -7,6 +7,11 @@ import { container } from './di/container'
 import { filterExperienceBySelection, filterProjectsBySelection } from './core/application/services/bullet-filter'
 import { computeCompleteness } from './infrastructure/profile-utils'
 import { z } from 'zod'
+import { addPdfJob, pdfQueue } from './infrastructure/queue/pdf-queue'
+import { redisClient } from './infrastructure/queue/redis'
+import { rateLimiter } from './infrastructure/rate-limiter'
+// Importing this module starts the in-process BullMQ PDF worker as a side-effect
+import './infrastructure/queue/pdf-worker'
 
 type Variables = {
   session: { user: { id: string; email: string; name: string; image?: string }; session: { id: string; expiresAt: Date; ipAddress?: string; userAgent?: string } }
@@ -34,6 +39,14 @@ app.get('/api/health', (c) => {
   return c.json({ status: "ok", timestamp: new Date().toISOString() })
 })
 
+// Auth rate limit (20 req/min per IP)
+app.use('/api/auth/*', rateLimiter({
+  windowMs: 60 * 1000,
+  limit: 20,
+  keyGenerator: (c) => `auth:${c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown'}`,
+  message: 'Too many authentication attempts. Please try again in a minute.'
+}))
+
 // BetterAuth handler
 app.on(['POST', 'GET'], '/api/auth/**', (c) => {
   return auth.handler(c.req.raw)
@@ -48,6 +61,40 @@ app.use('/api/protected/*', async (c, next) => {
   c.set('session', session as unknown as Variables['session'])
   await next()
 })
+
+// ── Protected Rate Limiters ───────────────────────────────────────────────────
+
+const aiRateLimiter = rateLimiter({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  limit: 10,
+  keyGenerator: (c) => `ai:${c.get('session')?.user?.id || 'unknown'}`,
+  message: 'AI usage limit reached (10 requests per hour). Please try again later.'
+})
+
+const compileRateLimiter = rateLimiter({
+  windowMs: 60 * 1000, // 1 min
+  limit: 15,
+  keyGenerator: (c) => `compile:${c.get('session')?.user?.id || 'unknown'}`,
+  message: 'Compilation rate limit exceeded. Please wait a moment before trying again.'
+})
+
+const generalRateLimiter = rateLimiter({
+  windowMs: 60 * 1000, // 1 min
+  limit: 100,
+  keyGenerator: (c) => `general:${c.get('session')?.user?.id || 'unknown'}`,
+  message: 'API rate limit exceeded. Please wait a moment.'
+})
+
+app.use('/api/protected/ai/*', aiRateLimiter)
+app.use('/api/protected/resume/tailor', aiRateLimiter)
+app.use('/api/protected/resume/parse', aiRateLimiter)
+app.use('/api/protected/chat/*', aiRateLimiter)
+
+app.use('/api/protected/resume/compile-live', compileRateLimiter)
+
+app.use('/api/protected/profile', generalRateLimiter)
+app.use('/api/protected/history/*', generalRateLimiter)
+
 
 // Profile API
 app.get('/api/protected/profile', async (c) => {
@@ -200,7 +247,11 @@ const compileLiveSchema = z.object({
   }).passthrough(),
 })
 
-// Live Compile (debounced, filtered by selected bullets)
+// ── Async PDF Compilation — enqueue job, poll status, fetch result ────────────
+
+// POST /compile-live — validates input, fills LaTeX template (fast, sync),
+// enqueues a BullMQ job, and returns { jobId } immediately (< 5 ms).
+// pdflatex runs in the worker via execFileAsync — the event loop is never blocked.
 app.post('/api/protected/resume/compile-live', async (c) => {
   const rawBody = await c.req.json()
   const parsed = compileLiveSchema.safeParse(rawBody)
@@ -215,6 +266,7 @@ app.post('/api/protected/resume/compile-live', async (c) => {
   const filteredExperience = filterExperienceBySelection(profile.experience || [], selectedBulletIds)
   const filteredProjects = filterProjectsBySelection(profile.projects || [], selectedBulletIds)
 
+  // Template filling is pure string manipulation — fast and synchronous
   const latexSource = container.latexTemplate.fill(
     safeTemplateId,
     profile.contact || null,
@@ -229,50 +281,47 @@ app.post('/api/protected/resume/compile-live', async (c) => {
     }
   )
 
-  const { join } = require('path')
-  const { tmpdir } = require('os')
-  const { randomUUID } = require('crypto')
-  const jobId = randomUUID()
-  const tempDir = (() => { try { return require('fs').mkdtempSync(join(tmpdir(), 'latex-')) } catch { return '' } })()
-  const texPath = tempDir ? join(tempDir, `${jobId}.tex`) : ''
-  const pdfPath = tempDir ? join(tempDir, `${jobId}.pdf`) : ''
-
   try {
-    const { execFileSync } = require('child_process')
-    const { writeFileSync, unlinkSync, copyFileSync, existsSync } = require('fs')
+    const jobId = await addPdfJob({ latexSource, templateId: safeTemplateId })
+    return c.json({ jobId })
+  } catch (err: any) {
+    console.error('[compile-live] Failed to enqueue job:', err.message)
+    return c.json({ error: 'Failed to queue PDF compilation', details: err.message }, 500)
+  }
+})
 
-    // Copy NSUT_logo.png from template directory into temp compile dir
-    const templatesDir = join(__dirname, 'infrastructure', 'latex', 'templates')
-    const logoPath = join(templatesDir, safeTemplateId, 'NSUT_logo.png')
-    if (existsSync(logoPath)) {
-      copyFileSync(logoPath, join(tempDir, 'NSUT_logo.png'))
+// GET /compile-status/:jobId — lightweight poll endpoint.
+// Returns: { status: 'queued' | 'active' | 'completed' | 'failed', error?: string }
+app.get('/api/protected/resume/compile-status/:jobId', async (c) => {
+  const jobId = c.req.param('jobId')
+  try {
+    const job = await pdfQueue.getJob(jobId)
+    if (!job) return c.json({ status: 'not_found' }, 404)
+
+    const state = await job.getState()
+    // BullMQ states: waiting | active | completed | failed | delayed | paused
+    const status = state === 'active' ? 'active'
+      : state === 'completed' ? 'completed'
+      : state === 'failed' ? 'failed'
+      : 'queued'
+
+    const error = state === 'failed' ? (job.failedReason ?? 'Compilation failed') : undefined
+    return c.json({ status, error })
+  } catch (err: any) {
+    return c.json({ error: err.message }, 500)
+  }
+})
+
+// GET /compile-result/:jobId — fetch the compiled PDF bytes from Redis.
+// Result is available for 5 minutes after the job completes (Redis TTL).
+app.get('/api/protected/resume/compile-result/:jobId', async (c) => {
+  const jobId = c.req.param('jobId')
+  try {
+    const encoded = await redisClient.get(`pdf:result:${jobId}`)
+    if (!encoded) {
+      return c.json({ error: 'Result not found or expired (TTL: 5 min). Re-compile to refresh.' }, 404)
     }
-
-    writeFileSync(texPath, latexSource, 'utf-8')
-    try {
-      execFileSync('pdflatex', [
-        '-interaction=nonstopmode',
-        `-output-directory=${tempDir}`,
-        texPath
-      ], {
-        timeout: 30000,
-        stdio: 'pipe',
-      })
-    } catch {
-      // pdflatex exits non-zero even when PDF is generated (LaTeX warnings)
-    }
-
-    if (!existsSync(pdfPath)) throw new Error('pdflatex: output PDF not found')
-    const pdfBuffer = require('fs').readFileSync(pdfPath)
-
-    try {
-      const { readdirSync, rmSync } = require('fs')
-      for (const f of readdirSync(tempDir)) {
-        unlinkSync(join(tempDir, f))
-      }
-      rmSync(tempDir, { recursive: true })
-    } catch { /* best-effort cleanup */ }
-
+    const pdfBuffer = Buffer.from(encoded, 'base64')
     return c.newResponse(pdfBuffer, {
       headers: {
         'Content-Type': 'application/pdf',
@@ -280,24 +329,7 @@ app.post('/api/protected/resume/compile-live', async (c) => {
       },
     })
   } catch (err: any) {
-    const details = err.message || String(err)
-    console.error('PDF compilation error:', details)
-    const stderr = err.stderr ? err.stderr.toString().slice(0, 2000) : ''
-    const stdout = err.stdout ? err.stdout.toString().slice(0, 2000) : ''
-    let logTail = ''
-    let texContent = ''
-    try {
-      const { readFileSync, readdirSync } = require('fs')
-      if (texPath) {
-        texContent = readFileSync(texPath, 'utf-8').slice(0, 3000)
-        const logPath = texPath.replace(/\.tex$/, '.log')
-        try { logTail = readFileSync(logPath, 'utf-8').slice(-3000) } catch {}
-      }
-      const files = tempDir ? readdirSync(tempDir).join(', ') : ''
-      return c.json({ error: 'PDF compilation failed. Check your LaTeX template.', details, stderr, stdout, logTail, texContent, tempFiles: files }, 500)
-    } catch (e2: any) {
-      return c.json({ error: 'PDF compilation failed.', details, stderr, stdout, logTail, texContent, readError: e2.message }, 500)
-    }
+    return c.json({ error: err.message }, 500)
   }
 })
 
@@ -374,4 +406,5 @@ serve({
   port: parseInt(process.env.PORT || '8080')
 }, (info) => {
   console.log(`Listening on http://localhost:${info.port}`)
+  console.log('[PDF Worker] in-process worker active (concurrency=2)')
 })

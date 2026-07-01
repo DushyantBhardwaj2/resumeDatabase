@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, type ReactNode } from 'react'
+import { useEffect, useRef, useMemo, type ReactNode } from 'react'
 import { useChatStore } from '@/store/useChatStore'
 import { MessageBubble } from './MessageBubble'
 import { ChatInput } from './ChatInput'
@@ -20,7 +20,8 @@ export function ChatContainer({ mode, renderWidget, renderInput }: ChatContainer
   const sendMessage = useChatStore((s) => s.sendMessage)
   const setMode = useChatStore((s) => s.setMode)
   const scrollRef = useRef<HTMLDivElement>(null)
-  const messages = messagesByMode[storeMode] || []
+  
+  const messages = useMemo(() => messagesByMode[storeMode] || [], [messagesByMode, storeMode])
 
   useEffect(() => {
     setMode(mode)

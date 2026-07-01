@@ -18,7 +18,8 @@ interface ProfileGenerationCardProps {
 }
 
 export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCardProps) {
-  const safeBullets = Array.isArray((data as any).bullets) ? (data as any).bullets as VaultBullet[] : []
+  const safeBullets =
+    data.type === 'PROJECT' || data.type === 'EXPERIENCE' ? data.bullets : []
   const [selectedBullets, setSelectedBullets] = useState<Set<string>>(
     new Set((data.type === 'PROJECT' || data.type === 'EXPERIENCE') && safeBullets.length > 0
       ? safeBullets.map((b) => b.id)
@@ -47,9 +48,9 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
         case 'PROJECT': {
           const project: Project = {
             id: genId(),
-            title: (data as any).title || '',
-            url: (data as any).url || '',
-            techStack: Array.isArray((data as any).techStack) ? (data as any).techStack : [],
+            title: data.title || '',
+            url: data.url || '',
+            techStack: Array.isArray(data.techStack) ? data.techStack : [],
             vaultBullets: safeBullets.filter((b) => selectedBullets.has(b.id)),
           }
           store.addProject(project)
@@ -58,11 +59,11 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
         case 'EXPERIENCE': {
           const exp: Experience = {
             id: genId(),
-            company: (data as any).company || '',
-            role: (data as any).role || '',
-            startDate: (data as any).startDate || '',
-            endDate: (data as any).endDate || '',
-            current: Boolean((data as any).current),
+            company: data.company || '',
+            role: data.role || '',
+            startDate: data.startDate || '',
+            endDate: data.endDate || '',
+            current: Boolean(data.current),
             vaultBullets: safeBullets.filter((b) => selectedBullets.has(b.id)),
           }
           store.addExperience(exp)
@@ -114,19 +115,23 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
     )
   }
 
-  const d = data as any
-  const showBullets = d.type === 'PROJECT' || d.type === 'EXPERIENCE'
+  const projectData = data.type === 'PROJECT' ? data : null
+  const experienceData = data.type === 'EXPERIENCE' ? data : null
+  const educationData = data.type === 'EDUCATION' ? data : null
+  const certificateData = data.type === 'CERTIFICATE' ? data : null
+  const skillsData = data.type === 'SKILLS' ? data : null
+  const showBullets = data.type === 'PROJECT' || data.type === 'EXPERIENCE'
 
   return (
     <div className="mt-3 rounded-[var(--radius-md)] border border-edge bg-surface overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2 bg-card border-b border-edge">
         <Sparkle size={14} className="text-brand" weight="fill" />
         <span className="text-xs font-medium text-content">
-          {d.type === 'PROJECT' && `Project: ${d.title || ''}`}
-          {d.type === 'EXPERIENCE' && `${d.role || ''} @ ${d.company || ''}`}
-          {d.type === 'EDUCATION' && `${d.degree || ''} @ ${d.school || ''}`}
-          {d.type === 'CERTIFICATE' && (d.name || 'Certificate')}
-          {d.type === 'SKILLS' && 'Technical Skills'}
+          {projectData && `Project: ${projectData.title || ''}`}
+          {experienceData && `${experienceData.role || ''} @ ${experienceData.company || ''}`}
+          {educationData && `${educationData.degree || ''} @ ${educationData.school || ''}`}
+          {certificateData && (certificateData.name || 'Certificate')}
+          {skillsData && 'Technical Skills'}
         </span>
       </div>
 
@@ -154,26 +159,26 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
         </div>
       )}
 
-      {d.type === 'EDUCATION' && (
+      {educationData && (
         <div className="px-3 py-2 text-xs text-content-muted space-y-0.5">
-          <p><span className="text-content">School:</span> {d.school || ''}</p>
-          <p><span className="text-content">Degree:</span> {d.degree || ''}</p>
-          {d.gpa && <p><span className="text-content">GPA:</span> {d.gpa}</p>}
-          {d.startYear && <p><span className="text-content">Years:</span> {d.startYear}{d.endYear ? ` - ${d.endYear}` : ''}</p>}
+          <p><span className="text-content">School:</span> {educationData.school || ''}</p>
+          <p><span className="text-content">Degree:</span> {educationData.degree || ''}</p>
+          {educationData.gpa && <p><span className="text-content">GPA:</span> {educationData.gpa}</p>}
+          {educationData.startYear && <p><span className="text-content">Years:</span> {educationData.startYear}{educationData.endYear ? ` - ${educationData.endYear}` : ''}</p>}
         </div>
       )}
 
-      {d.type === 'CERTIFICATE' && (
+      {certificateData && (
         <div className="px-3 py-2 text-xs text-content-muted space-y-0.5">
-          <p><span className="text-content">Issuer:</span> {d.issuer || ''}</p>
-          {d.date && <p><span className="text-content">Date:</span> {d.date}</p>}
+          <p><span className="text-content">Issuer:</span> {certificateData.issuer || ''}</p>
+          {certificateData.date && <p><span className="text-content">Date:</span> {certificateData.date}</p>}
         </div>
       )}
 
-      {d.type === 'SKILLS' && (
+      {skillsData && (
         <div className="px-3 py-2 space-y-1.5">
           {(['languages', 'frameworks', 'tools'] as const).map((cat) => {
-            const items = Array.isArray(d[cat]) ? d[cat] : []
+            const items = Array.isArray(skillsData[cat]) ? skillsData[cat] : []
             if (!items.length) return null
             return (
               <div key={cat} className="flex flex-wrap gap-1">
