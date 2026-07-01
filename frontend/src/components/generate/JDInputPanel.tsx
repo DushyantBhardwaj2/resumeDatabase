@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { api } from '@/config/api-client'
 import { useBuilderStore, type TemplateType } from '@/store/useBuilderStore'
+import { normalizeProfile } from '@/lib/normalize-profile'
 import { toast } from 'sonner'
 
 type VaultBulletData = { id: string; text: string; keywords?: string[] }
@@ -109,7 +110,7 @@ export function JDInputPanel() {
         skills: data.tailored.skills,
       }
 
-      setProfile(mergedProfile)
+      setProfile(normalizeProfile(mergedProfile))
 
       // Select all bullets by default
       const defaultSelections: Record<string, string[]> = {}

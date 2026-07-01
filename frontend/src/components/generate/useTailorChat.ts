@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { api } from '@/config/api-client'
-import { useBuilderStore } from '@/store/useBuilderStore'
+import { useBuilderStore, type TemplateType } from '@/store/useBuilderStore'
+import { normalizeProfile } from '@/lib/normalize-profile'
 import { toast } from 'sonner'
 
 export type ChatEntry = {
@@ -130,7 +131,7 @@ export function useTailorChat() {
         skills: data.tailored.skills,
       }
 
-      setProfile(mergedProfile)
+      setProfile(normalizeProfile(mergedProfile))
       setCurrentStage('reviewing')
 
       // Select all bullets by default

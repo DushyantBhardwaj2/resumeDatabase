@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { CaretDown, CaretUp, Link as LinkIcon } from '@phosphor-icons/react'
-import type { VaultBullet } from '@/lib/profile-types'
+import type { VaultBullet } from '@resumint/shared'
 
 export type AccordionItem = {
   id: string

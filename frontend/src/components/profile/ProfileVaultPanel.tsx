@@ -18,7 +18,7 @@ import {
 } from '@phosphor-icons/react'
 import { useProfileStore } from '@/store/useProfileStore'
 import { ProfileAccordionList, type AccordionItem } from './ProfileAccordionList'
-import type { SectionName } from '@/lib/profile-types'
+import type { SectionName } from '@resumint/shared'
 
 type VaultTab = 'info' | 'education' | 'experience' | 'projects' | 'certificates'
 

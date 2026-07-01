@@ -2,7 +2,7 @@ services:
   - type: web
     name: resumint-backend
     env: docker
-    repo: https://github.com/DushyantBhardwaj2/resumemint
+    repo: https://github.com/DushyantBhardwaj2/resumeDatabase
     branch: main
     rootDir: backend
     dockerfilePath: ./Dockerfile

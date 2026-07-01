@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { Check, PencilLine, Sparkle } from '@phosphor-icons/react'
-import type { VaultBullet, Experience, Project, Education, Certificate } from '@/lib/profile-types'
+import type { VaultBullet, Experience, Project, Education, Certificate } from '@resumint/shared'
 import { useProfileStore } from '@/store/useProfileStore'
 
 export type GeneratedDataType =
@@ -73,9 +73,9 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
           const edu: Education = {
             school: data.school,
             degree: data.degree,
-            gpa: data.gpa || '',
-            startYear: data.startYear || '',
-            endYear: data.endYear || '',
+            gpa: data.gpa || null,
+            startYear: data.startYear ? Number(data.startYear) : null,
+            endYear: data.endYear ? Number(data.endYear) : null,
           }
           store.addEducation(edu)
           break
