@@ -28,5 +28,19 @@ export const auth = {
         return null
       }
     },
+    hasProfile: async ({ headers: reqHeaders }: { headers: Headers }): Promise<boolean> => {
+      const cookie = reqHeaders.get("cookie") || ""
+      try {
+        const res = await fetch(`${API_URL}/api/protected/profile`, {
+          headers: { cookie },
+          cache: "no-store",
+        })
+        if (!res.ok) return false
+        const data = await res.json()
+        return !!data
+      } catch {
+        return false
+      }
+    }
   },
 }

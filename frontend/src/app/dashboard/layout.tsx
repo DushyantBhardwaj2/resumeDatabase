@@ -4,8 +4,12 @@ import { headers } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const session = await auth.api.getSession({ headers: await headers() })
+  const reqHeaders = await headers()
+  const session = await auth.api.getSession({ headers: reqHeaders })
   if (!session) redirect('/')
+  
+  const hasProfile = await auth.api.hasProfile({ headers: reqHeaders })
+  if (!hasProfile) redirect('/onboarding')
   return (
     <AppLayout user={session.user}>
       {children}
