@@ -201,46 +201,61 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
       <div className="border-t border-edge px-3 py-4 space-y-1">
         <button
           onClick={onToggleCollapse}
-          className="flex items-center justify-center w-full gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm text-content-muted hover:bg-surface hover:text-content transition-colors mb-1"
+          className={[
+            'flex items-center w-full gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm text-content-muted hover:bg-surface hover:text-content transition-colors mb-1',
+            collapsed ? 'justify-center px-2' : ''
+          ].join(' ')}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
           <SidebarIcon size={18} />
           {!collapsed && <span className="flex-1 text-left">Collapse</span>}
         </button>
 
-        {!collapsed && (
-          <>
-            <NavLink
-              icon={GearSix}
-              label="Settings"
-              href={settingsHref}
-              active={isActive(settingsHref)}
-            />
+        <NavLink
+          icon={GearSix}
+          label="Settings"
+          href={settingsHref}
+          active={isActive(settingsHref)}
+          collapsed={collapsed}
+        />
 
-            <div className="flex items-center gap-3 px-3 py-2 text-sm text-content-muted">
-              <span className="flex-1">Appearance</span>
-              <ThemeToggle />
-            </div>
+        {collapsed ? (
+          <div className="flex justify-center py-2" title="Toggle Theme">
+            <ThemeToggle size={18} />
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 px-3 py-2 text-sm text-content-muted">
+            <span className="flex-1">Appearance</span>
+            <ThemeToggle />
+          </div>
+        )}
 
-            {user && (
-              <div className="flex items-center gap-3 px-3 py-2 mt-1">
-                <Avatar size="sm" src={user.image} name={user.name} />
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-content truncate">{user.name}</p>
-                  <p className="text-xs text-content-subtle truncate">{user.email}</p>
-                </div>
+        {user && (
+          <div
+            className={collapsed ? "flex justify-center py-2" : "flex items-center gap-3 px-3 py-2 mt-1"}
+            title={collapsed ? `${user.name} (${user.email})` : undefined}
+          >
+            <Avatar size={collapsed ? "sm" : "sm"} src={user.image} name={user.name} />
+            {!collapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-content truncate">{user.name}</p>
+                <p className="text-xs text-content-subtle truncate">{user.email}</p>
               </div>
             )}
-
-            <button
-              onClick={handleSignOut}
-              className="flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm text-content-muted hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-500 transition-colors cursor-pointer w-full text-left"
-            >
-              <SignOut size={18} aria-hidden="true" />
-              Sign out
-            </button>
-          </>
+          </div>
         )}
+
+        <button
+          onClick={handleSignOut}
+          title={collapsed ? 'Sign out' : undefined}
+          className={[
+            'flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm text-content-muted hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-500 transition-colors cursor-pointer w-full text-left',
+            collapsed ? 'justify-center px-2' : ''
+          ].join(' ')}
+        >
+          <SignOut size={18} aria-hidden="true" />
+          {!collapsed && 'Sign out'}
+        </button>
       </div>
     </div>
   )
