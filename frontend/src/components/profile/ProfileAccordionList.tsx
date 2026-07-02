@@ -33,25 +33,26 @@ export function ProfileAccordionList({ items, emptyLabel = 'No entries yet', onE
   }
 
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-4">
       {items.map((item) => {
         const isOpen = openId === item.id
         return (
           <div
             key={item.id}
-            className="rounded-[var(--radius-md)] border border-edge bg-card overflow-hidden transition-all duration-200"
+            className="rounded-[var(--radius-lg)] border border-edge bg-card p-5 relative group overflow-hidden transition-all hover-glow"
           >
-            <button
-              onClick={() => toggle(item.id)}
-              className="w-full flex items-center justify-between px-3 py-2.5 text-left hover:bg-surface transition-colors"
-            >
-              <div className="min-w-0 flex-1">
-                <p className="text-xs font-medium text-content truncate">{item.title}</p>
+            <div className="absolute top-0 left-0 w-1 h-full bg-brand opacity-0 group-hover:opacity-100 transition-opacity"></div>
+            <div className="flex items-start justify-between gap-4">
+              <div
+                className="flex-1 cursor-pointer"
+                onClick={() => toggle(item.id)}
+              >
+                <h4 className="font-display font-semibold text-lg text-fg">{item.title}</h4>
                 {item.subtitle && (
-                  <p className="text-[11px] text-content-muted mt-0.5 truncate">{item.subtitle}</p>
+                  <p className="text-sm text-brand font-medium mb-3">{item.subtitle}</p>
                 )}
               </div>
-              <div className="flex items-center gap-1 shrink-0 ml-2">
+              <div className="flex items-center gap-1 shrink-0">
                 {item.url && (
                   <a
                     href={item.url}
@@ -61,7 +62,7 @@ export function ProfileAccordionList({ items, emptyLabel = 'No entries yet', onE
                     className="p-1.5 text-content-subtle hover:text-brand transition-colors rounded hover:bg-surface-hover"
                     title="Visit link"
                   >
-                    <LinkIcon size={14} />
+                    <LinkIcon size={16} />
                   </a>
                 )}
                 {onEdit && (
@@ -73,7 +74,7 @@ export function ProfileAccordionList({ items, emptyLabel = 'No entries yet', onE
                     className="p-1.5 text-content-subtle hover:text-brand transition-colors rounded hover:bg-surface-hover"
                     title="Edit entry"
                   >
-                    <PencilSimple size={14} />
+                    <PencilSimple size={16} />
                   </button>
                 )}
                 {onDelete && (
@@ -85,33 +86,39 @@ export function ProfileAccordionList({ items, emptyLabel = 'No entries yet', onE
                     className="p-1.5 text-content-subtle hover:text-red-500 transition-colors rounded hover:bg-red-500/10"
                     title="Delete entry"
                   >
-                    <Trash size={14} />
+                    <Trash size={16} />
                   </button>
                 )}
-                <span className="p-1.5 text-content-subtle transition-transform duration-200">
-                  {isOpen ? <CaretUp size={14} /> : <CaretDown size={14} />}
-                </span>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    toggle(item.id)
+                  }}
+                  className="p-1.5 text-content-subtle transition-transform duration-200"
+                >
+                  {isOpen ? <CaretUp size={16} /> : <CaretDown size={16} />}
+                </button>
               </div>
-            </button>
+            </div>
 
             <div
               className={[
                 'transition-all duration-200 overflow-hidden',
-                isOpen ? 'max-h-[1000px] opacity-100' : 'max-h-0 opacity-0',
+                isOpen ? 'max-h-[1000px] opacity-100 mt-2' : 'max-h-0 opacity-0',
               ].join(' ')}
             >
-              <div className="px-3 pb-3 pt-1 border-t border-edge space-y-1.5">
+              <ul className="space-y-2 m-0 p-0 list-none">
                 {item.bullets.length === 0 ? (
-                  <p className="text-[11px] text-content-subtle italic py-1">No bullets yet</p>
+                  <li className="text-[13px] text-content-subtle italic py-1">No bullets yet</li>
                 ) : (
                   item.bullets.map((b) => (
-                    <div key={b.id} className="flex items-start gap-2">
-                      <span className="text-brand text-[10px] mt-0.5 shrink-0">•</span>
-                      <p className="text-[11px] text-content leading-relaxed">{b.text}</p>
-                    </div>
+                    <li key={b.id} className="text-[13px] text-content-muted leading-relaxed flex items-start gap-2">
+                      <span className="text-brand text-[10px] mt-1">&#9679;</span>
+                      <span className="flex-1">{b.text}</span>
+                    </li>
                   ))
                 )}
-              </div>
+              </ul>
             </div>
           </div>
         )

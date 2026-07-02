@@ -95,40 +95,52 @@ export function ProfileVaultPanel() {
   }))
 
   return (
-    <div className="flex flex-col h-full">
-      {/* Tabs */}
-      <div className="flex overflow-x-auto border-b border-edge shrink-0 px-2 gap-1 scrollbar-none">
-        {TABS.map(({ key, label, icon: Icon }) => {
-          const isActive = activeTab === key
-          const count = key === 'info' ? 0 : sectionCount(key as SectionName)
-          return (
-            <button
-              key={key}
-              onClick={() => setActiveTab(key)}
-              className={[
-                'flex items-center gap-1.5 shrink-0 px-3 py-2.5 text-xs border-b-2 transition-colors',
-                isActive
-                  ? 'border-brand text-content'
-                  : 'border-transparent text-content-muted hover:text-content hover:border-edge',
-              ].join(' ')}
-            >
-              <Icon size={14} weight={isActive ? 'fill' : 'regular'} />
-              <span>{label}</span>
-              {count > 0 && (
-                <span className={[
-                  'text-[10px] rounded-full px-1.5 py-0.5 leading-none',
-                  isActive ? 'bg-brand/10 text-brand' : 'bg-muted-bg text-content-subtle',
-                ].join(' ')}>
-                  {count}
-                </span>
-              )}
-            </button>
-          )
-        })}
+    <div className="flex flex-col h-full bg-surface/20">
+      {/* Profile Vault Header */}
+      <div className="px-6 pt-6">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display font-semibold text-2xl text-fg flex items-center gap-3 m-0 tracking-tight">
+            <div className="w-3 h-3 rounded-full bg-brand shadow-[0_0_12px_rgba(22,163,74,0.6)]"></div>
+            Your Career Vault
+          </h2>
+          <span className="text-[11px] text-content-muted bg-surface px-3 py-1 rounded-[var(--radius-pill)] border border-edge">
+            Live Preview
+          </span>
+        </div>
+
+        {/* Tabs */}
+        <div className="flex gap-6 border-b border-edge overflow-x-auto scrollbar-none">
+          {TABS.map(({ key, label, icon: Icon }) => {
+            const isActive = activeTab === key
+            const count = key === 'info' ? 0 : sectionCount(key as SectionName)
+            return (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className={`flex items-center gap-2 pb-3 text-[13px] font-medium transition-colors relative whitespace-nowrap ${
+                  isActive ? 'text-brand' : 'text-content-muted hover:text-fg'
+                }`}
+              >
+                <Icon size={14} weight={isActive ? 'fill' : 'regular'} />
+                {label}
+                {count > 0 && (
+                  <span className={`text-[10px] rounded-full px-1.5 py-0.5 leading-none ${
+                    isActive ? 'bg-brand/20 text-brand' : 'bg-surface border border-edge text-content-subtle'
+                  }`}>
+                    {count}
+                  </span>
+                )}
+                {isActive && (
+                  <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-brand rounded-t-full shadow-[0_0_8px_rgba(22,163,74,0.5)]"></div>
+                )}
+              </button>
+            )
+          })}
+        </div>
       </div>
 
       {/* Content */}
-      <div className="flex-1 overflow-y-auto p-4">
+      <div className="flex-1 overflow-y-auto p-6 space-y-4">
         {activeTab === 'info' && <PersonalInfoTab profile={profile} />}
         {activeTab === 'education' && <EducationTab profile={profile} />}
         {activeTab === 'experience' && (

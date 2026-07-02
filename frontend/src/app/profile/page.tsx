@@ -47,7 +47,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="flex h-[calc(100dvh-3.5rem)] lg:h-screen w-full overflow-hidden">
+    <div className="flex h-[calc(100dvh-3.5rem)] lg:h-dvh w-full overflow-hidden p-6 gap-6">
       {/* Mobile header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 h-12 z-50 flex items-center gap-2 px-3 bg-card border-b border-edge">
         <button
@@ -74,47 +74,25 @@ export default function ProfilePage() {
       </div>
 
       {/* Desktop layout */}
-      <div className="hidden lg:flex w-full">
-        <div
-          className="min-w-[280px] border-r border-edge flex flex-col bg-card/40 backdrop-blur-sm"
-          style={{ width: `${leftWidth}%` }}
-        >
-          <div className="shrink-0 px-4 pt-4 pb-2 border-b border-edge">
+      <div className="hidden lg:flex w-full gap-6">
+        {/* Left Column: Chat Area */}
+        <div className="flex-[4] glass card-lift rounded-[var(--radius-xl)] flex flex-col relative overflow-hidden h-full">
+          {/* Back button overlay */}
+          <div className="absolute top-4 right-4 z-20">
             <button
               onClick={() => window.history.back()}
-              className="flex items-center gap-1.5 text-xs text-content-muted hover:text-content transition-colors mb-2"
+              className="flex items-center gap-1.5 text-[11px] text-content-muted hover:text-content transition-colors bg-surface/50 backdrop-blur-md px-3 py-1.5 rounded-full border border-edge/50 hover:bg-surface"
             >
-              <ArrowLeft size={14} />
-              Back to Dashboard
+              <ArrowLeft size={12} />
+              Dashboard
             </button>
-            <h2 className="text-sm font-semibold text-content flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand" />
-              AI Assistant
-            </h2>
-            <p className="text-xs text-content-muted mt-0.5">
-              Chat to build and edit your profile
-            </p>
           </div>
-          <div className="flex-1 overflow-hidden">
-            <ProfileChatWorkspace />
-          </div>
+          <ProfileChatWorkspace />
         </div>
 
-        <Splitter onResize={handleResize} />
-
-        <div className="flex-1 flex flex-col bg-surface">
-          <div className="shrink-0 px-4 pt-4 pb-2 border-b border-edge">
-            <h2 className="text-sm font-semibold text-content flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-brand/60" />
-              Profile Vault
-            </h2>
-            <p className="text-xs text-content-muted mt-0.5">
-              Your structured career data
-            </p>
-          </div>
-          <div className="flex-1 overflow-hidden">
-            <ProfileVaultPanel />
-          </div>
+        {/* Right Column: Profile Vault Summary */}
+        <div className="flex-[5] glass card-lift rounded-[var(--radius-xl)] flex flex-col overflow-hidden h-full">
+          <ProfileVaultPanel />
         </div>
       </div>
 
