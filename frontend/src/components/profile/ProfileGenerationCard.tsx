@@ -108,7 +108,7 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
 
   if (saved) {
     return (
-      <div className="mt-3 flex items-center gap-2 text-xs text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 rounded-[var(--radius-md)] px-3 py-2 border border-emerald-200 dark:border-emerald-800">
+      <div className="mt-3 flex items-center gap-2 text-sm text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 rounded-[var(--radius-md)] px-3 py-2 border border-emerald-200 dark:border-emerald-800">
         <Check size={14} weight="bold" />
         Saved to vault
       </div>
@@ -126,7 +126,7 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
     <div className="mt-3 rounded-[var(--radius-md)] border border-edge bg-surface overflow-hidden">
       <div className="flex items-center gap-2 px-3 py-2 bg-card border-b border-edge">
         <Sparkle size={14} className="text-brand" weight="fill" />
-        <span className="text-xs font-medium text-content">
+        <span className="text-sm font-medium text-content">
           {projectData && `Project: ${projectData.title || ''}`}
           {experienceData && `${experienceData.role || ''} @ ${experienceData.company || ''}`}
           {educationData && `${educationData.degree || ''} @ ${educationData.school || ''}`}
@@ -141,7 +141,7 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
             <label
               key={b.id}
               className={[
-                'flex items-start gap-2 px-2 py-1.5 rounded-[var(--radius-sm)] cursor-pointer transition-colors text-[11px]',
+                'flex items-start gap-2 px-2 py-1.5 rounded-[var(--radius-sm)] cursor-pointer transition-colors text-sm',
                 selectedBullets.has(b.id) ? 'bg-brand/5' : 'hover:bg-muted-bg',
               ].join(' ')}
             >
@@ -182,9 +182,9 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
             if (!items.length) return null
             return (
               <div key={cat} className="flex flex-wrap gap-1">
-                <span className="text-[10px] text-content-muted capitalize mr-1">{cat}:</span>
+                <span className="text-xs text-content-muted capitalize mr-1">{cat}:</span>
                 {items.map((t: string) => (
-                  <span key={t} className="inline-flex items-center gap-1 bg-brand/10 text-brand text-[10px] px-1.5 py-0.5 rounded-full">
+                  <span key={t} className="inline-flex items-center gap-1 bg-brand/10 text-brand text-xs px-1.5 py-0.5 rounded-full">
                     {t}
                   </span>
                 ))}
@@ -196,13 +196,13 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
 
       <div className="flex items-center gap-2 px-3 py-2 border-t border-edge">
         {showBullets && selectedBullets.size > 0 && (
-          <span className="text-[10px] text-content-muted mr-auto">
+          <span className="text-xs text-content-muted mr-auto">
             {selectedBullets.size} / {safeBullets.length} selected
           </span>
         )}
         <button
           onClick={onAskEdit}
-          className="flex items-center gap-1 h-7 px-3 border border-edge rounded-[var(--radius-md)] text-[10px] text-content-muted hover:text-content hover:bg-surface transition-colors"
+          className="flex items-center gap-1 h-7 px-3 border border-edge rounded-[var(--radius-md)] text-xs text-content-muted hover:text-content hover:bg-surface transition-colors"
         >
           <PencilLine size={12} />
           Ask for Edit
@@ -210,7 +210,7 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
         <button
           onClick={handleAccept}
           disabled={saving || (showBullets && selectedBullets.size === 0)}
-          className="flex items-center gap-1 h-7 px-3 bg-brand text-brand-fg rounded-[var(--radius-md)] text-[10px] font-medium hover:opacity-90 transition-all disabled:opacity-40"
+          className="flex items-center gap-1 h-7 px-3 bg-brand text-brand-fg rounded-[var(--radius-md)] text-xs font-medium hover:opacity-90 transition-all disabled:opacity-40"
         >
           {saving ? (
             <div className="w-3 h-3 rounded-full border-2 border-brand-fg border-t-transparent animate-spin" />

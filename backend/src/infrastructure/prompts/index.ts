@@ -14,20 +14,25 @@ Rules:
 - Only use information explicitly present in the input. Do NOT invent technologies or achievements.
 - Output ONLY valid JSON: { "vaultBullets": [{ "id": string, "text": string, "keywords": string[] }] }`,
 
-  projects: `You are a resume writing expert. Given raw notes about a person's project, generate 2-4 polished vault bullet points.
+  project: `You are an expert technical resume writer. Analyze the input (a GitHub link or raw project explanation) and output structured project data with 10-15 categorized vault bullets.
 
 Rules:
-- The resume MUST stay one page. Keep bullets concise (1 sentence each).
-- Each bullet must be an object with "id", "text", "keywords" fields.
+- Title must be concise and professional (not a raw repo name).
+- URL is the GitHub/project URL if provided; otherwise null.
+- TechStack: 5-7 core technologies max, listed in descending order of relevance.
+- Generate EXACTLY 10-15 vault bullet points covering different aspects:
+  - 3-4 bullets on Frontend/UI/UX aspects
+  - 3-4 bullets on Backend/Database/Architecture aspects
+  - 2-3 bullets on DevOps/Cloud/Testing/Security aspects
+  - 2-4 bullets on Leadership/Agile/Business Impact/Metrics aspects
+- Each bullet must be an object with "id", "text", "category", "keywords" fields.
 - "id": generate a random string id (e.g., "blt_" + random chars).
-- "text": the bullet text starting with a strong action verb (developed, optimized, designed, built).
+- "text": bullet text starting with a strong action verb. Use STAR method where possible. Be concise (1 sentence each).
+- "category": one of "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL"
 - "keywords": array of relevant technology/skill keywords.
-- Highlight technical skills, impact, and outcomes. Include tech stack in bullet descriptions.
 - Be impersonal — no personal pronouns (I, my, we, our).
-- Do NOT create an Objective or Summary section.
-- DO NOT make up specific numbers unless provided in the input.
-- Only use information explicitly present in the input. Do NOT invent technologies or features.
-- Output ONLY valid JSON: { "vaultBullets": [{ "id": string, "text": string, "keywords": string[] }] }`,
+- Only use information explicitly present in the input. Do NOT invent technologies or achievements.
+- Output ONLY valid JSON: { "title": string, "url": string | null, "techStack": string[], "vaultBullets": [{ "id": string, "text": string, "category": "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL", "keywords": string[] }] }`,
 
   skills: `You are a resume categorization expert. Given raw notes about a person's skills, organize them into categories: languages, frameworks, and tools.
 
@@ -61,21 +66,6 @@ Rules:
 - Be impersonal — no personal pronouns (I, my, we, our).
 - Only use information explicitly present in the input. Do NOT invent technologies or achievements.
 - Output ONLY valid JSON: { "company": string, "role": string, "startDate": string | null, "endDate": string | null, "vaultBullets": [{ "id": string, "text": string, "keywords": string[] }] }`,
-
-  project: `You are an expert technical resume writer. Analyze the input (a GitHub link or raw project explanation) and output structured project data.
-
-Rules:
-- Title must be concise and professional (not a raw repo name).
-- URL is the GitHub/project URL if provided; otherwise null.
-- TechStack: 5-7 core technologies max, listed in descending order of relevance.
-- vaultBullets: 3-5 professional resume vault bullet objects. Each must have "id", "text", "keywords".
-- "id": generate a random string id.
-- "text": bullet text starting with a strong action verb. Use STAR method where possible. Be concise (1 sentence each).
-- "keywords": array of relevant technology/skill keywords.
-- Be impersonal — no personal pronouns (I, my, we, our).
-- Include the tech stack in bullet descriptions.
-- Only use information explicitly present in the input. Do NOT invent technologies or achievements.
-- Output ONLY valid JSON: { "title": string, "url": string | null, "techStack": string[], "vaultBullets": [{ "id": string, "text": string, "keywords": string[] }] }`,
 }
 
 export const PARSE_RESUME = `You are a precise resume data extractor. Extract the following fields from the resume text and return ONLY valid JSON matching the schema. If a field is missing from the resume, use null for scalar fields and empty arrays for list fields.
@@ -126,16 +116,16 @@ You MUST respond in strictly valid JSON format matching this schema:
 CRITICAL INSTRUCTION FOR URLS:
 If the system injects [System Context] containing scraped content from a URL (like a GitHub repo or portfolio), you MUST:
 1. Analyze the injected content to extract project details, tech stack, and achievements.
-2. Formulate 3-5 professional resume bullets based on the content.
-3. Return this structured data in the "extractedData" field (following the GeneratedDataType schema).
+2. Formulate 10-15 categorized professional resume bullets covering frontend, backend, devops, and leadership aspects.
+3. Return this structured data in the "extractedData" field (following the GeneratedDataType schema with "category" on each bullet).
 4. Set "intent" to "GENERATE_PROFILE_DATA" and "targetWidget" to "PROFILE_GENERATOR".
-5. Set "reply" to a friendly confirmation like "I've scanned the URL and extracted your project details. How does this look?"
+5. Set "reply" to a friendly confirmation like "I've scanned the URL and extracted your project details with 10+ categorized bullet points. How does this look?"
 
 When a user wants to add a project, experience, or education:
 - Politely ask them for a description, link, or README if not provided.
 - When they provide the details, parse the information into extractedData matching the GeneratedDataType schema:
-  For projects: { "type": "PROJECT", "title": string, "url"?: string, "techStack"?: string[], "bullets": [{ "id": string, "text": string, "keywords": string[] }] }
-  For experience: { "type": "EXPERIENCE", "company": string, "role": string, "startDate"?: string, "endDate"?: string, "bullets": [{ "id": string, "text": string, "keywords": string[] }] }
+  For projects: { "type": "PROJECT", "title": string, "url"?: string, "techStack"?: string[], "bullets": [{ "id": string, "text": string, "category": "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL", "keywords": string[] }] }
+  For experience: { "type": "EXPERIENCE", "company": string, "role": string, "startDate"?: string, "endDate"?: string, "bullets": [{ "id": string, "text": string, "category": "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL", "keywords": string[] }] }
 - Set targetWidget to "PROFILE_GENERATOR" and intent to "GENERATE_PROFILE_DATA".
 
 Few-Shot Examples:
@@ -146,7 +136,7 @@ User: "Add this AWS Certified Developer cert: https://aws.amazon.com/verify/123"
 Assistant: { "intent": "PROVIDE_DATA", "targetWidget": "CERTIFICATES", "reply": "Got it, I've saved your AWS Certificate.", "extractedData": { "certificates": [{ "name": "AWS Certified Developer", "url": "https://aws.amazon.com/verify/123" }] } }
 
 User: "I built a web app with React and Node"
-Assistant: { "intent": "GENERATE_PROFILE_DATA", "targetWidget": "PROFILE_GENERATOR", "reply": "I've analyzed your project description. Check out the generated project below!", "extractedData": { "type": "PROJECT", "title": "Web App", "techStack": ["React", "Node"], "bullets": [{ "id": "b1", "text": "Developed a web application using React and Node.js", "keywords": ["React", "Node"] }] } }
+Assistant: { "intent": "GENERATE_PROFILE_DATA", "targetWidget": "PROFILE_GENERATOR", "reply": "I've analyzed your project description. Check out the generated project below with categorized bullet points!", "extractedData": { "type": "PROJECT", "title": "Web App", "techStack": ["React", "Node"], "bullets": [{ "id": "b1", "text": "Developed a web application using React and Node.js", "category": "FRONTEND", "keywords": ["React", "Node"] }] } }
 
 User: "What can you do?"
 Assistant: { "intent": "GENERAL_CHAT", "targetWidget": null, "reply": "I can help you build your Career Vault! Upload a resume, describe your experience, add projects, or manage your skills — all through chat.", "extractedData": {} }`

@@ -24,7 +24,7 @@ export function MessageBubble({ message, renderWidget }: MessageBubbleProps) {
       <div className="flex w-full justify-start animate-fade-up">
         <div className="max-w-[85%] rounded-[var(--radius-xl)] p-4 bg-card border border-edge rounded-bl-sm">
           {message.content && (
-            <p className="text-sm whitespace-pre-wrap text-content">{message.content}</p>
+            <p className="text-base whitespace-pre-wrap text-content">{message.content}</p>
           )}
           {customWidget}
         </div>
@@ -35,14 +35,13 @@ export function MessageBubble({ message, renderWidget }: MessageBubbleProps) {
   return (
     <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} animate-fade-up`}>
       <div
-        className={`max-w-[85%] rounded-[var(--radius-xl)] p-4 ${
-          isUser
+        className={`max-w-[85%] rounded-[var(--radius-xl)] p-4 ${isUser
             ? 'bg-brand text-brand-fg rounded-br-sm'
             : 'bg-card border border-edge rounded-bl-sm'
-        }`}
+          }`}
       >
         {message.content && (
-          <p className={`text-sm whitespace-pre-wrap ${isUser ? 'text-brand-fg' : 'text-content'}`}>
+          <p className={`text-base whitespace-pre-wrap ${isUser ? 'text-brand-fg' : 'text-content'}`}>
             {message.content}
           </p>
         )}

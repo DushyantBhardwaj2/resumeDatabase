@@ -38,7 +38,7 @@ function TagInput({
         {tags.map((t) => (
           <span
             key={t}
-            className="inline-flex items-center gap-1 bg-muted-bg border border-edge rounded-full px-2 py-0.5 text-[11px] text-content"
+            className="inline-flex items-center gap-1 bg-muted-bg border border-edge rounded-full px-2 py-0.5 text-xs text-content"
           >
             {t}
             <button
@@ -56,11 +56,11 @@ function TagInput({
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); add() } }}
           placeholder={placeholder}
-          className="flex-1 h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content placeholder:text-content-subtle outline-none focus:border-brand transition-colors"
+          className="flex-1 h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content placeholder:text-content-subtle outline-none focus:border-brand transition-colors"
         />
         <button
           onClick={add}
-          className="h-7 px-2 bg-muted-bg border border-edge rounded-[var(--radius-sm)] text-[10px] text-content hover:bg-surface transition-colors"
+          className="h-7 px-2 bg-muted-bg border border-edge rounded-[var(--radius-sm)] text-xs text-content hover:bg-surface transition-colors"
         >
           Add
         </button>
@@ -106,24 +106,24 @@ function VaultBulletEditor({
 
   return (
     <div className="space-y-1.5">
-      <p className="text-[10px] text-content-muted">Bullets</p>
+      <p className="text-xs text-content-muted">Bullets</p>
       {bullets.map((b, idx) => (
         <div key={b.id} className="flex flex-col gap-1 p-2 bg-muted-bg/50 border border-edge rounded-[var(--radius-sm)]">
           <div className="flex items-start gap-1.5">
-            <span className="text-content-subtle text-[10px] mt-1.5">•</span>
+            <span className="text-content-subtle text-xs mt-1.5">•</span>
             <div className="flex-1 space-y-1">
               <textarea
                 value={b.text}
                 onChange={(e) => update(idx, { text: e.target.value })}
                 rows={2}
-                className="w-full bg-transparent border-0 text-xs text-content resize-none outline-none placeholder:text-content-subtle"
+                className="w-full bg-transparent border-0 text-sm text-content resize-none outline-none placeholder:text-content-subtle"
                 placeholder="Write a bullet point..."
               />
               <div className="flex flex-wrap items-center gap-2">
                 <select
                   value={b.category || 'GENERAL'}
                   onChange={(e) => update(idx, { category: e.target.value as VaultBullet['category'] })}
-                  className="h-6 text-[10px] bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-1.5 text-content-muted outline-none"
+                  className="h-6 text-xs bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-1.5 text-content-muted outline-none"
                 >
                   <option value="GENERAL">General</option>
                   <option value="FRONTEND">Frontend</option>
@@ -133,7 +133,7 @@ function VaultBulletEditor({
                 </select>
                 <button
                   onClick={() => handleGenerateVault(idx)}
-                  className="inline-flex items-center gap-1 text-[10px] text-brand hover:text-brand-hover transition-colors"
+                  className="inline-flex items-center gap-1 text-xs text-brand hover:text-brand-hover transition-colors"
                 >
                   <Sparkle size={10} />
                   Expand
@@ -141,7 +141,7 @@ function VaultBulletEditor({
               </div>
               <div className="flex flex-wrap gap-1">
                 {b.keywords.map((kw) => (
-                  <span key={kw} className="inline-flex items-center gap-0.5 bg-brand/10 text-brand text-[9px] px-1.5 py-0.5 rounded-full">
+                  <span key={kw} className="inline-flex items-center gap-0.5 bg-brand/10 text-brand text-[10px] px-1.5 py-0.5 rounded-full">
                     {kw}
                     <button
                       onClick={() => update(idx, { keywords: b.keywords.filter((k) => k !== kw) })}
@@ -156,7 +156,7 @@ function VaultBulletEditor({
                 value={b.keywords.join(', ')}
                 onChange={(e) => update(idx, { keywords: e.target.value.split(',').map((s) => s.trim()).filter(Boolean) })}
                 placeholder="Keywords (comma-separated)"
-                className="w-full h-6 bg-transparent border-0 text-[10px] text-content-subtle outline-none placeholder:text-content-subtle/50"
+                className="w-full h-6 bg-transparent border-0 text-xs text-content-subtle outline-none placeholder:text-content-subtle/50"
               />
             </div>
             <button
@@ -170,7 +170,7 @@ function VaultBulletEditor({
       ))}
       <button
         onClick={add}
-        className="flex items-center gap-1 text-[10px] text-content-muted hover:text-brand transition-colors"
+        className="flex items-center gap-1 text-xs text-content-muted hover:text-brand transition-colors"
       >
         <Plus size={10} /> Add bullet
       </button>
@@ -196,7 +196,7 @@ function ContactEditor({ data, onChange }: { data: Profile; onChange: (d: Profil
         { label: 'Portfolio', field: 'portfolio', placeholder: 'yoursite.dev' },
       ].map(({ label, field, placeholder }) => (
         <div key={field}>
-          <label className="text-[11px] text-content-muted mb-1 block">{label}</label>
+          <label className="text-xs text-content-muted mb-1 block">{label}</label>
           <input
             value={(c as Record<string, string>)[field] || ''}
             onChange={(e) => set(field, e.target.value)}
@@ -223,9 +223,9 @@ function EducationEditor({ data, onChange }: { data: Profile; onChange: (d: Prof
   if (items.length === 0) {
     return (
       <div className="space-y-3">
-        <p className="text-xs text-content-muted">No education entries yet.</p>
+        <p className="text-sm text-content-muted">No education entries yet.</p>
         <button onClick={addItem}
-          className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-xs text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
+          className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-sm text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
           <Plus size={12} /> Add Education
         </button>
       </div>
@@ -238,39 +238,39 @@ function EducationEditor({ data, onChange }: { data: Profile; onChange: (d: Prof
         <div key={idx} className="border border-edge rounded-[var(--radius-md)] p-3 bg-surface space-y-2">
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
-              <label className="text-[10px] text-content-muted block">School / University</label>
+              <label className="text-xs text-content-muted block">School / University</label>
               <input value={edu.school} onChange={(e) => updateItem(idx, { school: e.target.value })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" />
             </div>
             <div>
-              <label className="text-[10px] text-content-muted block">Degree</label>
+              <label className="text-xs text-content-muted block">Degree</label>
               <input value={edu.degree} onChange={(e) => updateItem(idx, { degree: e.target.value })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" />
             </div>
             <div>
-              <label className="text-[10px] text-content-muted block">GPA</label>
+              <label className="text-xs text-content-muted block">GPA</label>
               <input value={edu.gpa ?? ''} onChange={(e) => updateItem(idx, { gpa: e.target.value || null })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="8.5" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" placeholder="8.5" />
             </div>
             <div>
-              <label className="text-[10px] text-content-muted block">Start Year</label>
+              <label className="text-xs text-content-muted block">Start Year</label>
               <input value={edu.startYear ?? ''} onChange={(e) => updateItem(idx, { startYear: e.target.value ? Number(e.target.value) : null })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="2020" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" placeholder="2020" />
             </div>
             <div>
-              <label className="text-[10px] text-content-muted block">End Year</label>
+              <label className="text-xs text-content-muted block">End Year</label>
               <input value={edu.endYear ?? ''} onChange={(e) => updateItem(idx, { endYear: e.target.value ? Number(e.target.value) : null })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="2024" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" placeholder="2024" />
             </div>
           </div>
           <button onClick={() => removeItem(idx)}
-            className="text-[10px] text-content-muted hover:text-red-500 transition-colors flex items-center gap-1">
+            className="text-xs text-content-muted hover:text-red-500 transition-colors flex items-center gap-1">
             <Trash size={10} /> Remove
           </button>
         </div>
       ))}
       <button onClick={addItem}
-        className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-xs text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
+        className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-sm text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
         <Plus size={12} /> Add Education
       </button>
     </div>
@@ -291,9 +291,9 @@ function ExperienceEditor({ data, onChange }: { data: Profile; onChange: (d: Pro
   if (items.length === 0) {
     return (
       <div className="space-y-3">
-        <p className="text-xs text-content-muted">No experience entries yet.</p>
+        <p className="text-sm text-content-muted">No experience entries yet.</p>
         <button onClick={addItem}
-          className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-xs text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
+          className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-sm text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
           <Plus size={12} /> Add Experience
         </button>
       </div>
@@ -306,26 +306,26 @@ function ExperienceEditor({ data, onChange }: { data: Profile; onChange: (d: Pro
         <div key={exp.id} className="border border-edge rounded-[var(--radius-md)] p-3 bg-surface space-y-2">
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[10px] text-content-muted block">Company</label>
+              <label className="text-xs text-content-muted block">Company</label>
               <input value={exp.company} onChange={(e) => updateItem(idx, { company: e.target.value })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" />
             </div>
             <div>
-              <label className="text-[10px] text-content-muted block">Role</label>
+              <label className="text-xs text-content-muted block">Role</label>
               <input value={exp.role} onChange={(e) => updateItem(idx, { role: e.target.value })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" />
             </div>
             <div>
-              <label className="text-[10px] text-content-muted block">Start</label>
+              <label className="text-xs text-content-muted block">Start</label>
               <input value={exp.startDate ?? ''} onChange={(e) => updateItem(idx, { startDate: e.target.value || null })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="Jun 2024" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" placeholder="Jun 2024" />
             </div>
             <div>
-              <label className="text-[10px] text-content-muted block">End</label>
+              <label className="text-xs text-content-muted block">End</label>
               <div className="flex items-center gap-2">
                 <input value={exp.endDate ?? ''} onChange={(e) => updateItem(idx, { endDate: e.target.value || null })} disabled={exp.current}
-                  className="flex-1 h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand disabled:opacity-40" placeholder="Aug 2024" />
-                <label className="flex items-center gap-1 text-[10px] text-content-muted cursor-pointer shrink-0">
+                  className="flex-1 h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand disabled:opacity-40" placeholder="Aug 2024" />
+                <label className="flex items-center gap-1 text-xs text-content-muted cursor-pointer shrink-0">
                   <input type="checkbox" checked={exp.current} onChange={(e) => updateItem(idx, { current: e.target.checked })}
                     className="accent-brand w-3 h-3" />
                   Current
@@ -338,13 +338,13 @@ function ExperienceEditor({ data, onChange }: { data: Profile; onChange: (d: Pro
             onChange={(bullets) => updateItem(idx, { vaultBullets: bullets })}
           />
           <button onClick={() => removeItem(idx)}
-            className="text-[10px] text-content-muted hover:text-red-500 transition-colors flex items-center gap-1">
+            className="text-xs text-content-muted hover:text-red-500 transition-colors flex items-center gap-1">
             <Trash size={10} /> Remove
           </button>
         </div>
       ))}
       <button onClick={addItem}
-        className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-xs text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
+        className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-sm text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
         <Plus size={12} /> Add Experience
       </button>
     </div>
@@ -365,9 +365,9 @@ function ProjectsEditor({ data, onChange }: { data: Profile; onChange: (d: Profi
   if (items.length === 0) {
     return (
       <div className="space-y-3">
-        <p className="text-xs text-content-muted">No projects yet.</p>
+        <p className="text-sm text-content-muted">No projects yet.</p>
         <button onClick={addItem}
-          className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-xs text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
+          className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-sm text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
           <Plus size={12} /> Add Project
         </button>
       </div>
@@ -380,18 +380,18 @@ function ProjectsEditor({ data, onChange }: { data: Profile; onChange: (d: Profi
         <div key={proj.id} className="border border-edge rounded-[var(--radius-md)] p-3 bg-surface space-y-2">
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
-              <label className="text-[10px] text-content-muted block">Title</label>
+              <label className="text-xs text-content-muted block">Title</label>
               <input value={proj.title} onChange={(e) => updateItem(idx, { title: e.target.value })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" />
             </div>
             <div>
-              <label className="text-[10px] text-content-muted block">URL</label>
+              <label className="text-xs text-content-muted block">URL</label>
               <input value={proj.url ?? ''} onChange={(e) => updateItem(idx, { url: e.target.value || null })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="github.com/you/proj" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" placeholder="github.com/you/proj" />
             </div>
           </div>
           <div>
-            <label className="text-[10px] text-content-muted block">Tech Stack</label>
+            <label className="text-xs text-content-muted block">Tech Stack</label>
             <TagInput
               tags={proj.techStack}
               onChange={(tags) => updateItem(idx, { techStack: tags })}
@@ -403,13 +403,13 @@ function ProjectsEditor({ data, onChange }: { data: Profile; onChange: (d: Profi
             onChange={(bullets) => updateItem(idx, { vaultBullets: bullets })}
           />
           <button onClick={() => removeItem(idx)}
-            className="text-[10px] text-content-muted hover:text-red-500 transition-colors flex items-center gap-1">
+            className="text-xs text-content-muted hover:text-red-500 transition-colors flex items-center gap-1">
             <Trash size={10} /> Remove
           </button>
         </div>
       ))}
       <button onClick={addItem}
-        className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-xs text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
+        className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-sm text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
         <Plus size={12} /> Add Project
       </button>
     </div>
@@ -424,7 +424,7 @@ function SkillsEditor({ data, onChange }: { data: Profile; onChange: (d: Profile
   return (
     <div className="space-y-3">
       <div>
-        <p className="text-[10px] font-medium text-content-muted mb-1">Languages</p>
+        <p className="text-xs font-medium text-content-muted mb-1">Languages</p>
         <TagInput
           tags={s.languages}
           onChange={(tags) => setSkills({ languages: tags })}
@@ -432,7 +432,7 @@ function SkillsEditor({ data, onChange }: { data: Profile; onChange: (d: Profile
         />
       </div>
       <div>
-        <p className="text-[10px] font-medium text-content-muted mb-1">Frameworks</p>
+        <p className="text-xs font-medium text-content-muted mb-1">Frameworks</p>
         <TagInput
           tags={s.frameworks}
           onChange={(tags) => setSkills({ frameworks: tags })}
@@ -440,7 +440,7 @@ function SkillsEditor({ data, onChange }: { data: Profile; onChange: (d: Profile
         />
       </div>
       <div>
-        <p className="text-[10px] font-medium text-content-muted mb-1">Tools</p>
+        <p className="text-xs font-medium text-content-muted mb-1">Tools</p>
         <TagInput
           tags={s.tools}
           onChange={(tags) => setSkills({ tools: tags })}
@@ -465,9 +465,9 @@ function CertificatesEditor({ data, onChange }: { data: Profile; onChange: (d: P
   if (items.length === 0) {
     return (
       <div className="space-y-3">
-        <p className="text-xs text-content-muted">No certificates yet.</p>
+        <p className="text-sm text-content-muted">No certificates yet.</p>
         <button onClick={addItem}
-          className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-xs text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
+          className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-sm text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
           <Plus size={12} /> Add Certificate
         </button>
       </div>
@@ -480,34 +480,34 @@ function CertificatesEditor({ data, onChange }: { data: Profile; onChange: (d: P
         <div key={cert.id} className="border border-edge rounded-[var(--radius-md)] p-3 bg-surface space-y-2">
           <div className="grid grid-cols-2 gap-2">
             <div className="col-span-2">
-              <label className="text-[10px] text-content-muted block">Name</label>
+              <label className="text-xs text-content-muted block">Name</label>
               <input value={cert.name} onChange={(e) => updateItem(idx, { name: e.target.value })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="AWS Solutions Architect" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" placeholder="AWS Solutions Architect" />
             </div>
             <div>
-              <label className="text-[10px] text-content-muted block">Issuer</label>
+              <label className="text-xs text-content-muted block">Issuer</label>
               <input value={cert.issuer} onChange={(e) => updateItem(idx, { issuer: e.target.value })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="Amazon Web Services" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" placeholder="Amazon Web Services" />
             </div>
             <div>
-              <label className="text-[10px] text-content-muted block">Date</label>
+              <label className="text-xs text-content-muted block">Date</label>
               <input value={cert.date || ''} onChange={(e) => updateItem(idx, { date: e.target.value })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="Jun 2025" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" placeholder="Jun 2025" />
             </div>
             <div className="col-span-2">
-              <label className="text-[10px] text-content-muted block">URL</label>
+              <label className="text-xs text-content-muted block">URL</label>
               <input value={cert.url} onChange={(e) => updateItem(idx, { url: e.target.value })}
-                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content outline-none focus:border-brand" placeholder="credential URL" />
+                className="w-full h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-sm text-content outline-none focus:border-brand" placeholder="credential URL" />
             </div>
           </div>
           <button onClick={() => removeItem(idx)}
-            className="text-[10px] text-content-muted hover:text-red-500 transition-colors flex items-center gap-1">
+            className="text-xs text-content-muted hover:text-red-500 transition-colors flex items-center gap-1">
             <Trash size={10} /> Remove
           </button>
         </div>
       ))}
       <button onClick={addItem}
-        className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-xs text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
+        className="w-full h-8 border border-dashed border-edge rounded-[var(--radius-md)] text-sm text-content-muted hover:text-brand hover:border-brand/40 transition-colors flex items-center justify-center gap-1">
         <Plus size={12} /> Add Certificate
       </button>
     </div>
