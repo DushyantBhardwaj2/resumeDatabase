@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { CaretDown, CaretUp, Link as LinkIcon } from '@phosphor-icons/react'
+import { CaretDown, CaretUp, Link as LinkIcon, PencilSimple, Trash } from '@phosphor-icons/react'
 import type { VaultBullet } from '@resumint/shared'
 
 export type AccordionItem = {
@@ -15,9 +15,11 @@ export type AccordionItem = {
 interface ProfileAccordionListProps {
   items: AccordionItem[]
   emptyLabel?: string
+  onEdit?: (id: string) => void
+  onDelete?: (id: string) => void
 }
 
-export function ProfileAccordionList({ items, emptyLabel = 'No entries yet' }: ProfileAccordionListProps) {
+export function ProfileAccordionList({ items, emptyLabel = 'No entries yet', onEdit, onDelete }: ProfileAccordionListProps) {
   const [openId, setOpenId] = useState<string | null>(null)
 
   const toggle = (id: string) => setOpenId(openId === id ? null : id)
@@ -49,20 +51,45 @@ export function ProfileAccordionList({ items, emptyLabel = 'No entries yet' }: P
                   <p className="text-[11px] text-content-muted mt-0.5 truncate">{item.subtitle}</p>
                 )}
               </div>
-              <div className="flex items-center gap-2 shrink-0 ml-2">
+              <div className="flex items-center gap-1 shrink-0 ml-2">
                 {item.url && (
                   <a
                     href={item.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     onClick={(e) => e.stopPropagation()}
-                    className="text-content-subtle hover:text-brand transition-colors"
+                    className="p-1.5 text-content-subtle hover:text-brand transition-colors rounded hover:bg-surface-hover"
+                    title="Visit link"
                   >
-                    <LinkIcon size={13} />
+                    <LinkIcon size={14} />
                   </a>
                 )}
-                <span className="text-content-subtle transition-transform duration-200">
-                  {isOpen ? <CaretUp size={13} /> : <CaretDown size={13} />}
+                {onEdit && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onEdit(item.id)
+                    }}
+                    className="p-1.5 text-content-subtle hover:text-brand transition-colors rounded hover:bg-surface-hover"
+                    title="Edit entry"
+                  >
+                    <PencilSimple size={14} />
+                  </button>
+                )}
+                {onDelete && (
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onDelete(item.id)
+                    }}
+                    className="p-1.5 text-content-subtle hover:text-red-500 transition-colors rounded hover:bg-red-500/10"
+                    title="Delete entry"
+                  >
+                    <Trash size={14} />
+                  </button>
+                )}
+                <span className="p-1.5 text-content-subtle transition-transform duration-200">
+                  {isOpen ? <CaretUp size={14} /> : <CaretDown size={14} />}
                 </span>
               </div>
             </button>

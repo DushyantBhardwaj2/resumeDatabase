@@ -25,6 +25,10 @@ interface ProfileStore {
   addExperience: (item: Experience) => void
   addEducation: (item: Education) => void
   addCertificate: (item: Certificate) => void
+  updateExperience: (id: string, item: Experience) => void
+  deleteExperience: (id: string) => void
+  updateProject: (id: string, item: Project) => void
+  deleteProject: (id: string) => void
   updateContact: (contact: Contact) => void
   updateSkills: (skills: Skills) => void
 }
@@ -109,6 +113,46 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
   addCertificate: (item) => {
     const { profile } = get()
     const updated = { ...profile, certificates: [...profile.certificates, item] }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  updateExperience: (id, item) => {
+    const { profile } = get()
+    const updated = {
+      ...profile,
+      experience: profile.experience.map(e => e.id === id ? item : e)
+    }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  deleteExperience: (id) => {
+    const { profile } = get()
+    const updated = {
+      ...profile,
+      experience: profile.experience.filter(e => e.id !== id)
+    }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  updateProject: (id, item) => {
+    const { profile } = get()
+    const updated = {
+      ...profile,
+      projects: profile.projects.map(p => p.id === id ? item : p)
+    }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  deleteProject: (id) => {
+    const { profile } = get()
+    const updated = {
+      ...profile,
+      projects: profile.projects.filter(p => p.id !== id)
+    }
     set({ profile: updated })
     get().saveProfile()
   },

@@ -18,7 +18,8 @@ import {
 } from '@phosphor-icons/react'
 import { useProfileStore } from '@/store/useProfileStore'
 import { ProfileAccordionList, type AccordionItem } from './ProfileAccordionList'
-import type { SectionName } from '@resumint/shared'
+import { EditEntryDialog } from './EditEntryDialog'
+import type { SectionName, Experience, Project } from '@resumint/shared'
 
 type VaultTab = 'info' | 'education' | 'experience' | 'projects' | 'certificates'
 
@@ -32,7 +33,41 @@ const TABS: { key: VaultTab; label: string; icon: React.ElementType }[] = [
 
 export function ProfileVaultPanel() {
   const profile = useProfileStore((s) => s.profile)
+  const deleteExperience = useProfileStore((s) => s.deleteExperience)
+  const deleteProject = useProfileStore((s) => s.deleteProject)
+  const updateExperience = useProfileStore((s) => s.updateExperience)
+  const updateProject = useProfileStore((s) => s.updateProject)
+
   const [activeTab, setActiveTab] = useState<VaultTab>('info')
+  
+  const [editType, setEditType] = useState<'EXPERIENCE' | 'PROJECT' | null>(null)
+  const [editItem, setEditItem] = useState<Experience | Project | null>(null)
+
+  const handleEditExperience = (id: string) => {
+    const exp = profile.experience.find(e => e.id === id)
+    if (exp) {
+      setEditType('EXPERIENCE')
+      setEditItem(exp)
+    }
+  }
+
+  const handleEditProject = (id: string) => {
+    const proj = profile.projects.find(p => p.id === id)
+    if (proj) {
+      setEditType('PROJECT')
+      setEditItem(proj)
+    }
+  }
+
+  const handleSaveEdit = (updatedItem: any) => {
+    if (editType === 'EXPERIENCE') {
+      updateExperience(updatedItem.id, updatedItem)
+    } else if (editType === 'PROJECT') {
+      updateProject(updatedItem.id, updatedItem)
+    }
+    setEditType(null)
+    setEditItem(null)
+  }
 
   const sectionCount = (section: SectionName): number => {
     if (section === 'contact') return profile.contact.name ? 1 : 0
@@ -97,13 +132,31 @@ export function ProfileVaultPanel() {
         {activeTab === 'info' && <PersonalInfoTab profile={profile} />}
         {activeTab === 'education' && <EducationTab profile={profile} />}
         {activeTab === 'experience' && (
-          <ProfileAccordionList items={experienceItems} emptyLabel="No experience entries yet" />
+          <ProfileAccordionList 
+            items={experienceItems} 
+            emptyLabel="No experience entries yet" 
+            onEdit={handleEditExperience}
+            onDelete={deleteExperience}
+          />
         )}
         {activeTab === 'projects' && (
-          <ProfileAccordionList items={projectItems} emptyLabel="No projects yet" />
+          <ProfileAccordionList 
+            items={projectItems} 
+            emptyLabel="No projects yet" 
+            onEdit={handleEditProject}
+            onDelete={deleteProject}
+          />
         )}
         {activeTab === 'certificates' && <CertificatesTab profile={profile} />}
       </div>
+      
+      <EditEntryDialog
+        isOpen={editType !== null}
+        onClose={() => setEditType(null)}
+        type={editType}
+        item={editItem}
+        onSave={handleSaveEdit}
+      />
     </div>
   )
 }
