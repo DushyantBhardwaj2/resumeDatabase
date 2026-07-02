@@ -2,6 +2,7 @@
 
 import type { ReactNode } from 'react'
 import type { ChatMessage } from '@/store/useChatStore'
+import { BorderGlow } from '@/components/ui/border-glow'
 import { ResumeUploadWidget } from './widgets/ResumeUploadWidget'
 import { TailoringChecklistWidget } from './widgets/TailoringChecklistWidget'
 import { DashboardWelcomeWidget } from './widgets/DashboardWelcomeWidget'
@@ -22,46 +23,52 @@ export function MessageBubble({ message, renderWidget }: MessageBubbleProps) {
   if (customWidget) {
     return (
       <div className="flex w-full justify-start animate-fade-up">
-        <div className="max-w-[85%] rounded-[var(--radius-xl)] p-4 bg-card border border-edge rounded-bl-sm">
-          {message.content && (
-            <p className="text-base whitespace-pre-wrap text-content">{message.content}</p>
-          )}
-          {customWidget}
-        </div>
+        <BorderGlow animated glowColor="#16A34A">
+          <div className="max-w-[85%] rounded-[var(--radius-xl)] p-4 bg-card border border-edge rounded-bl-sm">
+            {message.content && (
+              <p className="text-base whitespace-pre-wrap text-content">{message.content}</p>
+            )}
+            {customWidget}
+          </div>
+        </BorderGlow>
       </div>
     )
   }
 
   return (
     <div className={`flex w-full ${isUser ? 'justify-end' : 'justify-start'} animate-fade-up`}>
-      <div
-        className={`max-w-[85%] rounded-[var(--radius-xl)] p-4 ${isUser
-            ? 'bg-brand text-brand-fg rounded-br-sm'
-            : 'bg-card border border-edge rounded-bl-sm'
-          }`}
-      >
-        {message.content && (
-          <p className={`text-base whitespace-pre-wrap ${isUser ? 'text-brand-fg' : 'text-content'}`}>
-            {message.content}
-          </p>
-        )}
-
-        {message.widget === 'UPLOAD_DROPZONE' && <ResumeUploadWidget />}
-        {message.widget === 'PROJECTS' && <TailoringChecklistWidget />}
-        {message.widget === 'DASHBOARD_WELCOME' && <DashboardWelcomeWidget name={(message.meta?.name as string) || 'there'} />}
-        {message.widget === 'DASHBOARD_STATS' && (
-          <DashboardStatsWidget
-            education={(message.meta?.education as number) ?? 0}
-            experience={(message.meta?.experience as number) ?? 0}
-            projects={(message.meta?.projects as number) ?? 0}
-            skills={(message.meta?.skills as number) ?? 0}
-          />
-        )}
-        {message.widget === 'DASHBOARD_COMPLETENESS' && (
-          <DashboardCompletenessWidget percent={(message.meta?.completeness as number) ?? 0} />
-        )}
-        {message.widget === 'DASHBOARD_QUICK_ACTIONS' && <DashboardQuickActionsWidget />}
-      </div>
+      {isUser ? (
+        <div className="max-w-[85%] rounded-[var(--radius-xl)] p-4 bg-brand text-brand-fg rounded-br-sm">
+          {message.content && (
+            <p className="text-base whitespace-pre-wrap text-brand-fg">{message.content}</p>
+          )}
+        </div>
+      ) : (
+        <BorderGlow animated glowColor="#16A34A">
+          <div className="max-w-[85%] rounded-[var(--radius-xl)] p-4 bg-card border border-edge rounded-bl-sm">
+            {message.content && (
+              <p className="text-base whitespace-pre-wrap text-content">{message.content}</p>
+            )}
+            {message.widget === 'UPLOAD_DROPZONE' && <ResumeUploadWidget />}
+            {message.widget === 'PROJECTS' && <TailoringChecklistWidget />}
+            {message.widget === 'DASHBOARD_WELCOME' && (
+              <DashboardWelcomeWidget name={(message.meta?.name as string) || 'there'} />
+            )}
+            {message.widget === 'DASHBOARD_STATS' && (
+              <DashboardStatsWidget
+                education={(message.meta?.education as number) ?? 0}
+                experience={(message.meta?.experience as number) ?? 0}
+                projects={(message.meta?.projects as number) ?? 0}
+                skills={(message.meta?.skills as number) ?? 0}
+              />
+            )}
+            {message.widget === 'DASHBOARD_COMPLETENESS' && (
+              <DashboardCompletenessWidget percent={(message.meta?.completeness as number) ?? 0} />
+            )}
+            {message.widget === 'DASHBOARD_QUICK_ACTIONS' && <DashboardQuickActionsWidget />}
+          </div>
+        </BorderGlow>
+      )}
     </div>
   )
 }

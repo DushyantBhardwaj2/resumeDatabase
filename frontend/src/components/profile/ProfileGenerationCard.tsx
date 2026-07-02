@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { Check, PencilLine, Sparkle } from '@phosphor-icons/react'
 import type { VaultBullet, Experience, Project, Education, Certificate } from '@resumint/shared'
 import { useProfileStore } from '@/store/useProfileStore'
+import { AnimatedList } from '@/components/ui/animated-list'
 
 export type GeneratedDataType =
   | { type: 'PROJECT'; title: string; url?: string; techStack?: string[]; bullets: VaultBullet[] }
@@ -135,11 +136,10 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
         </span>
       </div>
 
-      {showBullets && (
-        <div className="px-3 py-2 space-y-1 max-h-48 overflow-y-auto">
-          {safeBullets.map((b) => (
+      {showBullets && safeBullets.length > 0 && (
+        <div className="px-3 py-2 max-h-48 overflow-y-auto">
+          <AnimatedList items={safeBullets} delay={0.04} className="space-y-1" renderItem={(b) => (
             <label
-              key={b.id}
               className={[
                 'flex items-start gap-2 px-2 py-1.5 rounded-[var(--radius-sm)] cursor-pointer transition-colors text-sm',
                 selectedBullets.has(b.id) ? 'bg-brand/5' : 'hover:bg-muted-bg',
@@ -155,7 +155,7 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
                 {b.text}
               </span>
             </label>
-          ))}
+          )} />
         </div>
       )}
 

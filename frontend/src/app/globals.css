@@ -169,6 +169,11 @@ h1, h2, h3, h4 {
   to { transform: rotate(360deg); }
 }
 
+@keyframes rotate-glow {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
 /* ── Animation Utilities ────────────────────────────────────────────────── */
 .animate-fade-up    { animation: fade-up 0.35s cubic-bezier(0.16, 1, 0.3, 1) both; }
 .animate-fade-in    { animation: fade-in 0.25s ease both; }
