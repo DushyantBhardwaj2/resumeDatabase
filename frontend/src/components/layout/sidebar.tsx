@@ -70,17 +70,17 @@ function NavLink({
       href={href}
       onClick={onClick}
       className={[
-        'flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm transition-colors duration-150 mb-0.5',
+        'flex items-center rounded-[var(--radius-md)] text-sm transition-colors duration-150 mb-0.5',
+        collapsed ? 'justify-center py-2 px-0' : 'gap-3 px-3 py-2',
         active
           ? 'bg-brand-light text-brand font-medium'
           : 'text-content-muted hover:bg-surface hover:text-content',
-        collapsed ? 'justify-center px-2' : '',
       ].join(' ')}
       aria-current={active ? 'page' : undefined}
       title={collapsed ? label : undefined}
     >
-      <Icon size={18} weight={active ? 'fill' : 'regular'} aria-hidden="true" />
-      {!collapsed && label}
+      <Icon size={18} weight={active ? 'fill' : 'regular'} className="shrink-0" aria-hidden="true" />
+      {!collapsed && <span>{label}</span>}
     </Link>
   )
 }
@@ -202,12 +202,12 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
         <button
           onClick={onToggleCollapse}
           className={[
-            'flex items-center w-full gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm text-content-muted hover:bg-surface hover:text-content transition-colors mb-1',
-            collapsed ? 'justify-center px-2' : ''
+            'flex items-center w-full rounded-[var(--radius-md)] text-sm text-content-muted hover:bg-surface hover:text-content transition-colors mb-1',
+            collapsed ? 'justify-center py-2 px-0' : 'gap-3 px-3 py-2'
           ].join(' ')}
           title={collapsed ? 'Expand sidebar' : 'Collapse sidebar'}
         >
-          <SidebarIcon size={18} />
+          <SidebarIcon size={18} className="shrink-0" />
           {!collapsed && <span className="flex-1 text-left">Collapse</span>}
         </button>
 
@@ -221,7 +221,7 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
 
         {collapsed ? (
           <div className="flex justify-center py-2" title="Toggle Theme">
-            <ThemeToggle size={18} />
+            <ThemeToggle size={18} className="shrink-0" />
           </div>
         ) : (
           <div className="flex items-center gap-3 px-3 py-2 text-sm text-content-muted">
@@ -235,7 +235,7 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
             className={collapsed ? "flex justify-center py-2" : "flex items-center gap-3 px-3 py-2 mt-1"}
             title={collapsed ? `${user.name} (${user.email})` : undefined}
           >
-            <Avatar size={collapsed ? "sm" : "sm"} src={user.image} name={user.name} />
+            <Avatar size="sm" src={user.image} name={user.name} />
             {!collapsed && (
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-medium text-content truncate">{user.name}</p>
@@ -249,12 +249,12 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
           onClick={handleSignOut}
           title={collapsed ? 'Sign out' : undefined}
           className={[
-            'flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm text-content-muted hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-500 transition-colors cursor-pointer w-full text-left',
-            collapsed ? 'justify-center px-2' : ''
+            'flex items-center rounded-[var(--radius-md)] text-sm text-content-muted hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-500 transition-colors cursor-pointer w-full text-left',
+            collapsed ? 'justify-center py-2 px-0' : 'gap-3 px-3 py-2'
           ].join(' ')}
         >
-          <SignOut size={18} aria-hidden="true" />
-          {!collapsed && 'Sign out'}
+          <SignOut size={18} className="shrink-0" aria-hidden="true" />
+          {!collapsed && <span>Sign out</span>}
         </button>
       </div>
     </div>
