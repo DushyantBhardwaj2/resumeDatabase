@@ -1,1 +1,1 @@
-export * from "@resumint/shared"
+export * from "../../shared"
