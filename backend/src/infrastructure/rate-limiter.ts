@@ -17,6 +17,10 @@ export function rateLimiter(options: RateLimiterOptions) {
     const key = `rl:${options.keyGenerator(c)}`
 
     try {
+      if (redisClient.status !== 'ready') {
+        return await next()
+      }
+      
       // Execute INCR and PTTL atomically via a Redis transaction
       const results = await redisClient.multi().incr(key).pttl(key).exec()
 

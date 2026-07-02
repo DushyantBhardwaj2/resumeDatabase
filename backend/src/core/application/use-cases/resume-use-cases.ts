@@ -136,11 +136,25 @@ export class ResumeUseCases {
       jobDescription: input.jobDescription,
       profile: compactProfile,
     })
-    const selectionResult = await this.aiService.generateStructuredData(
+    // Start both AI generation tasks in parallel to avoid Vercel timeouts
+    const selectionPromise = this.aiService.generateStructuredData(
       this.bulletSelectorPrompt,
       userContent,
       this.bulletSelectorSchema
-    ) as unknown as BulletSelection
+    ) as Promise<unknown>
+
+    const summaryPromise = this.aiService.generateStructuredData(
+      "You are a resume summary writer. Given the job description and candidate profile, generate a 2-sentence professional summary. Output ONLY valid JSON: {\"summary\": string}",
+      JSON.stringify({ jobDescription: input.jobDescription, profile: compactProfile }),
+      { parse: (data: unknown) => data as { summary: string } }
+    ).then((r) => (r as { summary?: string }).summary).catch((err) => {
+      console.error("[tailorResume] Summary AI failed:", err)
+      return null
+    })
+
+    // Await both promises
+    const [selectionResultRaw, summary] = await Promise.all([selectionPromise, summaryPromise])
+    const selectionResult = selectionResultRaw as BulletSelection
 
     const tailored = buildTailoredFromSelections(profile, selectionResult.selections)
 
@@ -148,13 +162,6 @@ export class ResumeUseCases {
     const templateConfig = this.latexTemplate.getTemplateConfig(templateId)
     applyTemplateConstraints(tailored, templateConfig)
 
-    // Generate summary via AI (optional, in parallel)
-    const summaryPromise = this.aiService.generateStructuredData(
-      "You are a resume summary writer. Given the job description and candidate profile, generate a 2-sentence professional summary. Output ONLY valid JSON: {\"summary\": string}",
-      JSON.stringify({ jobDescription: input.jobDescription, profile: compactProfile }),
-      { parse: (data: unknown) => data as { summary: string } }
-    ).then((r) => (r as { summary?: string }).summary).catch(() => null)
-    const summary = await summaryPromise
     if (summary) tailored.summary = summary
 
     const latex = this.latexTemplate.fill(
