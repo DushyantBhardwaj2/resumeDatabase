@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
+import { Dialog } from '@/components/ui/dialog'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
@@ -51,78 +51,78 @@ export function EditEntryDialog({ isOpen, onClose, type, item, onSave }: EditEnt
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Edit {type === 'EXPERIENCE' ? 'Experience' : 'Project'}</DialogTitle>
-        </DialogHeader>
-
-        <div className="space-y-4 py-4">
-          {type === 'EXPERIENCE' ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-content">Company</label>
-                  <Input value={formData.company || ''} onChange={(e) => handleChange('company', e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-content">Role</label>
-                  <Input value={formData.role || ''} onChange={(e) => handleChange('role', e.target.value)} />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-content">Start Date</label>
-                  <Input value={formData.startDate || ''} onChange={(e) => handleChange('startDate', e.target.value)} placeholder="e.g. Jun 2023" />
-                </div>
-                <div className="space-y-1.5">
-                  <label className="text-xs font-medium text-content">End Date</label>
-                  <Input value={formData.endDate || ''} onChange={(e) => handleChange('endDate', e.target.value)} placeholder="e.g. Present" />
-                </div>
-              </div>
-            </>
-          ) : (
-            <>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-content">Title</label>
-                <Input value={formData.title || ''} onChange={(e) => handleChange('title', e.target.value)} />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-content">URL</label>
-                <Input value={formData.url || ''} onChange={(e) => handleChange('url', e.target.value)} placeholder="https://github.com/..." />
-              </div>
-            </>
-          )}
-
-          <div className="space-y-3 pt-2">
-            <h4 className="text-sm font-semibold text-content">Vault Bullets</h4>
-            {formData.vaultBullets?.map((bullet: VaultBullet) => (
-              <div key={bullet.id} className="flex items-start gap-2">
-                <Textarea
-                  value={bullet.text}
-                  onChange={(e) => handleBulletChange(bullet.id, e.target.value)}
-                  className="min-h-[60px] text-xs leading-relaxed resize-y"
-                />
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => handleBulletDelete(bullet.id)} 
-                  className="text-red-500 hover:text-red-600 hover:bg-red-500/10 shrink-0"
-                  title="Delete bullet"
-                >
-                  <Trash size={16} />
-                </Button>
-              </div>
-            ))}
-            {formData.vaultBullets?.length === 0 && (
-              <p className="text-xs text-content-muted italic">No bullets remaining.</p>
-            )}
-          </div>
-        </div>
-
-        <DialogFooter>
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      title={`Edit ${type === 'EXPERIENCE' ? 'Experience' : 'Project'}`}
+      size="lg"
+      footer={
+        <>
           <Button variant="ghost" onClick={onClose}>Cancel</Button>
           <Button onClick={handleSave}>Save Changes</Button>
-        </DialogFooter>
-      </DialogContent>
+        </>
+      }
+    >
+      <div className="space-y-4">
+        {type === 'EXPERIENCE' ? (
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-content">Company</label>
+                <Input value={formData.company || ''} onChange={(e) => handleChange('company', e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-content">Role</label>
+                <Input value={formData.role || ''} onChange={(e) => handleChange('role', e.target.value)} />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-content">Start Date</label>
+                <Input value={formData.startDate || ''} onChange={(e) => handleChange('startDate', e.target.value)} placeholder="e.g. Jun 2023" />
+              </div>
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-content">End Date</label>
+                <Input value={formData.endDate || ''} onChange={(e) => handleChange('endDate', e.target.value)} placeholder="e.g. Present" />
+              </div>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-content">Title</label>
+              <Input value={formData.title || ''} onChange={(e) => handleChange('title', e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-xs font-medium text-content">URL</label>
+              <Input value={formData.url || ''} onChange={(e) => handleChange('url', e.target.value)} placeholder="https://github.com/..." />
+            </div>
+          </>
+        )}
+
+        <div className="space-y-3 pt-2">
+          <h4 className="text-sm font-semibold text-content">Vault Bullets</h4>
+          {formData.vaultBullets?.map((bullet: VaultBullet) => (
+            <div key={bullet.id} className="flex items-start gap-2">
+              <Textarea
+                value={bullet.text}
+                onChange={(e) => handleBulletChange(bullet.id, e.target.value)}
+                className="min-h-[60px] text-xs leading-relaxed resize-y"
+              />
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => handleBulletDelete(bullet.id)}
+                className="text-red-500 hover:text-red-600 hover:bg-red-500/10 shrink-0"
+                title="Delete bullet"
+              >
+                <Trash size={16} />
+              </Button>
+            </div>
+          ))}
+          {formData.vaultBullets?.length === 0 && (
+            <p className="text-xs text-content-muted italic">No bullets remaining.</p>
+          )}
+        </div>
+      </div>
     </Dialog>
   )
 }
