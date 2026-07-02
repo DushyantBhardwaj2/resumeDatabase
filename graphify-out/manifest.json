@@ -1,0 +1,922 @@
+{
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\prisma.config.ts": {
+    "mtime": 1782233817.3099692,
+    "hash": "444647e41040b623b99346e28373e2b7"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\vitest.config.ts": {
+    "mtime": 1782976277.1126266,
+    "hash": "7f99f78d6ae82e7203bf2d6ea921f0f1"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\prisma\\migrations\\20260627041137_rename_certifications_to_certificates\\migration.sql": {
+    "mtime": 1782517779.051623,
+    "hash": "caafe8d97b572e14b913e25141e39dc9"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\scripts\\copy-templates.mjs": {
+    "mtime": 1782517779.0725715,
+    "hash": "00b479b4baf70bd54a7208e483ad1c41"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\scripts\\__tests__\\postbuild.test.ts": {
+    "mtime": 1782932166.7468789,
+    "hash": "04cee46f7598b419e3281c7a34275e80"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\env-init.ts": {
+    "mtime": 1782517779.1285653,
+    "hash": "31f56a5b658b62cdfa9e180f8211a2cb"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\index.ts": {
+    "mtime": 1782981798.710185,
+    "hash": "6b33863ee453cef78c63e44d53458728"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\config\\auth-client.ts": {
+    "mtime": 1782233817.3281767,
+    "hash": "d8d8f1a252a8410a1cf858fa69e39207"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\config\\auth.ts": {
+    "mtime": 1782517779.0775719,
+    "hash": "28a8ecdc795eadb15824adf2feba8dc4"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\config\\prisma.ts": {
+    "mtime": 1782233817.344499,
+    "hash": "a96c0fd560c31d24f22114181e5efb9c"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\dto\\index.ts": {
+    "mtime": 1782233817.3575237,
+    "hash": "7bf94c3ac4fb07885f077d247c373d33"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\ports\\ai-service.ts": {
+    "mtime": 1782233817.3645256,
+    "hash": "6cdf2b01451aeda81abf86d59e179768"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\ports\\chat-types.ts": {
+    "mtime": 1782894342.8079927,
+    "hash": "6e6a82e32dea166316dc73c6e3589ba7"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\ports\\index.ts": {
+    "mtime": 1782233817.372131,
+    "hash": "c5dd40e973c49935cf56de2071bab85a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\ports\\latex-compiler.ts": {
+    "mtime": 1782517779.0865786,
+    "hash": "6a59625d0a0709db0e6255dfe70ab32b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\ports\\pdf-parser.ts": {
+    "mtime": 1782233817.384748,
+    "hash": "6a0475ac684c00a2c231456ab78f8137"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\services\\bullet-filter.ts": {
+    "mtime": 1782517779.097837,
+    "hash": "19ab7e840b9a9e8285b2035a9fea9343"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\services\\__tests__\\bullet-filter.test.ts": {
+    "mtime": 1782517779.0927024,
+    "hash": "fc239ee72646429f0c15a722ecd7d51f"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\ai-use-cases.ts": {
+    "mtime": 1782233817.3912995,
+    "hash": "eb563db8fb2ba98024bb3e2c264830ea"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\chat-use-cases.ts": {
+    "mtime": 1782916898.9344983,
+    "hash": "dfc09bb1de522198b35cc61be7e964f3"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\github-use-cases.ts": {
+    "mtime": 1782553488.9245389,
+    "hash": "1c724d036cf6cedb64ba562ee9ffc599"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\history-use-cases.ts": {
+    "mtime": 1782233817.4053156,
+    "hash": "884609db68612f28fc773e700a29d3e7"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\profile-use-cases.ts": {
+    "mtime": 1782550982.7463248,
+    "hash": "941a8b4452e6fa9b290ceebc066fe24e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\resume-use-cases.ts": {
+    "mtime": 1782982399.0788016,
+    "hash": "ee0ccdb1e585642d05f78634852608bb"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\__tests__\\ai-use-cases.test.ts": {
+    "mtime": 1782976276.970753,
+    "hash": "9606986c6df6bb2a0f136cbc1872f8a1"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\__tests__\\chat-use-cases.test.ts": {
+    "mtime": 1782976276.974886,
+    "hash": "2d95c4cd6f71348c5d32e15492b91b71"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\__tests__\\github-use-cases.test.ts": {
+    "mtime": 1782976276.9818163,
+    "hash": "18d2f0e1a6c276a2e5d7fc5e3008d3bb"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\__tests__\\history-use-cases.test.ts": {
+    "mtime": 1782976276.986815,
+    "hash": "d3009ff6b090db4c9c483e7e248a2587"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\__tests__\\profile-use-cases.test.ts": {
+    "mtime": 1782976276.9898155,
+    "hash": "82f246b467451a38f8d7da264e503b22"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\application\\use-cases\\__tests__\\resume-use-cases.test.ts": {
+    "mtime": 1782976276.9939055,
+    "hash": "30102f39f652a19ec6f29553ca522759"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\domain\\entities.ts": {
+    "mtime": 1782976508.180061,
+    "hash": "2593dd1dc9ed8ae426107581eebdd2d7"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\core\\domain\\repositories.ts": {
+    "mtime": 1782233817.4342666,
+    "hash": "c7505b798ae0c7730c37ceb71f839174"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\di\\container.ts": {
+    "mtime": 1782976508.8103516,
+    "hash": "dbb0a8245d249d84e79e81dfbe02dc8e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\profile-utils.ts": {
+    "mtime": 1782233817.5408933,
+    "hash": "7c7c2f003055b110a4ec26d3edc7815e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\rate-limiter.ts": {
+    "mtime": 1782982371.8021016,
+    "hash": "ae5f05041e7f44d1c6ea1c1c9639f094"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\ai\\index.ts": {
+    "mtime": 1782976277.041922,
+    "hash": "83b576520f9217c6d6eae7526edaad61"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\latex\\latex-compiler.ts": {
+    "mtime": 1782976277.0459287,
+    "hash": "ab7c4a6c2592dce8a27dbe834323bca5"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\latex\\latex-template.ts": {
+    "mtime": 1782550994.7902408,
+    "hash": "23d4374887ccd6a363b2ed81687d093b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\latex\\__tests__\\latex-template.test.ts": {
+    "mtime": 1782517779.1440709,
+    "hash": "b3901ddc8737c7cc2c9f7e2f8597c819"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\pdf\\index.ts": {
+    "mtime": 1782233817.510934,
+    "hash": "4c68bbcb7fc6de0ea9982b99f24d329d"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\persistence\\github-repo-repository.ts": {
+    "mtime": 1782233817.5179317,
+    "hash": "8aa104b82e4338087bc5069d14444b55"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\persistence\\profile-repository.ts": {
+    "mtime": 1782932166.759179,
+    "hash": "c2e637b6251b306103ebea4a87c4b5f7"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\persistence\\tailored-resume-repository.ts": {
+    "mtime": 1782233817.5335276,
+    "hash": "bcfcaacec2a07985fb1916120207841d"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\prompts\\index.ts": {
+    "mtime": 1782985789.424451,
+    "hash": "374fbff619affb7573c9eef19259e154"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\queue\\pdf-queue.ts": {
+    "mtime": 1782932166.7758815,
+    "hash": "5999dd067c7a8c924d296674f38e02c0"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\queue\\pdf-worker.ts": {
+    "mtime": 1782976277.057026,
+    "hash": "5b28993ae96920c538f5b73d069e2708"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\queue\\redis.ts": {
+    "mtime": 1782976277.0605514,
+    "hash": "4ca1c789f5fdb655a092b6b59d9b41e7"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\__tests__\\ai-service.test.ts": {
+    "mtime": 1782976277.0164738,
+    "hash": "2ac7fcd4c63fcded8d1a8cc4d865d05f"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\__tests__\\profile-utils.test.ts": {
+    "mtime": 1782976277.0260043,
+    "hash": "eaf2e426d11779b7bfad3326c6cdda79"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\__tests__\\rate-limiter.test.ts": {
+    "mtime": 1782976277.03077,
+    "hash": "4c2add17112dde91fef34fcac441b9ae"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\__tests__\\redis.test.ts": {
+    "mtime": 1782976277.0357673,
+    "hash": "c98959fdb7e1f22de8908a71bd0bb32a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\types.ts": {
+    "mtime": 1782932166.8235276,
+    "hash": "8f4810ec74e3eb43ba5630521c3560ab"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\routes\\ai.ts": {
+    "mtime": 1782976277.0878026,
+    "hash": "688eac9aaa2126d2a1608afc7b9b743b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\routes\\chat.ts": {
+    "mtime": 1782976277.091348,
+    "hash": "39119504a8aa234b10da388ed95ced68"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\routes\\history.ts": {
+    "mtime": 1782976277.094874,
+    "hash": "bd86093afc500a04ac2a02ba4a5dfaef"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\routes\\profile.ts": {
+    "mtime": 1782976277.099495,
+    "hash": "f3e4fafbf9aaf12365482ebdc746cda5"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\routes\\resume.ts": {
+    "mtime": 1782976277.103601,
+    "hash": "e7abb5ed1dcff8cfd74faf17100576fc"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\routes\\__tests__\\ai.route.test.ts": {
+    "mtime": 1782976277.0640774,
+    "hash": "8f9c79321649c6c0aa2a2089499741a2"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\routes\\__tests__\\chat.route.test.ts": {
+    "mtime": 1782976277.067078,
+    "hash": "70f36c1c4471cbf7fdf8ec8c6aed7f72"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\routes\\__tests__\\history.route.test.ts": {
+    "mtime": 1782976277.076761,
+    "hash": "7c83db0048c976887c638eab3150b577"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\routes\\__tests__\\profile.route.test.ts": {
+    "mtime": 1782976277.0802693,
+    "hash": "ddfb84ee2c02eba12b604928372cc6c1"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\interface\\routes\\__tests__\\resume.route.test.ts": {
+    "mtime": 1782976277.0832982,
+    "hash": "000f29dab69f90c745347341c5903e40"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\shared\\index.ts": {
+    "mtime": 1782976504.0648947,
+    "hash": "481f54899827f8ef17ba28f2387ff616"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\eslint.config.mjs": {
+    "mtime": 1782517779.2935917,
+    "hash": "8b20b4f296f122f6deb38eec476867f3"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\next-env.d.ts": {
+    "mtime": 1782757006.806413,
+    "hash": "2a74d3909800ca5467fa83b0ab4a4890"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\next.config.ts": {
+    "mtime": 1782517793.6317976,
+    "hash": "1c6b28487c14fc2e7660d35f0a222314"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\postcss.config.mjs": {
+    "mtime": 1782204080.185542,
+    "hash": "481fac0fdecd70e1821cc30b86030c1a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\vitest.config.ts": {
+    "mtime": 1782301575.9442937,
+    "hash": "806c5b0f37db981f9d3470bc8422df89"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\vitest.setup.ts": {
+    "mtime": 1782517793.687432,
+    "hash": "dfe4351b131aabb2252e4892f7065ea4"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\scripts\\build.mjs": {
+    "mtime": 1782976277.1211746,
+    "hash": "14760d571143b479c0466f5efd9ac745"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\proxy.ts": {
+    "mtime": 1782976277.28985,
+    "hash": "f0867fa86f69629cf5bb714b7484512c"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\error.tsx": {
+    "mtime": 1782976277.1645217,
+    "hash": "c9f4ae813c4b0558657757933fbcf898"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\global-error.tsx": {
+    "mtime": 1782976277.1685214,
+    "hash": "1464736618e6021b10051c81db1676bb"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\layout.tsx": {
+    "mtime": 1782758543.1057873,
+    "hash": "3e0aed93247b3d7c655c3705436a7796"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\page.tsx": {
+    "mtime": 1782553446.2316046,
+    "hash": "7e8d9d0fb7facf9e9372520177849996"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\access-denied\\page.tsx": {
+    "mtime": 1782301575.6116948,
+    "hash": "9c69a7702c36f4e584240fc2fe667213"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\auth\\error.tsx": {
+    "mtime": 1782976277.1323452,
+    "hash": "c9f4ae813c4b0558657757933fbcf898"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\auth\\redirect\\error.tsx": {
+    "mtime": 1782204083.67187,
+    "hash": "fbebab4b45f8bfccc8458f3ba717af9d"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\auth\\redirect\\page.tsx": {
+    "mtime": 1782976277.1363442,
+    "hash": "08c36f6e9960a138d882816d0adaa157"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\dashboard-chat-client.tsx": {
+    "mtime": 1782553842.4485953,
+    "hash": "ace9c42b7f2507e396482c09204c0c6f"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\error.tsx": {
+    "mtime": 1782976277.145545,
+    "hash": "c9f4ae813c4b0558657757933fbcf898"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\layout.tsx": {
+    "mtime": 1782976277.1520705,
+    "hash": "1ef3a18b3b3086854797a05c7d92ee9f"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\nav.tsx": {
+    "mtime": 1782896068.4178326,
+    "hash": "e2a7b3967f458230a9e4bc82d9e47691"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\page.tsx": {
+    "mtime": 1782976277.1603663,
+    "hash": "83a50e2cf6143d1df348d528caaa1ebb"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\analytics\\page.tsx": {
+    "mtime": 1782301575.6157236,
+    "hash": "83690c00d730d7007eb109402f1f72d4"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\ats-score\\page.tsx": {
+    "mtime": 1782301575.617737,
+    "hash": "b8a7fe249075b91df4fd8393256f0416"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\profile\\page.tsx": {
+    "mtime": 1782896049.7472723,
+    "hash": "5fe3f583e8ce1aabe6bad79277523aff"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\resumes\\page.tsx": {
+    "mtime": 1782301575.6575787,
+    "hash": "58cd6f2e5e52b7f329284cb8a2ab2c91"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\roles\\page.tsx": {
+    "mtime": 1782301575.6575787,
+    "hash": "a3a248889d2d37f16b8385f470259dd4"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\settings\\page.tsx": {
+    "mtime": 1782301575.673376,
+    "hash": "a95cce70afb43c8500e931f6e7604140"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\dashboard\\templates\\page.tsx": {
+    "mtime": 1782978886.372867,
+    "hash": "ffa04d521946a5385a061f31a6f04936"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\history\\error.tsx": {
+    "mtime": 1782976277.1718946,
+    "hash": "c9f4ae813c4b0558657757933fbcf898"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\history\\layout.tsx": {
+    "mtime": 1782976277.1750488,
+    "hash": "18af6c0acd22989b1f7f9ce09dea2feb"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\history\\page.tsx": {
+    "mtime": 1782932166.8867395,
+    "hash": "a9388c40ade1f573fe0ecd13e90124d3"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\onboarding\\error.tsx": {
+    "mtime": 1782976277.18694,
+    "hash": "c9f4ae813c4b0558657757933fbcf898"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\onboarding\\page.tsx": {
+    "mtime": 1782976277.1930127,
+    "hash": "0bc8649d22df1c8ccc6fd45cd1ea21a9"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\profile\\error.tsx": {
+    "mtime": 1782976277.1970122,
+    "hash": "c9f4ae813c4b0558657757933fbcf898"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\profile\\layout.tsx": {
+    "mtime": 1782976277.2020237,
+    "hash": "fdf2c6a755495459f74af79faff7f154"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\profile\\page.tsx": {
+    "mtime": 1782976277.4773626,
+    "hash": "04ac87fd53cfa8058fb6993c2a703c87"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\tailor\\error.tsx": {
+    "mtime": 1782976277.214148,
+    "hash": "c9f4ae813c4b0558657757933fbcf898"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\tailor\\layout.tsx": {
+    "mtime": 1782976277.2186992,
+    "hash": "9384f2ea053449fc7c382e267f773f45"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\tailor\\page.tsx": {
+    "mtime": 1782976277.2289114,
+    "hash": "44afeddccb5aaf90bb446545696df3a2"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\tailor\\builder\\layout.tsx": {
+    "mtime": 1782517779.3448017,
+    "hash": "264be2c00e0344783e20e6911527571e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\app\\tips\\page.tsx": {
+    "mtime": 1782517779.3626308,
+    "hash": "bf6afd430f998ce96ee9e10c2eff7567"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ai-assisted-content.tsx": {
+    "mtime": 1782932166.9126215,
+    "hash": "b553a3aed30e0145bc6d53d9eb036403"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\sign-in-button.tsx": {
+    "mtime": 1782301575.7888148,
+    "hash": "190037af8b8260ce1a1d46f4c27e9126"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\theme-toggle.tsx": {
+    "mtime": 1782301575.800643,
+    "hash": "5acd79c23e542299d9ff48d232b5ff10"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\ChatContainer.tsx": {
+    "mtime": 1782932166.926211,
+    "hash": "02aef143b52c64153457d6b2d01b91f0"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\ChatInput.tsx": {
+    "mtime": 1782517793.667699,
+    "hash": "75c8bc43ed06f3c3c9a2ff99b66e181b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\MessageBubble.tsx": {
+    "mtime": 1782978776.1217027,
+    "hash": "1797c40b0899b5c5435f9fe33d5e9868"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\widgets\\DashboardCompletenessWidget.tsx": {
+    "mtime": 1782517779.4010215,
+    "hash": "651f4b93370c863fff3a7aff02b091de"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\widgets\\DashboardQuickActionsWidget.tsx": {
+    "mtime": 1782896063.926916,
+    "hash": "4945ff6736a59d98bd9c2bdcca8e2944"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\widgets\\DashboardStatsWidget.tsx": {
+    "mtime": 1782517779.4173613,
+    "hash": "55846f5e484b02b3c5cfb51e47dc94b9"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\widgets\\DashboardWelcomeWidget.tsx": {
+    "mtime": 1782517779.4233627,
+    "hash": "2e8034ba06984766aa43333262faf1a4"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\widgets\\ProfileSectionEditor.tsx": {
+    "mtime": 1782976310.7778356,
+    "hash": "75d38de1032ad1556c9e6069f55701ab"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\widgets\\ResumeUploadWidget.tsx": {
+    "mtime": 1782932166.9461553,
+    "hash": "f07926882e146e33ec2fd7a1cd819702"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\widgets\\TailoringChecklistWidget.tsx": {
+    "mtime": 1782517779.4627967,
+    "hash": "b077815278459b0314abf12f3a503eca"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\widgets\\TailorInputWidget.tsx": {
+    "mtime": 1782517779.4444294,
+    "hash": "e71e84bbe27ba0debb6781bb6c88a26c"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\chat\\widgets\\TailorResultWidget.tsx": {
+    "mtime": 1782932166.9511552,
+    "hash": "778b26a93e7a3fe5e195f4e66441f16a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\generate\\BulletChecklist.tsx": {
+    "mtime": 1782932166.9593687,
+    "hash": "3c3aeb30484295ad8ab9dcb81a8483b8"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\generate\\BulletSelectionPanel.tsx": {
+    "mtime": 1782517779.4675615,
+    "hash": "93c2804f1baf4ae2915b8b83b69aae7a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\generate\\ChatComposer.tsx": {
+    "mtime": 1782932166.9680765,
+    "hash": "5475eb092d5f178a3e80723aaaeadb4d"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\generate\\GenerateChatWorkspace.tsx": {
+    "mtime": 1782932166.9725947,
+    "hash": "63fafafd5e25ebfe34e02c7b8c08fbf6"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\generate\\JDInputPanel.tsx": {
+    "mtime": 1782976277.2455087,
+    "hash": "a4f8c41961a38cce22c8d6bb22b2e003"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\generate\\JobDetailsForm.tsx": {
+    "mtime": 1782932166.987499,
+    "hash": "07daaa093edbe885e65c745e9ad117b1"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\generate\\PdfPreviewPanel.tsx": {
+    "mtime": 1782517779.4895616,
+    "hash": "d537d29636f3e54ec7b4b423904c4672"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\generate\\useTailorChat.ts": {
+    "mtime": 1782976277.2517571,
+    "hash": "b8d43bbcc3e4d6d7be76129b3a11b91d"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\layout\\app-layout.tsx": {
+    "mtime": 1782932167.0035174,
+    "hash": "a8fb5a62fc3d51342ba6c1a5b761cd37"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\layout\\auth-layout.tsx": {
+    "mtime": 1782301575.7687635,
+    "hash": "5a61ded4fd5df5f987fac1495e139599"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\layout\\mobile-nav.tsx": {
+    "mtime": 1782896059.1155944,
+    "hash": "1d561160273539b7aaff4566730cc4b1"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\layout\\sidebar.tsx": {
+    "mtime": 1782983752.047294,
+    "hash": "225e41e593f026260e589f83b5660b38"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\profile\\EditEntryDialog.tsx": {
+    "mtime": 1782985718.6194866,
+    "hash": "bd68cf8c32e29d5f89601ec1ad815a68"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\profile\\ProfileAccordionList.tsx": {
+    "mtime": 1782985740.2777276,
+    "hash": "d08a9813e00b1c091e8aa0ec0dd77884"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\profile\\ProfileChatWorkspace.tsx": {
+    "mtime": 1782976277.260789,
+    "hash": "38d0a918c2ab3a8354273373f54f003e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\profile\\ProfileGenerationCard.tsx": {
+    "mtime": 1782978883.6543398,
+    "hash": "f24bce639d37c988ec62e420771755c3"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\profile\\ProfileVaultPanel.tsx": {
+    "mtime": 1782985770.6454127,
+    "hash": "50fd25aecdfb65b14f7e5dbcd4fc1233"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\animated-list.tsx": {
+    "mtime": 1782978877.1027741,
+    "hash": "3df67e7241c0170ddc3d78d1ac5ced76"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\avatar.tsx": {
+    "mtime": 1782301575.800643,
+    "hash": "dde71bbb175b5fc6f11caf4aba0060e1"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\badge.tsx": {
+    "mtime": 1782301575.816786,
+    "hash": "af94ac38ae7e5b00341451a77126d4b9"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\border-glow.tsx": {
+    "mtime": 1782978755.8196921,
+    "hash": "0251486d6b433b48b303141daf55272f"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\bullet-list.tsx": {
+    "mtime": 1782204080.858056,
+    "hash": "e7e320a110db1fc02f22c4dee1c2128e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\button.tsx": {
+    "mtime": 1782301575.816786,
+    "hash": "2c6d2b8ad688a803621856dd1542d417"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\card.tsx": {
+    "mtime": 1782301575.8328073,
+    "hash": "2ae26eeb24955835690f57986d322490"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\chroma-grid.tsx": {
+    "mtime": 1782978763.118272,
+    "hash": "4762092a23126434598ca2b2bb905e8b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\dialog.tsx": {
+    "mtime": 1782301575.8328073,
+    "hash": "2542776872c2c291cd24c133deea4de4"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\field.tsx": {
+    "mtime": 1782204080.8712647,
+    "hash": "166c3e80e50ac43004238d4bed884603"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\input.tsx": {
+    "mtime": 1782301575.8485951,
+    "hash": "5d8a17e1873b44da43ea97c28b90622e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\overleaf-button.tsx": {
+    "mtime": 1782204081.542477,
+    "hash": "54f0c7d4cb0f6257913585cc9d12db5b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\progress.tsx": {
+    "mtime": 1782301575.8485951,
+    "hash": "b8518215c47a4f7d0a7f0405d83c391b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\section-card.tsx": {
+    "mtime": 1782204080.8796582,
+    "hash": "de742cf4d5d27afcb8c15e2fdefc9c5a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\separator.tsx": {
+    "mtime": 1782301575.8702922,
+    "hash": "c4b6ead36ed18737673fde4a158ffa03"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\skeleton.tsx": {
+    "mtime": 1782301575.8743258,
+    "hash": "35f4550c0a6161d270078deb3ce90939"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\splitter.tsx": {
+    "mtime": 1782517779.5178032,
+    "hash": "1ae63a50ba80a0e674939adc9c297e30"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\textarea.tsx": {
+    "mtime": 1782301575.880775,
+    "hash": "618765fed36839f1adb01554abe3d324"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\components\\ui\\tooltip.tsx": {
+    "mtime": 1782301575.880775,
+    "hash": "f429fbca85a0a000068bbb7beed26e49"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\config\\api-client-server.ts": {
+    "mtime": 1782976277.2758412,
+    "hash": "5b2a1e762404b01157fd1a36d79476e0"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\config\\api-client.ts": {
+    "mtime": 1782932167.0384402,
+    "hash": "acd9abf57e0d2f25b24c25843884c6fe"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\config\\auth-client.ts": {
+    "mtime": 1782233817.8088858,
+    "hash": "0563ee2c86c757e69966a142a1a7ca6e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\lib\\normalize-profile.ts": {
+    "mtime": 1782976277.280892,
+    "hash": "94c989b5eeb2568745e187b77e19124d"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\lib\\use-local-storage.ts": {
+    "mtime": 1782932167.057534,
+    "hash": "33da4deb1bcaf9ccb1b1bfc1f898ea13"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\lib\\utils.ts": {
+    "mtime": 1782301575.8966615,
+    "hash": "fc3187bd36834531496a6352b859de4c"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\store\\useBuilderStore.ts": {
+    "mtime": 1782976277.2941554,
+    "hash": "1aeb5bb6af413019c61df682cf4b73bc"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\store\\useChatStore.ts": {
+    "mtime": 1782932167.0720468,
+    "hash": "e27ebd15c26e0136ba6d4971fb5df969"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\src\\store\\useProfileStore.ts": {
+    "mtime": 1782985660.8383615,
+    "hash": "518e5e813e3b11bd5791f048c0413b9d"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\tests\\auth-flow.test.ts": {
+    "mtime": 1782301575.9125926,
+    "hash": "a2c2fbeb0d7ad6505c8ff14fe187790a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\tests\\auth-redirect.test.ts": {
+    "mtime": 1782301575.9125926,
+    "hash": "4f0525aea7fc577dad16b646637e2cb6"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\tests\\backend-integration.test.ts": {
+    "mtime": 1782517779.5499904,
+    "hash": "8fb45880be9aa6cfe693f9f66334100a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\tests\\normalize-profile.test.ts": {
+    "mtime": 1782976277.302142,
+    "hash": "06701f1a5f7b98addf51e1223d7b3a50"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\tests\\profile-section-editor.test.tsx": {
+    "mtime": 1782517779.5650558,
+    "hash": "19f280dc13c18619ed8f38f3ae6a2c07"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\tests\\sign-in-button.test.tsx": {
+    "mtime": 1782301575.9283562,
+    "hash": "2beff2e784aca076cb0d85d8b560844b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\tests\\use-builder-store.test.ts": {
+    "mtime": 1782976277.3072479,
+    "hash": "30cec5eaca2be294585a6da46f968af9"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\tests\\use-chat-store.test.ts": {
+    "mtime": 1782976277.3215897,
+    "hash": "f9bfe2b2abcb6192fac4f28867f8cc61"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\tests\\use-local-storage.test.ts": {
+    "mtime": 1782976277.3255906,
+    "hash": "bb4b2dd0734037f86a8de08c02b1ff1c"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\tests\\utils.test.ts": {
+    "mtime": 1782976277.3306406,
+    "hash": "96bccf7a4d1b79096fc449de5efd4f6f"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\packages\\shared\\vitest.config.ts": {
+    "mtime": 1782976277.402683,
+    "hash": "58ea110b5b05b7d1028a0b4019ea7462"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\packages\\shared\\src\\index.ts": {
+    "mtime": 1782976277.3953779,
+    "hash": "cc2b44264eaf69eea8a58afbaec050e2"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\packages\\shared\\src\\__tests__\\schemas.test.ts": {
+    "mtime": 1782976277.3923793,
+    "hash": "6153f1d96bf8bffe2bec5417402f6f0a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\scripts\\smoke-test.mjs": {
+    "mtime": 1782517779.6134634,
+    "hash": "08b10458ab38813ce9941c7c0f42e64f"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\AGENTS.md": {
+    "mtime": 1782567809.6820803,
+    "hash": "24631fb35f52760dbaed79d183cffdc7"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\CLAUDE.md": {
+    "mtime": 1782204080.0403214,
+    "hash": "771faa62feb60b7de901a397aebb29b0"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\CONTRIBUTING.md": {
+    "mtime": 1782204082.2402818,
+    "hash": "b99bc9658f02c2a16f819ecfffefdabd"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\development_log.md": {
+    "mtime": 1782517779.249596,
+    "hash": "bd1e5de2bc71c573b899fc24ec07bfe3"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docker-compose.yml": {
+    "mtime": 1782932166.831169,
+    "hash": "413da883e12c4904505d65b59cb2ee0a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\implementation_plan.md": {
+    "mtime": 1782978648.9876997,
+    "hash": "4768827900a08746c6c6a727eb9bd468"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\oncampus_profile_requirements.md": {
+    "mtime": 1782204080.1284797,
+    "hash": "0dcd89bc4612e278f53f51072dffbf17"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\plan.md": {
+    "mtime": 1782517779.6010377,
+    "hash": "017ff02165e3509aecf986f553ef0ce4"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\product_documentation.md": {
+    "mtime": 1782204080.2080758,
+    "hash": "bb84526e684df44d935cd60968e794c7"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\README.md": {
+    "mtime": 1782517793.607555,
+    "hash": "7d0938c300f476ae3a69b6a9df297857"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\render.yaml": {
+    "mtime": 1782976277.4056633,
+    "hash": "b53c70cc91e8250fd7c8704d1fbe11a5"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\archived_v1_docs\\functional_workflow.md": {
+    "mtime": 1782204079.791375,
+    "hash": "b75aaa979d2688eafdc4dedb2cf36ce5"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\archived_v1_docs\\implementation_plan.md": {
+    "mtime": 1782204079.7999058,
+    "hash": "e3450464d51bcb1a43f4ab0f1257782d"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\archived_v1_docs\\oncampus_profile_requirements.md": {
+    "mtime": 1782204079.8196585,
+    "hash": "8a157803a4e7d4fc48cc0127aa67c12c"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\archived_v1_docs\\README_AGENT.md": {
+    "mtime": 1782204079.768936,
+    "hash": "9ab6df75e3086a3f66f28c6efe394054"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\archived_v1_docs\\Resume_Database_README.md": {
+    "mtime": 1782517779.0349646,
+    "hash": "b6ca1c54f569d7f4558aa2be5919e363"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\archived_v1_docs\\Resume_Edit_Rules.md": {
+    "mtime": 1782204079.7838116,
+    "hash": "8979ac736a3463c07a861c73d04a266b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\archived_v1_docs\\walkthrough.md": {
+    "mtime": 1782204079.8438284,
+    "hash": "da31344f9e4d550794c7ad1bf3a2bcaa"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\ai_project_generation_prompt.md": {
+    "mtime": 1782204080.6535974,
+    "hash": "d32f6c2e441ba3cd0e9e21f979173e14"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\bug_fixes.md": {
+    "mtime": 1782548465.933363,
+    "hash": "979c06c7a0fd558a761e8b8fea7136c4"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\chat_interface_planning.md": {
+    "mtime": 1782517779.2555945,
+    "hash": "bf5712756e814174ca57463a591935ee"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\clean_architecture_prompt.md": {
+    "mtime": 1782204082.2517402,
+    "hash": "3ac3f3d17d87c9450fb702728536b87a"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\data_saving_planning.md": {
+    "mtime": 1782517779.2642403,
+    "hash": "989af4f8f74da942e0c228b3db158a07"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\deployment_checklist.md": {
+    "mtime": 1782517779.2672806,
+    "hash": "5e4a8a304a4565105f4a57d2a09e62f8"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\feature_checklist.md": {
+    "mtime": 1782517779.272127,
+    "hash": "436d2acbf41184cd5ed542fd75428dd8"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\fix_onboarding_prompt.md": {
+    "mtime": 1782554070.7871785,
+    "hash": "92eeb65168b96fc16021735956f8924d"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\fix_render_errors_prompt.md": {
+    "mtime": 1782556446.592607,
+    "hash": "5bc2982dbf66d4fee11e74e29d256094"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\fix_tailor_prompt.md": {
+    "mtime": 1782554896.2946644,
+    "hash": "da39c377219d3e4785bd1e6b74e239f4"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\image_generation_prompt.md": {
+    "mtime": 1782204080.6754646,
+    "hash": "517ae0535c510b7d164eddabba64462e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\opencode_implementation_prompt.md": {
+    "mtime": 1782204080.6810522,
+    "hash": "028001acee5f4ca977d55a975d27090c"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\overleaf_implementation_prompt.md": {
+    "mtime": 1782204081.487786,
+    "hash": "b9ac1cbe7522a935bf80c4ee42b4f719"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\phase_1_auth_and_parsing.md": {
+    "mtime": 1782517779.2777224,
+    "hash": "06809823224783d31f31d533b1784f4c"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\phase_2_profile_dashboard.md": {
+    "mtime": 1782204080.709644,
+    "hash": "b90c4003abe541cf534c4d2264b3a222"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\phase_3_resume_tailoring.md": {
+    "mtime": 1782517779.283837,
+    "hash": "9734de1215d5cc9e470bee20f2cef156"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\phase_4_history_templates.md": {
+    "mtime": 1782204080.0959268,
+    "hash": "55b05cf1d5bc32d66734b2cdf4a2e36b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\render_deployment_fix_prompt.md": {
+    "mtime": 1782233817.5910213,
+    "hash": "5d1122cfb14bc344589d91d81e056189"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\ui_design.md": {
+    "mtime": 1782517779.2888381,
+    "hash": "20c20d5d8d502b54a3f5a02a4b258ade"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\user_data_lifecycle.md": {
+    "mtime": 1782204080.1029243,
+    "hash": "e90177e571bc4454ce3ea67aad170eda"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\docs\\vercel_deployment.md": {
+    "mtime": 1782233817.6000237,
+    "hash": "8562d1f3ddcee532b5d8fcf7eb6b3617"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\skills\\graphify\\SKILL.md": {
+    "mtime": 1782204080.7755978,
+    "hash": "7389845b8591161652143890a02b9ac4"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\Trial Base\\README_AGENT.md": {
+    "mtime": 1782517779.0130682,
+    "hash": "9ab6df75e3086a3f66f28c6efe394054"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\Trial Base\\Resume_Database_README.md": {
+    "mtime": 1782517779.0170672,
+    "hash": "59de9acfb4fa9ebbcb4aff35ea051a9e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\Trial Base\\Resume_Edit_Rules.md": {
+    "mtime": 1782517779.0245235,
+    "hash": "8979ac736a3463c07a861c73d04a266b"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\archived_v1_docs\\unified_capabilities_infographic.png": {
+    "mtime": 1782204079.8438284,
+    "hash": "095642150277da680519af39d1846298"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\latex\\templates\\ats-clean\\NSUT_logo.png": {
+    "mtime": 1782517779.1570568,
+    "hash": "7f81034fc16a3c345308ef92db54a8a6"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\backend\\src\\infrastructure\\latex\\templates\\nsut-canonical\\NSUT_logo.png": {
+    "mtime": 1782517779.206964,
+    "hash": "7f81034fc16a3c345308ef92db54a8a6"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\public\\file.svg": {
+    "mtime": 1782204080.2179854,
+    "hash": "d09f95206c3fa0bb9bd9fefabfd0ea71"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\public\\globe.svg": {
+    "mtime": 1782204080.2247481,
+    "hash": "2aaafa6a49b6563925fe440891e32717"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\public\\next.svg": {
+    "mtime": 1782204080.2326736,
+    "hash": "8e061864f388b47f33a1c3780831193e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\public\\vercel.svg": {
+    "mtime": 1782204080.2397027,
+    "hash": "c0af2f507b369b085b35ef4bbe3bcf1e"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\frontend\\public\\window.svg": {
+    "mtime": 1782204080.2442217,
+    "hash": "a2760511c65806022ad20adf74370ff3"
+  },
+  "C:\\Users\\Dushy\\OneDrive\\Desktop\\Projects\\resumemint\\Trial Base\\NSUT_logo.png": {
+    "mtime": 1782517779.0120673,
+    "hash": "7f81034fc16a3c345308ef92db54a8a6"
+  }
+}

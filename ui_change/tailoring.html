@@ -1,0 +1,430 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ResumeMint — Tailoring Builder</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<style>
+@import url('https://fonts.cdnfonts.com/css/cabinet-grotesk');
+@import url('https://fonts.cdnfonts.com/css/satoshi');
+
+:root {
+  --bg: #09090b; --surface: #0c0c0e; --card: #141417; --muted: #1a1a1e;
+  --fg: #f2f2f4; --fg-2: #e4e4e7; --muted-fg: #a1a1aa; --meta: #71717a;
+  --border: #27272b; --border-soft: #1e1e22;
+  --accent: #16a34a; --accent-hover: #15803d; --accent-soft: rgba(22,163,74,0.12);
+  --success: #22c55e; --success-soft: rgba(34,197,94,0.12);
+  --warn: #f59e0b; --danger: #ef4444;
+  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+  --font-display: 'Cabinet Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Satoshi', 'Inter', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --sidebar-w: 228px;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); min-height: 100vh; overflow: hidden; }
+.glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255,255,255,0.06); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.4); }
+.glass-heavy { background: rgba(255,255,255,0.07); backdrop-filter: blur(24px) saturate(180%); border: 1px solid rgba(255,255,255,0.08); }
+.bg-orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(80px); }
+@keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+
+</style>
+</head>
+<body>
+<div class="bg-orb" style="top:-6%;right:-3%;width:350px;height:350px;background:radial-gradient(circle,rgba(22,163,74,0.06) 0%,transparent 70%);"></div>
+<div id="root" style="position:relative;z-index:1;height:100vh;"></div>
+<script type="text/babel">
+const { useState, useEffect, useRef, useCallback } = React;
+
+/* ─── Sidebar ─────────────────────────────────────── */
+function Sidebar({ activePage }) {
+  const navItems = [
+    { id:"home", icon:"\u25C9", label:"Home", href:"dashboard.html" },
+    { id:"vault", icon:"\u25C6", label:"Career Vault", href:"career-vault.html" },
+    { id:"tailor", icon:"\u25B6", label:"Tailor", href:"tailoring.html" },
+    { id:"history", icon:"\u25CB", label:"History", href:"#" },
+  ];
+  const bottomItems = [{ id:"settings", icon:"\u2699", label:"Settings", href:"#" }];
+  return (
+    <div style={{ width:"var(--sidebar-w)", height:"100vh", display:"flex", flexDirection:"column", background:"var(--card)", borderRight:"1px solid var(--border-soft)", position:"fixed", left:0, top:0, zIndex:50, overflow:"hidden" }}>
+      <div style={{ padding:"1.25rem 1.25rem 0.75rem", borderBottom:"1px solid var(--border-soft)" }}>
+        <a href="index.html" style={{ fontFamily:"var(--font-display)", fontWeight:800, fontSize:"1.25rem", letterSpacing:"-0.03em", color:"var(--fg)", textDecoration:"none", display:"inline-flex", alignItems:"center", gap:8 }}>
+          <span style={{ width:24, height:24, borderRadius:"var(--radius-sm)", background:"linear-gradient(135deg,#16a34a,#22c55e)", display:"inline-flex", alignItems:"center", justifyContent:"center", fontSize:"0.75rem", color:"white" }}>M</span>
+          ResumeMint
+        </a>
+        <p style={{ fontSize:"0.6875rem", color:"var(--meta)", marginTop:2 }}>Your career command center</p>
+      </div>
+      <nav style={{ flex:1, overflowY:"auto", padding:"0.5rem 0.75rem" }}>
+        {navItems.map((item) => {
+          const isActive = item.id === activePage;
+          return (<a key={item.id} href={item.href} style={{ display:"flex", alignItems:"center", gap:10, padding:"0.5rem 0.75rem", borderRadius:"var(--radius-md)", marginBottom:2, fontSize:"0.875rem", fontWeight:isActive?600:400, color:isActive?"var(--accent)":"var(--muted-fg)", background:isActive?"var(--accent-soft)":"transparent", textDecoration:"none", transition:"all 0.15s ease", position:"relative" }}>
+            <span style={{ fontSize:"0.875rem", width:18, textAlign:"center" }}>{item.icon}</span>
+            {item.label}
+            {isActive && <span style={{ position:"absolute", left:0, top:"25%", bottom:"25%", width:3, borderRadius:99, background:"var(--accent)" }} />}
+          </a>);
+        })}
+      </nav>
+      <div style={{ borderTop:"1px solid var(--border-soft)", padding:"0.5rem 0.75rem" }}>
+        {bottomItems.map((item) => (<a key={item.id} href={item.href} style={{ display:"flex", alignItems:"center", gap:10, padding:"0.5rem 0.75rem", borderRadius:"var(--radius-md)", fontSize:"0.875rem", color:"var(--muted-fg)", textDecoration:"none", transition:"all 0.15s ease" }}>
+          <span style={{ fontSize:"0.875rem", width:18, textAlign:"center" }}>{item.icon}</span>{item.label}
+        </a>))}
+        <div style={{ display:"flex", alignItems:"center", gap:10, padding:"0.625rem 0.75rem", marginTop:4, borderRadius:"var(--radius-md)", background:"var(--surface)" }}>
+          <div style={{ width:28, height:28, borderRadius:"50%", background:"linear-gradient(135deg,#16a34a,#22c55e)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.6875rem", fontWeight:600, color:"white", flexShrink:0 }}>AD</div>
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ fontSize:"0.8125rem", fontWeight:500, color:"var(--fg)" }}>Alex D.</div>
+            <div style={{ fontSize:"0.6875rem", color:"var(--meta)" }}>alex@example.com</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Impact Badge ─────────────────────────────────── */
+function ImpactBadge({ label, active }) {
+  const colors = {
+    Metrics: ["rgba(34,197,94,0.12)","#22c55e"], Leadership: ["rgba(22,163,74,0.12)","#4ade80"],
+    Architecture: ["rgba(59,130,246,0.12)","#60a5fa"], "AI/ML": ["rgba(245,158,11,0.12)","#fbbf24"],
+    Design: ["rgba(168,85,247,0.12)","#c084fc"], Optimization: ["rgba(6,182,212,0.12)","#22d3ee"],
+    Collaboration: ["rgba(236,72,153,0.12)","#f472b6"], Accessibility: ["rgba(52,211,153,0.12)","#34d399"]
+  };
+  const c = colors[label] || ["var(--muted)","var(--muted-fg)"];
+  return <span style={{ padding:"2px 8px", borderRadius:"var(--radius-pill)", fontSize:"0.5625rem", fontWeight:500, background: active ? c[0] : "var(--muted)", color: active ? c[1] : "var(--muted-fg)", whiteSpace:"nowrap" }}>{label}</span>;
+}
+
+/* ─── Splitter ─────────────────────────────────────── */
+function Splitter({ onResize }) {
+  const dragging = useRef(false);
+  const startX = useRef(0);
+
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (!dragging.current) return;
+      const dx = e.clientX - startX.current;
+      startX.current = e.clientX;
+      onResize(dx);
+    };
+    const handleMouseUp = () => { dragging.current = false; document.body.style.cursor = ""; document.body.style.userSelect = ""; };
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+    return () => { window.removeEventListener("mousemove", handleMouseMove); window.removeEventListener("mouseup", handleMouseUp); };
+  }, [onResize]);
+
+  const handleMouseDown = (e) => {
+    dragging.current = true;
+    startX.current = e.clientX;
+    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none";
+  };
+
+  return (
+    <div onMouseDown={handleMouseDown} style={{ width:8, cursor:"col-resize", display:"flex", alignItems:"center", justifyContent:"center", background:"transparent", flexShrink:0, position:"relative", zIndex:10 }}>
+      <div style={{ width:2, height:32, borderRadius:99, background:"var(--border)", transition:"background 0.15s, height 0.15s" }}
+        onMouseEnter={(e) => { e.currentTarget.style.background = "var(--accent)"; e.currentTarget.style.height = "64px"; }}
+        onMouseLeave={(e) => { e.currentTarget.style.background = "var(--border)"; e.currentTarget.style.height = "32px"; }} />
+    </div>
+  );
+}
+
+/* ─── Checklist Item (expandable) ──────────────────── */
+function ChecklistItem({ exp, selectedBullets, onToggle }) {
+  const [expanded, setExpanded] = useState(true);
+  const selCount = selectedBullets.filter((id) => exp.bullets.some((b) => b.id === id)).length;
+  return (
+    <div className="glass" style={{ borderRadius:"var(--radius-md)", overflow:"hidden" }}>
+      <div onClick={() => setExpanded(!expanded)} style={{ padding:"0.625rem 0.875rem", display:"flex", alignItems:"center", justifyContent:"space-between", cursor:"pointer" }}>
+        <div>
+          <div style={{ fontSize:"0.75rem", fontWeight:600, fontFamily:"var(--font-display)", color:"var(--fg)" }}>{exp.role}</div>
+          <div style={{ fontSize:"0.625rem", color:"var(--accent)" }}>{exp.company}</div>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:6 }}>
+          <span style={{ fontSize:"0.625rem", color:"var(--accent)", fontWeight:500 }}>{selCount}/{exp.bullets.length}</span>
+          <span style={{ fontSize:"0.5625rem", color:"var(--meta)", transform: expanded ? "rotate(180deg)" : "none", transition:"transform 0.2s" }}>&#9660;</span>
+        </div>
+      </div>
+      {expanded && (
+        <div style={{ borderTop:"1px solid var(--border-soft)", padding:"0.375rem 0.625rem", display:"flex", flexDirection:"column", gap:"0.25rem" }}>
+          {exp.bullets.map((bullet) => {
+            const isSelected = selectedBullets.includes(bullet.id);
+            return (
+              <label key={bullet.id} style={{ display:"flex", gap:"0.5rem", alignItems:"flex-start", padding:"0.375rem 0.5rem", borderRadius:"var(--radius-sm)", cursor:"pointer", background: isSelected ? "var(--accent-soft)" : "transparent", transition:"background 0.15s" }}>
+                <input type="checkbox" checked={isSelected} onChange={() => onToggle(exp.id, bullet.id)}
+                  style={{ marginTop:3, accentColor:"var(--accent)", width:13, height:13, cursor:"pointer", flexShrink:0 }} />
+                <div style={{ flex:1 }}>
+                  <span style={{ fontSize:"0.6875rem", color: isSelected ? "var(--fg)" : "var(--muted-fg)", lineHeight:1.5 }}>{bullet.text}</span>
+                  <div style={{ display:"flex", gap:3, marginTop:3, flexWrap:"wrap" }}>
+                    {bullet.badges.map((b) => <ImpactBadge key={b} label={b} active={isSelected} />)}
+                  </div>
+                </div>
+              </label>
+            );
+          })}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ─── Center Panel — Chat Workspace ─────────────────── */
+function GenerateChatWorkspace({ experiences, selectedBullets, onToggle, onAnalyze, jobDesc }) {
+  const [jdInput, setJdInput] = useState(jobDesc);
+
+  return (
+    <div style={{ height:"100%", display:"flex", flexDirection:"column", overflow:"hidden" }}>
+      <div style={{ padding:"1rem 1.25rem 0.625rem", borderBottom:"1px solid var(--border-soft)" }}>
+        <h2 style={{ fontFamily:"var(--font-display)", fontSize:"1rem", fontWeight:700, letterSpacing:"-0.02em" }}>
+          Tailoring <span style={{ color:"var(--accent)", fontWeight:700 }}>Workspace</span>
+        </h2>
+        <p style={{ fontSize:"0.6875rem", color:"var(--muted-fg)", marginTop:2 }}>Chat-driven bullet selection for your target role.</p>
+      </div>
+
+      <div style={{ padding:"0.625rem 1.25rem", borderBottom:"1px solid var(--border-soft)" }}>
+        <label style={{ fontSize:"0.6875rem", fontWeight:500, color:"var(--muted-fg)", display:"block", marginBottom:4 }}>Job Description</label>
+        <textarea value={jdInput} onChange={(e) => setJdInput(e.target.value)}
+          placeholder="Paste a job description to auto-select matching bullets..."
+          rows={2}
+          style={{ width:"100%", padding:"0.5rem 0.75rem", borderRadius:"var(--radius-sm)", background:"var(--surface)", border:"1px solid var(--border)", color:"var(--fg)", fontSize:"0.6875rem", fontFamily:"var(--font-body)", outline:"none", resize:"vertical", lineHeight:1.5 }}
+          onFocus={(e) => e.currentTarget.style.borderColor="var(--accent)"}
+          onBlur={(e) => e.currentTarget.style.borderColor="var(--border)"} />
+        <button onClick={() => onAnalyze(jdInput)} style={{ marginTop:"0.375rem", padding:"5px 14px", borderRadius:"var(--radius-sm)", background:"var(--accent)", border:"none", color:"white", fontSize:"0.6875rem", fontWeight:600, cursor:"pointer", fontFamily:"inherit", width:"100%", transition:"opacity 0.15s" }}
+          onMouseEnter={(e) => e.currentTarget.style.opacity="0.85"} onMouseLeave={(e) => e.currentTarget.style.opacity="1"}>
+          Analyze &amp; Recommend
+        </button>
+      </div>
+
+      <div style={{ flex:1, overflowY:"auto", padding:"0.625rem 1.25rem", display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+        <div style={{ display:"flex", alignItems:"center", justifyContent:"space-between", marginBottom:"0.125rem" }}>
+          <span style={{ fontSize:"0.6875rem", color:"var(--muted-fg)", fontWeight:500 }}>Your Experience</span>
+          <span onClick={() => onAnalyze(jdInput)} style={{ fontSize:"0.625rem", color:"var(--accent)", cursor:"pointer", fontWeight:500 }}>Select all recommended</span>
+        </div>
+        {experiences.map((exp) => (
+          <ChecklistItem key={exp.id} exp={exp} selectedBullets={selectedBullets} onToggle={onToggle} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* ─── Preview Panel — Live PDF Renderer ────────────── */
+function PdfPreviewPanel({ selectedBullets, experiences }) {
+  const [compiling, setCompiling] = useState(false);
+
+  useEffect(() => {
+    setCompiling(true);
+    const t = setTimeout(() => setCompiling(false), 800);
+    return () => clearTimeout(t);
+  }, [selectedBullets]);
+
+  return (
+    <div style={{ height:"100%", display:"flex", flexDirection:"column", background:"#0c0c0f", position:"relative" }}>
+      <div style={{ padding:"0.625rem 1.25rem", borderBottom:"1px solid rgba(255,255,255,0.06)", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"0.5rem" }}>
+          <span style={{ color:"var(--success)", fontSize:"0.5rem" }}>&#9679;</span>
+          <span style={{ fontSize:"0.6875rem", color:"var(--muted-fg)", fontFamily:"var(--font-mono)", fontWeight:500 }}>
+            {compiling ? "Compiling..." : "Ready"}
+          </span>
+        </div>
+        <div style={{ display:"flex", alignItems:"center", gap:"0.5rem" }}>
+          <span style={{ fontSize:"0.625rem", color:"var(--meta)" }}>
+            {selectedBullets.length} bullets selected
+          </span>
+          <button style={{ padding:"4px 12px", borderRadius:"var(--radius-sm)", background:"var(--accent)", border:"none", color:"white", fontSize:"0.625rem", fontWeight:500, cursor:"pointer", fontFamily:"inherit", transition:"opacity 0.15s" }}
+            onMouseEnter={(e) => e.currentTarget.style.opacity="0.85"} onMouseLeave={(e) => e.currentTarget.style.opacity="1"}>Export PDF</button>
+        </div>
+      </div>
+
+      {compiling && (
+        <div style={{ position:"absolute", inset:0, zIndex:10, display:"flex", flexDirection:"column", gap:"0.75rem", padding:"2rem", background:"rgba(9,9,11,0.85)", backdropFilter:"blur(4px)" }}>
+          {[1,2,3,4,5].map((i) => (
+            <div key={i} style={{ height:10, borderRadius:4, background:"linear-gradient(90deg, var(--border) 0%, var(--muted) 50%, var(--border) 100%)", backgroundSize:"200% 100%", animation:"shimmer 1.2s ease-in-out infinite", width: `${60 + Math.random() * 30}%`, opacity: 1 - i * 0.12 }} />
+          ))}
+        </div>
+      )}
+
+      <div style={{ flex:1, overflow:"auto", padding:"1.5rem", display:"flex", justifyContent:"center" }}>
+        <div style={{ width:595, minHeight:842, background:"white", borderRadius:"4px", padding:"1.75rem 2rem", boxShadow:"0 4px 40px rgba(0,0,0,0.5)", color:"#1a1a1a", fontFamily:"'Inter', system-ui, sans-serif", fontSize:"10pt", lineHeight:1.4 }}>
+          <div style={{ textAlign:"center", marginBottom:"0.75rem", borderBottom:"1px solid #ddd", paddingBottom:"0.625rem" }}>
+            <div style={{ fontSize:"15pt", fontWeight:700, letterSpacing:"-0.02em", color:"#000", fontFamily:"'Cabinet Grotesk', system-ui, sans-serif" }}>Alex Dushy</div>
+            <div style={{ fontSize:"7.5pt", color:"#666", marginTop:3, display:"flex", justifyContent:"center", gap:12 }}>
+              <span>alex@example.com</span>
+              <span>San Francisco, CA</span>
+              <span>linkedin.com/in/alex</span>
+            </div>
+          </div>
+
+          <div style={{ marginBottom:"0.625rem" }}>
+            <div style={{ fontSize:"9pt", fontWeight:600, color:"#000", borderBottom:"1px solid #ddd", paddingBottom:"2px", marginBottom:"4px", textTransform:"uppercase", letterSpacing:"0.05em" }}>Professional Summary</div>
+            <p style={{ fontSize:"8pt", color:"#333", lineHeight:1.5, marginTop:3 }}>
+              Senior software engineer with 8+ years of experience building scalable distributed systems and leading cross-functional engineering teams. Proven track record in payment processing, real-time ML systems, and developer tooling.
+            </p>
+          </div>
+
+          <div style={{ marginBottom:"0.625rem" }}>
+            <div style={{ fontSize:"9pt", fontWeight:600, color:"#000", borderBottom:"1px solid #ddd", paddingBottom:"2px", marginBottom:"4px", textTransform:"uppercase", letterSpacing:"0.05em" }}>Experience</div>
+            {experiences.map((exp) => {
+              const shownBullets = exp.bullets.filter((b) => selectedBullets.includes(b.id));
+              if (shownBullets.length === 0) return null;
+              return (
+                <div key={exp.id} style={{ marginBottom:"0.5rem" }}>
+                  <div style={{ display:"flex", justifyContent:"space-between", alignItems:"baseline" }}>
+                    <div>
+                      <span style={{ fontWeight:700, color:"#000", fontSize:"8.5pt" }}>{exp.role}</span>
+                      <span style={{ color:"#555", fontSize:"8pt" }}> - {exp.company}</span>
+                    </div>
+                    <span style={{ fontSize:"7pt", color:"#888", whiteSpace:"nowrap" }}>{exp.startDate} - {exp.endDate}</span>
+                  </div>
+                  <ul style={{ margin:"3px 0 0 14px", padding:0, listStyle:"none" }}>
+                    {shownBullets.map((b, i) => (
+                      <li key={i} style={{ fontSize:"7.5pt", color:"#333", lineHeight:1.5, marginBottom:2, paddingLeft:8, position:"relative" }}>
+                        <span style={{ position:"absolute", left:0, color:"#888" }}>&#8226;</span>
+                        {b.text}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              );
+            })}
+          </div>
+
+          <div>
+            <div style={{ fontSize:"9pt", fontWeight:600, color:"#000", borderBottom:"1px solid #ddd", paddingBottom:"2px", marginBottom:"4px", textTransform:"uppercase", letterSpacing:"0.05em" }}>Skills</div>
+            <div style={{ fontSize:"7.5pt", color:"#333", lineHeight:1.6 }}>
+              <span style={{ fontWeight:500 }}>Languages: </span>TypeScript, Python, Go, SQL<br />
+              <span style={{ fontWeight:500 }}>Frameworks: </span>React, Next.js, Node.js, Express<br />
+              <span style={{ fontWeight:500 }}>Infrastructure: </span>Kafka, PostgreSQL, Docker, AWS<br />
+              <span style={{ fontWeight:500 }}>Practices: </span>System Design, CI/CD, Agile Leadership
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ─── EXPERIENCES Data ─────────────────────────────── */
+const EXPERIENCES = [
+  { id:"exp-1", company:"Stripe", role:"Staff Engineer", startDate:"Jan 2023", endDate:"Present",
+    bullets:[
+      { id:"b1", text:"Led redesign of payment processing pipeline, reducing latency by 40% across 12M+ daily transactions. {/* mock */}", badges:["Metrics","Leadership"] },
+      { id:"b2", text:"Architected real-time fraud detection system using ML models, preventing $2.3M in potential losses annually. {/* mock */}", badges:["Architecture","AI/ML"] },
+      { id:"b3", text:"Mentored 5 junior engineers through structured growth plans, resulting in 3 promotions within 18 months. {/* mock */}", badges:["Leadership","Collaboration"] },
+      { id:"b4", text:"Designed canary deployment framework reducing production incidents by 60%. {/* mock */}", badges:["Optimization","Architecture"] },
+    ]},
+  { id:"exp-2", company:"Vercel", role:"Senior Frontend Engineer", startDate:"Jun 2021", endDate:"Dec 2022",
+    bullets:[
+      { id:"b5", text:"Built edge-rendered dashboard framework serving 500K+ developers, improving Time-to-Interactive by 60%. {/* mock */}", badges:["Architecture","Metrics"] },
+      { id:"b6", text:"Designed template marketplace UI with 200+ community templates and one-click deploy. {/* mock */}", badges:["Design","Leadership"] },
+      { id:"b7", text:"Reduced bundle size by 45% through code-splitting and tree-shaking optimization. {/* mock */}", badges:["Metrics","Optimization"] },
+    ]},
+];
+
+/* ─── Main App — Split-Screen Builder ──────────────── */
+function App() {
+  const [selectedBullets, setSelectedBullets] = useState(["b1","b2","b3","b5","b7"]);
+  const [jobDesc, setJobDesc] = useState("");
+
+  const containerRef = useRef(null);
+  const centerPercent = useRef(55);
+  const STORAGE_KEY = "tailor-panel-widths";
+  const MIN_CENTER_PX = 360;
+  const MIN_PREVIEW_PX = 320;
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      if (saved) centerPercent.current = parseFloat(saved);
+    } catch {}
+    applyWidths();
+  }, []);
+
+  const applyWidths = useCallback(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    const containerW = container.getBoundingClientRect().width;
+    const centerEl = container.querySelector('[data-panel="center"]');
+    const previewEl = container.querySelector('[data-panel="preview"]');
+    if (!centerEl || !previewEl) return;
+    const centerPx = (centerPercent.current / 100) * containerW;
+    const clamped = Math.max(MIN_CENTER_PX, Math.min(centerPx, containerW - MIN_PREVIEW_PX));
+    centerEl.style.width = clamped + "px";
+    centerEl.style.flex = "none";
+    previewEl.style.flex = "1 1 0";
+    previewEl.style.minWidth = "0";
+  }, []);
+
+  useEffect(() => {
+    const onResize = () => applyWidths();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [applyWidths]);
+
+  const handleSplitter = useCallback((delta) => {
+    const container = containerRef.current;
+    if (!container) return;
+    const containerW = container.getBoundingClientRect().width;
+    if (containerW === 0) return;
+    const centerEl = container.querySelector('[data-panel="center"]');
+    if (!centerEl) return;
+    const currentCenterPx = centerEl.getBoundingClientRect().width;
+    const newCenterPx = Math.max(MIN_CENTER_PX, Math.min(currentCenterPx + delta, containerW - MIN_PREVIEW_PX));
+    const pct = (newCenterPx / containerW) * 100;
+    centerPercent.current = pct;
+    try { localStorage.setItem(STORAGE_KEY, String(pct)); } catch {}
+    centerEl.style.width = newCenterPx + "px";
+    centerEl.style.flex = "none";
+  }, []);
+
+  const handleToggle = (expId, bulletId) => {
+    setSelectedBullets((prev) =>
+      prev.includes(bulletId) ? prev.filter((id) => id !== bulletId) : [...prev, bulletId]
+    );
+  };
+
+  const handleAnalyze = (jd) => {
+    setJobDesc(jd);
+    setSelectedBullets(["b1","b2","b4","b5","b6","b7"]);
+  };
+
+  return (
+    <div style={{ display:"flex", height:"100vh" }}>
+      <div style={{ width:"var(--sidebar-w)", flexShrink:0 }}><Sidebar activePage="tailor" /></div>
+      <div ref={containerRef} style={{ flex:1, display:"flex", overflow:"hidden" }}>
+        {/* Center Panel — Chat Workspace */}
+        <div data-od-id="tailor-workspace" data-panel="center" style={{ display:"flex", flexDirection:"column", minWidth:0, borderRight:"1px solid var(--border-soft)", overflow:"hidden" }}>
+          <GenerateChatWorkspace
+            experiences={EXPERIENCES}
+            selectedBullets={selectedBullets}
+            onToggle={handleToggle}
+            onAnalyze={handleAnalyze}
+            jobDesc={jobDesc}
+          />
+        </div>
+
+        {/* Splitter */}
+        <Splitter onResize={handleSplitter} />
+
+        {/* Preview Panel — PDF Renderer */}
+        <div data-od-id="tailor-preview" data-panel="preview" style={{ display:"flex", flexDirection:"column", minWidth:0, overflow:"hidden" }}>
+          <PdfPreviewPanel experiences={EXPERIENCES} selectedBullets={selectedBullets} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

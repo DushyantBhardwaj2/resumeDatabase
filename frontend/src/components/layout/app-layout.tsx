@@ -17,12 +17,12 @@ export function AppLayout({ children, user }: AppLayoutProps) {
   const [sidebarCollapsed, setSidebarCollapsed] = useLocalStorage('sidebar-collapsed', true)
 
   return (
-    <div className="flex min-h-[100dvh] bg-surface">
+    <div className="flex min-h-[100dvh] bg-bg text-fg">
       {/* Desktop sidebar */}
       <div
         className={[
-          'hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 z-30 transition-all duration-200',
-          sidebarCollapsed ? 'lg:w-[56px]' : 'lg:w-[228px]',
+          'hidden lg:flex lg:flex-col lg:fixed lg:inset-y-0 lg:left-0 z-40 transition-all duration-300',
+          sidebarCollapsed ? 'lg:w-[72px]' : 'lg:w-[240px]',
         ].join(' ')}
       >
         <Sidebar
@@ -38,12 +38,12 @@ export function AppLayout({ children, user }: AppLayoutProps) {
       {/* Main content */}
       <main
         className={[
-          'flex-1 min-h-[100dvh] transition-all duration-200',
-          sidebarCollapsed ? 'lg:pl-[56px]' : 'lg:pl-[228px]',
+          'flex-1 min-h-[100dvh] transition-all duration-300 relative z-10',
+          sidebarCollapsed ? 'lg:pl-[72px]' : 'lg:pl-[240px]',
         ].join(' ')}
       >
         {/* pt-14 accounts for fixed mobile header; removed on desktop */}
-        <div className="pt-14 lg:pt-0">
+        <div className="pt-14 lg:pt-0 h-full flex flex-col">
           {children}
         </div>
       </main>

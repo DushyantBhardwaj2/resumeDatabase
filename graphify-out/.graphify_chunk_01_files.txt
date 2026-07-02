@@ -1,0 +1,22 @@
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\data_saving_planning.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\deployment_checklist.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\feature_checklist.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\fix_onboarding_prompt.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\fix_render_errors_prompt.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\fix_tailor_prompt.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\image_generation_prompt.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\opencode_implementation_prompt.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\overleaf_implementation_prompt.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\phase_1_auth_and_parsing.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\phase_2_profile_dashboard.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\phase_3_resume_tailoring.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\phase_4_history_templates.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\render_deployment_fix_prompt.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\ui_design.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\user_data_lifecycle.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\docs\vercel_deployment.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\skills\graphify\SKILL.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\Trial Base\README_AGENT.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\Trial Base\Resume_Database_README.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\Trial Base\Resume_Edit_Rules.md
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\archived_v1_docs\unified_capabilities_infographic.png

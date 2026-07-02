@@ -11,25 +11,28 @@ interface DashboardStatsWidgetProps {
 
 export function DashboardStatsWidget({ education, experience, projects, skills }: DashboardStatsWidgetProps) {
   const stats = [
-    { label: 'Education', value: education, icon: Books, color: 'text-blue-500 bg-blue-500/10' },
-    { label: 'Experience', value: experience, icon: Briefcase, color: 'text-amber-500 bg-amber-500/10' },
-    { label: 'Projects', value: projects, icon: Folder, color: 'text-violet-500 bg-violet-500/10' },
-    { label: 'Skills', value: skills, icon: Code, color: 'text-emerald-500 bg-emerald-500/10' },
+    { label: 'Education', value: education, icon: Books },
+    { label: 'Experience', value: experience, icon: Briefcase },
+    { label: 'Projects', value: projects, icon: Folder },
+    { label: 'Skills', value: skills, icon: Code },
   ]
 
   return (
-    <div className="grid grid-cols-2 gap-2 mt-3">
-      {stats.map((s) => (
-        <div key={s.label} className="bg-surface border border-edge rounded-[var(--radius-lg)] p-3 flex items-center gap-3">
-          <div className={`w-8 h-8 rounded-[var(--radius-md)] flex items-center justify-center shrink-0 ${s.color}`}>
-            <s.icon size={16} />
+    <div className="glass card-lift h-full p-6 rounded-[var(--radius-xl)] flex flex-col">
+      <h3 className="font-display text-base text-fg mb-6 font-semibold">Profile Vault</h3>
+      <div className="grid grid-cols-2 gap-4 flex-1">
+        {stats.map((s) => (
+          <div key={s.label} className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-[var(--radius-md)] bg-brand-light text-brand flex items-center justify-center shrink-0">
+              <s.icon size={20} />
+            </div>
+            <div>
+              <div className="font-display font-bold text-xl text-fg leading-none">{s.value}</div>
+              <div className="text-xs text-content-muted mt-1">{s.label}</div>
+            </div>
           </div>
-          <div>
-            <p className="font-mono text-lg font-bold text-content leading-none">{s.value}</p>
-            <p className="text-[10px] text-content-muted mt-0.5">{s.label}</p>
-          </div>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   )
 }

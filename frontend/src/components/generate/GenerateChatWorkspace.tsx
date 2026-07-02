@@ -38,9 +38,22 @@ export function GenerateChatWorkspace() {
   }, [selectedBulletIds, profile, currentStage, triggerCompile])
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full relative">
+      <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand/20 via-brand to-brand/20"></div>
+
+      {/* Chat Header */}
+      <div className="px-5 py-4 border-b border-edge/50 flex items-center gap-3 bg-surface/30 backdrop-blur-md">
+        <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
+          <span className="w-2 h-2 rounded-full bg-brand animate-pulse-glow" />
+        </div>
+        <div>
+          <h3 className="font-display font-semibold text-[15px] text-fg leading-none mb-1">Tailoring Agent</h3>
+          <p className="text-[11px] text-content-muted leading-none">Ready to match your profile</p>
+        </div>
+      </div>
+
       {/* Scrollable message area */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-5 scroll-smooth">
+      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-5 scroll-smooth bg-surface/10">
         {entries.map((entry) => {
           if (entry.type === 'greeting') {
             return (

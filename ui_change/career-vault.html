@@ -1,0 +1,524 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ResumeMint — Career Vault</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet" />
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" crossorigin></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" crossorigin></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" crossorigin></script>
+<style>
+@import url('https://fonts.cdnfonts.com/css/cabinet-grotesk');
+@import url('https://fonts.cdnfonts.com/css/satoshi');
+
+:root {
+  --bg: #09090b; --surface: #0c0c0e; --card: #141417; --muted: #1a1a1e;
+  --fg: #f2f2f4; --fg-2: #e4e4e7; --muted-fg: #a1a1aa; --meta: #71717a;
+  --border: #27272b; --border-soft: #1e1e22;
+  --accent: #16a34a; --accent-hover: #15803d; --accent-soft: rgba(22,163,74,0.12);
+  --success: #22c55e; --success-soft: rgba(34,197,94,0.12);
+  --warn: #f59e0b; --danger: #ef4444;
+  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-xl: 20px; --radius-2xl: 28px; --radius-pill: 9999px;
+  --font-display: 'Cabinet Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Satoshi', 'Inter', system-ui, sans-serif;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; height:100%; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); height:100vh; overflow: hidden; }
+.glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255,255,255,0.06); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.4); }
+.glass-heavy { background: rgba(255,255,255,0.07); backdrop-filter: blur(24px) saturate(180%); border: 1px solid rgba(255,255,255,0.08); }
+
+.bg-orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(80px); }
+@keyframes fade-up { from { opacity: 0; transform: translateY(16px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes pulse-glow { 0%,100% { opacity: 0.3; } 50% { opacity: 0.8; } }
+@keyframes bounce-dot { 0%,80%,100% { transform: translateY(0); } 40% { transform: translateY(-6px); } }
+@keyframes slide-in-right { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
+.animate-fade-up { animation: fade-up 0.5s var(--ease-out-expo) both; }
+.animate-fade-up-d1 { animation: fade-up 0.5s 0.1s var(--ease-out-expo) both; }
+.animate-fade-up-d2 { animation: fade-up 0.5s 0.2s var(--ease-out-expo) both; }
+.animate-fade-up-d3 { animation: fade-up 0.5s 0.3s var(--ease-out-expo) both; }
+.animate-pulse-glow { animation: pulse-glow 4s ease-in-out infinite; }
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
+@media (prefers-reduced-motion: reduce) {
+  .animate-fade-up, .animate-fade-up-d1, .animate-fade-up-d2, .animate-fade-up-d3 { animation: none; opacity: 1; transform: none; }
+  .animate-pulse-glow { animation: none; }
+}
+</style>
+</head>
+<body>
+<div class="bg-orb animate-pulse-glow" style="top:-8%;right:25%;width:500px;height:500px;background:radial-gradient(circle,rgba(22,163,74,0.06) 0%,transparent 70%);"></div>
+<div id="root" style="position:relative;z-index:1;height:100vh;"></div>
+<script type="text/babel">
+const { useState, useRef, useEffect, useCallback } = React;
+
+/* ─── Impact Badge ─────────────────────────────────── */
+function ImpactBadge({ label }) {
+  const m = {
+    Metrics: ["rgba(34,197,94,0.12)","#22c55e"], Leadership: ["rgba(22,163,74,0.12)","#4ade80"],
+    Architecture: ["rgba(59,130,246,0.12)","#60a5fa"], "AI/ML": ["rgba(245,158,11,0.12)","#fbbf24"],
+    Design: ["rgba(168,85,247,0.12)","#c084fc"], Optimization: ["rgba(6,182,212,0.12)","#22d3ee"],
+    Collaboration: ["rgba(236,72,153,0.12)","#f472b6"], Accessibility: ["rgba(52,211,153,0.12)","#34d399"]
+  };
+  const c = m[label] || ["var(--muted)","var(--muted-fg)"];
+  return <span style={{ display:"inline-flex", alignItems:"center", gap:3, padding:"2px 8px", borderRadius:"var(--radius-pill)", fontSize:"0.5625rem", fontWeight:500, background:c[0], color:c[1], whiteSpace:"nowrap" }}>{label}</span>;
+}
+
+/* ═══════════════════════════════════════════════════════
+   LEFT PANEL — CHAT INTERFACE (AI Command Center)
+   ═══════════════════════════════════════════════════════ */
+
+function ProjectsVaultWidget({ data }) {
+  return (
+    <div className="glass" style={{ padding:"0.75rem 1rem", borderRadius:"var(--radius-md)", margin:"0.5rem 0", borderLeft:"3px solid var(--accent)", position:"relative", overflow:"hidden" }}>
+      <div style={{ position:"absolute", top:0, right:0, width:120, height:120, borderRadius:"50%", background:"radial-gradient(circle,rgba(22,163,74,0.04) 0%,transparent 70%)", transform:"translate(30%,-30%)" }} />
+      <div style={{ display:"flex", justifyContent:"space-between", alignItems:"flex-start", marginBottom:"0.5rem", position:"relative" }}>
+        <div>
+          <div style={{ fontFamily:"var(--font-display)", fontWeight:600, fontSize:"0.8125rem" }}>{data.role}</div>
+          <div style={{ fontSize:"0.625rem", color:"var(--accent)", marginTop:1 }}>{data.company} &middot; {data.location}</div>
+        </div>
+        <span style={{ fontSize:"0.5625rem", color:"var(--accent)", fontWeight:500, padding:"2px 7px", borderRadius:"var(--radius-pill)", background:"var(--accent-soft)", whiteSpace:"nowrap" }}>PARSED</span>
+      </div>
+      <div style={{ display:"flex", flexDirection:"column", gap:"0.25rem", position:"relative" }}>
+        {data.bullets.slice(0, 3).map((b, i) => (
+          <div key={i} style={{ fontSize:"0.625rem", color:"var(--fg-2)", lineHeight:1.5, paddingLeft:5, borderLeft:"1.5px solid var(--border)", display:"flex", gap:5 }}>
+            <span style={{ color:"var(--accent)", flexShrink:0, fontSize:"0.4375rem", marginTop:2 }}>&#10003;</span>
+            <span>{b.text}</span>
+          </div>
+        ))}
+      </div>
+      <div style={{ display:"flex", gap:3, marginTop:"0.375rem", flexWrap:"wrap", position:"relative" }}>
+        {data.badges.slice(0, 4).map((b) => <ImpactBadge key={b} label={b} />)}
+      </div>
+    </div>
+  );
+}
+
+function UploadWidget() {
+  return (
+    <div className="glass" style={{ padding:"0.75rem 1rem", borderRadius:"var(--radius-md)", border:"1px dashed rgba(22,163,74,0.25)", textAlign:"center", margin:"0.5rem 0" }}>
+      <div style={{ fontSize:"0.6875rem", color:"var(--muted-fg)", marginBottom:"0.375rem" }}>Drop a resume or paste your experience — I'll extract every detail</div>
+      <div style={{ display:"flex", gap:"0.375rem", justifyContent:"center" }}>
+        <button style={{ padding:"5px 12px", borderRadius:"var(--radius-sm)", background:"var(--accent)", border:"none", color:"white", fontSize:"0.625rem", fontWeight:500, cursor:"pointer", fontFamily:"inherit" }}>Upload Resume</button>
+        <button style={{ padding:"5px 12px", borderRadius:"var(--radius-sm)", background:"var(--muted)", border:"none", color:"var(--muted-fg)", fontSize:"0.625rem", fontWeight:500, cursor:"pointer", fontFamily:"inherit" }}>Paste Experience</button>
+      </div>
+    </div>
+  );
+}
+
+function TypingIndicator() {
+  return (
+    <div style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"0.625rem 1rem", borderRadius:"var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px", background:"var(--card)", border:"1px solid var(--border-soft)" }}>
+      {[0, 150, 300].map((d, i) => (
+        <span key={i} style={{ width:6, height:6, borderRadius:"50%", background:"var(--accent)", animation:"bounce-dot 1.2s ease-in-out infinite", animationDelay:d+"ms" }} />
+      ))}
+    </div>
+  );
+}
+
+function ChatInput({ onSend, disabled }) {
+  const DRAFT_KEY = "resumint-chat-draft";
+  const [text, setText] = useState("");
+  const inputRef = useRef(null);
+  const hydrated = useRef(false);
+
+  useEffect(() => {
+    hydrated.current = true;
+    try { setText(localStorage.getItem(DRAFT_KEY) || ""); } catch {}
+  }, []);
+
+  useEffect(() => {
+    if (!hydrated.current) return;
+    try { if (text) localStorage.setItem(DRAFT_KEY, text); else localStorage.removeItem(DRAFT_KEY); } catch {}
+  }, [text]);
+
+  const clearDraft = useCallback(() => { setText(""); try { localStorage.removeItem(DRAFT_KEY); } catch {} }, []);
+  const handleSend = useCallback(() => {
+    if (!text.trim() || disabled) return;
+    onSend(text.trim());
+    clearDraft();
+    inputRef.current?.focus();
+  }, [text, disabled, onSend, clearDraft]);
+
+  return (
+    <div className="glass-heavy" style={{ display:"flex", alignItems:"flex-end", gap:"0.5rem", padding:"0.5rem 0.5rem 0.5rem 1rem", borderRadius:"var(--radius-xl)" }}>
+      <div style={{ flex:1, position:"relative" }}>
+        <textarea ref={inputRef} value={text} onChange={(e) => setText(e.target.value)}
+          onKeyDown={(e) => { if (e.key==="Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+          placeholder="Describe an achievement, role, or skill..."
+          rows={1}
+          style={{ width:"100%", resize:"none", background:"transparent", border:"none", outline:"none", color:"var(--fg)", fontSize:"0.75rem", fontFamily:"var(--font-body)", lineHeight:1.5, padding:"0.5rem 0", minHeight:"2.25rem", maxHeight:"8rem" }}
+          onInput={(e) => { e.currentTarget.style.height="auto"; e.currentTarget.style.height=Math.min(e.currentTarget.scrollHeight,128)+"px"; }} />
+        {text && <button onClick={clearDraft} style={{ position:"absolute", right:0, top:"0.25rem", background:"none", border:"none", color:"var(--meta)", cursor:"pointer", fontSize:"0.4375rem", padding:2 }}>&#10005;</button>}
+      </div>
+      <button onClick={handleSend} disabled={!text.trim()||disabled}
+        style={{ width:34, height:34, display:"flex", alignItems:"center", justifyContent:"center", borderRadius:"var(--radius-md)", background:"var(--accent)", border:"none", color:"white", cursor:"pointer", flexShrink:0, opacity:(!text.trim()||disabled)?0.4:1, transition:"opacity 0.15s" }}
+        onMouseEnter={(e) => e.currentTarget.style.background="var(--accent-hover)"}
+        onMouseLeave={(e) => e.currentTarget.style.background="var(--accent)"}>
+        <span style={{ fontSize:"0.8125rem", transform:"rotate(90deg)" }}>&#10148;</span>
+      </button>
+    </div>
+  );
+}
+
+function ChatPanel() {
+  const [messages, setMessages] = useState([
+    { id:"w1", role:"assistant", text:"Welcome to your Career Vault, Alex. I'll turn your experience into a polished, interview-ready record — no forms, no hassle. What's the first thing you'd like to capture?" },
+    { id:"w2", role:"user", text:"I recently led a large payment processing redesign at Stripe." },
+    { id:"w3", role:"assistant", text:"Let's lock that in. What tech did you use, how big was your scope, and what results can we measure? Drop in a resume or LinkedIn export and I'll parse it instantly.",
+      widget:"UPLOAD_DROPZONE" },
+    { id:"w4", role:"user", text:"Node.js, Kafka, PostgreSQL. I led 5 engineers. Reduced payment latency by 40% across 12M+ daily transactions." },
+    { id:"w5", role:"assistant", text:"I've structured that into ready-to-use experience data. Here's what I captured:" },
+    { id:"w6", role:"assistant", text:"",
+      widget:"PROJECTS",
+      data:{ company:"Stripe", role:"Staff Engineer — Payment Pipeline", location:"Remote",
+        bullets:[
+          { text:"Led the redesign of the payment processing pipeline, reducing latency by 40% across 12M+ daily transactions." },
+          { text:"Architected a real-time fraud detection system using ML models, preventing $2.3M in potential losses annually." },
+          { text:"Mentored 5 junior engineers through structured growth plans, resulting in 3 promotions within 18 months." },
+        ],
+        badges:["Metrics","Leadership","Architecture"]
+      }
+    },
+    { id:"w7", role:"assistant", text:"I've generated 12 tailored VaultBullets across Frontend, Backend, DevOps, and Leadership. Your vault is loaded. What's next?" },
+  ]);
+  const [isTyping, setIsTyping] = useState(false);
+  const scrollRef = useRef(null);
+
+  useEffect(() => {
+    if (scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+  }, [messages, isTyping]);
+
+  const sendMessage = useCallback((text) => {
+    setMessages((p) => [...p, { id:"m"+Date.now(), role:"user", text }]);
+    setIsTyping(true);
+    setTimeout(() => {
+      setIsTyping(false);
+      setMessages((p) => [...p, { id:"m"+Date.now()+1, role:"assistant", text:"Done. Your vault is updated — check the panel on the right for your latest entries." }]);
+    }, 1200);
+  }, []);
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", height:"100%", background:"rgba(9,9,11,0.6)", backdropFilter:"blur(2px)" }}>
+      <div style={{ padding:"1rem 1.25rem 0.625rem", borderBottom:"1px solid var(--border-soft)" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"0.5rem" }}>
+          <div style={{ width:8, height:8, borderRadius:"50%", background:"var(--success)", boxShadow:"0 0 8px rgba(34,197,94,0.4)", animation:"pulse-glow 2s ease-in-out infinite" }} />
+          <h1 style={{ fontFamily:"var(--font-display)", fontSize:"1.0625rem", fontWeight:700, letterSpacing:"-0.02em" }}>Career Vault</h1>
+        </div>
+        <p style={{ color:"var(--muted-fg)", fontSize:"0.6875rem", marginTop:2, marginLeft:16 }}>Your complete career record &middot; Built through conversation</p>
+      </div>
+
+      <div ref={scrollRef} style={{ flex:1, overflowY:"auto", padding:"1rem 1.25rem" }}>
+        {messages.length === 0 && (
+          <div style={{ display:"flex", alignItems:"center", justifyContent:"center", height:"100%", color:"var(--muted-fg)", fontSize:"0.8125rem" }}>
+            Your next opportunity starts here. Send a message or upload a file.
+          </div>
+        )}
+        {messages.map((msg, i) => {
+          const isUser = msg.role === "user";
+          return (
+            <div key={msg.id} className={i > 0 ? "animate-fade-up-d" + (((i-1)%3)+1) : ""}
+              style={{ display:"flex", flexDirection:"column", alignItems:isUser?"flex-end":"flex-start", marginBottom:"0.625rem" }}>
+              <div style={{ maxWidth:"92%", display:"flex", flexDirection:"column", gap:"0.25rem" }}>
+                <div style={{ fontSize:"0.5625rem", color:"var(--meta)", fontWeight:500, padding:isUser?"0 4px":"0 4px", letterSpacing:"0.03em" }}>{isUser ? "You" : "AI Assistant"}</div>
+                {msg.text && (
+                  <div style={{
+                    padding:"0.5625rem 0.875rem",
+                    borderRadius:isUser ? "var(--radius-lg) var(--radius-lg) 4px var(--radius-lg)" : "var(--radius-lg) var(--radius-lg) var(--radius-lg) 4px",
+                    background:isUser ? "var(--accent)" : "var(--card)",
+                    color:isUser ? "white" : "var(--fg-2)",
+                    fontSize:"0.75rem",
+                    lineHeight:1.6,
+                    border:isUser ? "none" : "1px solid var(--border-soft)",
+                  }}>
+                    {msg.text}
+                  </div>
+                )}
+                {msg.widget === "UPLOAD_DROPZONE" && <UploadWidget />}
+                {msg.widget === "PROJECTS" && msg.data && <ProjectsVaultWidget data={msg.data} />}
+              </div>
+            </div>
+          );
+        })}
+        {isTyping && (
+          <div style={{ display:"flex", flexDirection:"column", alignItems:"flex-start", marginBottom:"0.625rem" }}>
+            <div style={{ fontSize:"0.5625rem", color:"var(--meta)", fontWeight:500, padding:"0 4px", marginBottom:"0.25rem" }}>AI Assistant</div>
+            <TypingIndicator />
+          </div>
+        )}
+      </div>
+
+      <div style={{ padding:"0.625rem 1.25rem 1rem", borderTop:"1px solid var(--border-soft)" }}>
+        <ChatInput onSend={sendMessage} disabled={isTyping} />
+      </div>
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   RIGHT PANEL — PROFILE VAULT (Tabbed Dashboard)
+   ═══════════════════════════════════════════════════════ */
+
+const PROFILE = {
+  contact: { name:"Alex Dushy", email:"alex@dushy.dev", phone:"+1 (415) 555-0123", linkedin:"linkedin.com/in/alexdushy", github:"github.com/alexdushy", portfolio:"alexdushy.dev" },
+  skills: { languages:["TypeScript","Python","Go","SQL"], frameworks:["React","Next.js","Node.js","Express"], tools:["Kafka","PostgreSQL","Docker","AWS"] },
+  education: [
+    { id:"e1", school:"MIT", degree:"B.S. Computer Science", gpa:"3.9", startYear:"2015", endYear:"2019" },
+    { id:"e2", school:"Stanford", degree:"M.S. AI & Machine Learning", gpa:"3.8", startYear:"2019", endYear:"2021" },
+  ],
+  experience: [
+    { id:"x1", company:"Stripe", role:"Staff Engineer", startDate:"Jan 2023", endDate:"Present",
+      vaultBullets:[
+        { id:"xb1", text:"Led redesign of payment processing pipeline, reducing latency by 40% across 12M+ daily transactions.", badges:["Metrics","Leadership"] },
+        { id:"xb2", text:"Architected real-time fraud detection system using ML models, preventing $2.3M in potential losses annually.", badges:["Architecture","AI/ML"] },
+        { id:"xb3", text:"Mentored 5 junior engineers through structured growth plans, resulting in 3 promotions within 18 months.", badges:["Leadership","Collaboration"] },
+        { id:"xb4", text:"Designed canary deployment framework reducing production incidents by 60%.", badges:["Optimization","Architecture"] },
+      ]},
+    { id:"x2", company:"Vercel", role:"Senior Frontend Engineer", startDate:"Jun 2021", endDate:"Dec 2022",
+      vaultBullets:[
+        { id:"xb5", text:"Built edge-rendered dashboard framework serving 500K+ developers, improving Time-to-Interactive by 60%.", badges:["Architecture","Metrics"] },
+        { id:"xb6", text:"Designed template marketplace UI with 200+ community templates and one-click deploy.", badges:["Design","Leadership"] },
+        { id:"xb7", text:"Reduced bundle size by 45% through code-splitting and tree-shaking optimization.", badges:["Metrics","Optimization"] },
+      ]},
+    { id:"x3", company:"Google", role:"Software Engineer II", startDate:"Sep 2019", endDate:"May 2021",
+      vaultBullets:[
+        { id:"xb8", text:"Developed ML infrastructure for Google Ads serving pipeline, handling 1B+ queries daily.", badges:["Architecture","AI/ML"] },
+        { id:"xb9", text:"Improved distributed caching layer reducing p99 latency by 35% across 3 global regions.", badges:["Metrics","Optimization"] },
+      ]},
+    { id:"x4", company:"Freelance", role:"Full-Stack Consultant", startDate:"Jun 2018", endDate:"Aug 2019",
+      vaultBullets:[
+        { id:"xb10", text:"Built 12+ full-stack applications for startups across fintech, healthtech, and SaaS domains.", badges:["Design","Collaboration"] },
+        { id:"xb11", text:"Delivered projects on time and within budget, maintaining 95%+ client satisfaction score.", badges:["Metrics","Leadership"] },
+      ]},
+  ],
+  projects: [
+    { id:"p1", title:"Open Source AI Toolkit", techStack:["Python","PyTorch","ONNX"], url:"github.com/example/ai-toolkit",
+      vaultBullets:[
+        { id:"pb1", text:"Built model quantization toolkit reducing inference time by 3x with 1% accuracy loss.", badges:["AI/ML","Optimization"] },
+        { id:"pb2", text:"Published 3 peer-reviewed papers at NeurIPS and ICML on efficient transformer architectures.", badges:["Metrics","Architecture"] },
+      ]},
+    { id:"p2", title:"Developer Analytics Dashboard", techStack:["React","D3","WebSocket"], url:"github.com/example/analytics",
+      vaultBullets:[
+        { id:"pb3", text:"Designed real-time analytics dashboard processing 50M+ events daily with sub-100ms latency.", badges:["Design","Metrics"] },
+      ]},
+  ],
+  certificates:[
+    { id:"c1", name:"AWS Solutions Architect", issuer:"Amazon", date:"2023", url:"#" },
+    { id:"c2", name:"Google Cloud Professional", issuer:"Google", date:"2022", url:"#" },
+    { id:"c3", name:"Kubernetes Admin (CKA)", issuer:"CNCF", date:"2022", url:"#" },
+  ],
+};
+
+function ProfileVaultPanel() {
+  const [activeTab, setActiveTab] = useState("info");
+  const tabs = [
+    { key:"info", label:"Personal Info", icon:"\u263A" },
+    { key:"education", label:"Education", icon:"\u2302" },
+    { key:"experience", label:"Experience", icon:"\u2692" },
+    { key:"projects", label:"Projects", icon:"\u2601" },
+    { key:"certificates", label:"Certificates", icon:"\u2605" },
+  ];
+
+  const sectionCount = (key) => {
+    if (key === "info") return 0;
+    if (key === "education") return PROFILE.education.length;
+    if (key === "experience") return PROFILE.experience.length;
+    if (key === "projects") return PROFILE.projects.length;
+    if (key === "certificates") return PROFILE.certificates.length;
+    return 0;
+  };
+
+  return (
+    <div style={{ display:"flex", flexDirection:"column", height:"100%", background:"rgba(12,12,14,0.8)" }}>
+      <div style={{ padding:"1rem 1.25rem 0", borderBottom:"1px solid var(--border-soft)" }}>
+        <h2 style={{ fontFamily:"var(--font-display)", fontSize:"1rem", fontWeight:700, letterSpacing:"-0.02em", marginBottom:"0.75rem" }}>
+          Profile Vault
+        </h2>
+        <div style={{ display:"flex", gap:"0.25rem", overflow:"auto", scrollbarWidth:"none" }}>
+          {tabs.map((t) => {
+            const isActive = activeTab === t.key;
+            const count = sectionCount(t.key);
+            return (
+              <button key={t.key} onClick={() => setActiveTab(t.key)}
+                style={{ display:"flex", alignItems:"center", gap:6, padding:"0.5rem 0.75rem", fontSize:"0.6875rem", fontWeight:isActive?600:400, color:isActive?"var(--accent)":"var(--muted-fg)", background:"transparent", border:"none", borderBottom:isActive?"2px solid var(--accent)":"2px solid transparent", cursor:"pointer", fontFamily:"inherit", whiteSpace:"nowrap", transition:"all 0.15s" }}>
+                <span style={{ fontSize:"0.625rem" }}>{t.icon}</span>
+                <span>{t.label}</span>
+                {count > 0 && (
+                  <span style={{ fontSize:"0.5rem", padding:"1px 5px", borderRadius:"var(--radius-pill)", background:isActive?"var(--accent-soft)":"var(--muted)", color:isActive?"var(--accent)":"var(--meta)" }}>{count}</span>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      <div style={{ flex:1, overflow:"auto", padding:"0.75rem 1.25rem" }}>
+        {activeTab === "info" && <PersonalInfoTab />}
+        {activeTab === "education" && <EducationTab />}
+        {activeTab === "experience" && <ExperienceTab />}
+        {activeTab === "projects" && <ProjectsTab />}
+        {activeTab === "certificates" && <CertificatesTab />}
+      </div>
+    </div>
+  );
+}
+
+function PersonalInfoTab() {
+  const c = PROFILE.contact;
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:"1rem" }}>
+      <div className="glass" style={{ borderRadius:"var(--radius-lg)", padding:"1rem 1.25rem" }}>
+        <div style={{ display:"flex", alignItems:"center", gap:"0.75rem", marginBottom:"0.75rem" }}>
+          <div style={{ width:40, height:40, borderRadius:"var(--radius-md)", background:"linear-gradient(135deg,#16a34a,#22c55e)", display:"flex", alignItems:"center", justifyContent:"center", fontSize:"0.8125rem", fontWeight:600, color:"white" }}>AD</div>
+          <div>
+            <div style={{ fontFamily:"var(--font-display)", fontWeight:600, fontSize:"0.875rem" }}>{c.name}</div>
+            <div style={{ fontSize:"0.625rem", color:"var(--accent)" }}>Senior Software Engineer</div>
+          </div>
+        </div>
+        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:"0.5rem" }}>
+          {[
+            { icon:"\u2709", label:c.email },
+            { icon:"\u260E", label:c.phone },
+            { icon:"\u2601", label:c.linkedin },
+            { icon:"\u2699", label:c.github },
+          ].map((item,i) => (
+            <div key={i} style={{ display:"flex", alignItems:"center", gap:6, fontSize:"0.625rem", color:"var(--muted-fg)" }}>
+              <span style={{ color:"var(--accent)", fontSize:"0.5rem" }}>{item.icon}</span>
+              <span>{item.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div className="glass" style={{ borderRadius:"var(--radius-lg)", padding:"1rem 1.25rem" }}>
+        <h3 style={{ fontSize:"0.6875rem", fontWeight:600, color:"var(--fg)", fontFamily:"var(--font-display)", marginBottom:"0.625rem" }}>Technical Skills</h3>
+        {[["Languages", PROFILE.skills.languages], ["Frameworks", PROFILE.skills.frameworks], ["Tools", PROFILE.skills.tools]].map(([label, tags]) => (
+          <div key={label} style={{ marginBottom:"0.5rem" }}>
+            <div style={{ fontSize:"0.5625rem", color:"var(--meta)", fontWeight:500, marginBottom:"0.25rem" }}>{label}</div>
+            <div style={{ display:"flex", flexWrap:"wrap", gap:"0.25rem" }}>
+              {tags.map((t) => (
+                <span key={t} style={{ display:"inline-flex", alignItems:"center", gap:4, padding:"2px 8px", borderRadius:"var(--radius-pill)", background:"var(--accent-soft)", border:"1px solid rgba(22,163,74,0.15)", fontSize:"0.5625rem", color:"var(--accent)" }}>
+                  {t}
+                </span>
+              ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function EducationTab() {
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+      {PROFILE.education.map((edu) => (
+        <div key={edu.id} className="glass" style={{ borderRadius:"var(--radius-md)", padding:"0.75rem 1rem" }}>
+          <div style={{ fontFamily:"var(--font-display)", fontWeight:600, fontSize:"0.75rem", color:"var(--fg)" }}>{edu.school}</div>
+          <div style={{ fontSize:"0.625rem", color:"var(--muted-fg)", marginTop:2 }}>
+            {[edu.degree, edu.gpa && `GPA: ${edu.gpa}`, edu.startYear && `${edu.startYear}${edu.endYear ? ` \u2014 ${edu.endYear}` : ''}`].filter(Boolean).join(" \u00B7 ")}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function AccordionList({ items }) {
+  const [expandedId, setExpandedId] = useState(null);
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+      {items.map((item) => {
+        const isOpen = expandedId === item.id;
+        return (
+          <div key={item.id} className="glass" style={{ borderRadius:"var(--radius-md)", overflow:"hidden" }}>
+            <div onClick={() => setExpandedId(isOpen ? null : item.id)}
+              style={{ padding:"0.625rem 0.875rem", display:"flex", alignItems:"center", justifyContent:"space-between", cursor:"pointer" }}>
+              <div>
+                <div style={{ fontSize:"0.75rem", fontWeight:600, fontFamily:"var(--font-display)", color:"var(--fg)" }}>{item.title}</div>
+                <div style={{ fontSize:"0.5625rem", color:"var(--accent)", marginTop:1 }}>{item.subtitle}</div>
+              </div>
+              <div style={{ display:"flex", alignItems:"center", gap:"0.5rem" }}>
+                <span style={{ fontSize:"0.5625rem", color:"var(--accent)", fontWeight:500 }}>{item.bullets?.length || 0} bullets</span>
+                <span style={{ fontSize:"0.5rem", color:"var(--meta)", transform:isOpen?"rotate(180deg)":"none", transition:"transform 0.2s" }}>&#9660;</span>
+              </div>
+            </div>
+            {isOpen && (
+              <div style={{ borderTop:"1px solid var(--border-soft)", padding:"0.5rem 0.75rem" }}>
+                {item.bullets?.map((b, i) => (
+                  <div key={i} style={{ display:"flex", gap:"0.5rem", padding:"0.375rem 0", borderBottom:i < item.bullets.length-1 ? "1px solid var(--border-soft)" : "none" }}>
+                    <span style={{ color:"var(--accent)", fontSize:"0.375rem", marginTop:3, flexShrink:0 }}>&#9679;</span>
+                    <div style={{ flex:1 }}>
+                      <span style={{ fontSize:"0.625rem", color:"var(--fg-2)", lineHeight:1.5 }}>{b.text}</span>
+                      {b.badges && <div style={{ display:"flex", gap:3, marginTop:3, flexWrap:"wrap" }}>{b.badges.map((bg) => <ImpactBadge key={bg} label={bg} />)}</div>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ExperienceTab() {
+  const items = PROFILE.experience.map((x) => ({
+    id:x.id, title:x.role, subtitle:`${x.company} \u00B7 ${x.startDate} \u2014 ${x.endDate}`, bullets:x.vaultBullets,
+  }));
+  return items.length > 0 ? <AccordionList items={items} /> : <p style={{ fontSize:"0.75rem", color:"var(--muted-fg)", fontStyle:"italic" }}>No experience entries yet.</p>;
+}
+
+function ProjectsTab() {
+  const items = PROFILE.projects.map((p) => ({
+    id:p.id, title:p.title, subtitle:p.techStack?.join(", "), bullets:p.vaultBullets,
+  }));
+  return items.length > 0 ? <AccordionList items={items} /> : <p style={{ fontSize:"0.75rem", color:"var(--muted-fg)", fontStyle:"italic" }}>No projects yet.</p>;
+}
+
+function CertificatesTab() {
+  return (
+    <div style={{ display:"flex", flexDirection:"column", gap:"0.5rem" }}>
+      {PROFILE.certificates.map((cert) => (
+        <div key={cert.id} className="glass" style={{ borderRadius:"var(--radius-md)", padding:"0.75rem 1rem", display:"flex", alignItems:"center", justifyContent:"space-between" }}>
+          <div>
+            <div style={{ fontSize:"0.75rem", fontWeight:600, fontFamily:"var(--font-display)", color:"var(--fg)" }}>{cert.name}</div>
+            <div style={{ fontSize:"0.5625rem", color:"var(--muted-fg)", marginTop:1 }}>{cert.issuer} &middot; {cert.date}</div>
+          </div>
+          <span style={{ fontSize:"0.625rem", color:"var(--accent)", cursor:"pointer" }}>&#8599;</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+/* ═══════════════════════════════════════════════════════
+   MAIN APP — Split-Screen Layout
+   ═══════════════════════════════════════════════════════ */
+
+function App() {
+  return (
+    <div style={{ display:"flex", height:"100vh" }}>
+      {/* Left Panel — Chat Interface (~42%) */}
+      <div style={{ width:"42%", minWidth:380, maxWidth:520, borderRight:"1px solid var(--border-soft)", overflow:"hidden" }}>
+        <ChatPanel />
+      </div>
+      {/* Right Panel — Profile Vault (~58%) */}
+      <div style={{ flex:1, overflow:"hidden" }}>
+        <ProfileVaultPanel />
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById("root")).render(<App />);
+</script>
+</body>
+</html>

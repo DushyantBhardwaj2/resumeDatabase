@@ -1,0 +1,8 @@
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\backend\src\infrastructure\latex\templates\ats-clean\NSUT_logo.png
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\backend\src\infrastructure\latex\templates\nsut-canonical\NSUT_logo.png
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\frontend\public\file.svg
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\frontend\public\globe.svg
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\frontend\public\next.svg
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\frontend\public\vercel.svg
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\frontend\public\window.svg
+C:\Users\Dushy\OneDrive\Desktop\Projects\resumemint\Trial Base\NSUT_logo.png

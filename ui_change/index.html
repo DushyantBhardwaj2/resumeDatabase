@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ResumeMint — Resume Builder</title>
+<meta name="description" content="ResumeMint — Chat-driven resume builder with live ATS scoring, per-job tailoring, and a glass workspace built for focus.">
+<meta name="theme-color" content="#09090b">
+<meta property="og:title" content="ResumeMint — AI Resume Builder">
+<meta property="og:description" content="Chat-driven resume builder with live ATS scoring, per-job tailoring, and a glass workspace built for focus.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%2316a34a'/><text x='16' y='22' font-size='18' font-weight='700' text-anchor='middle' fill='white' font-family='system-ui'>M</text></svg>">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<style>
+.skip-link { position: fixed; top: -100%; left: 1rem; z-index: 100; padding: 0.5rem 1rem; background: var(--accent); color: #fff; font-size: 0.875rem; font-family: var(--font-body); border-radius: var(--radius-sm); text-decoration: none; transition: top 0.2s ease; }
+.skip-link:focus { top: 1rem; }
+
+@import url('https://fonts.cdnfonts.com/css/cabinet-grotesk');
+@import url('https://fonts.cdnfonts.com/css/satoshi');
+
+:root {
+  --bg: #09090b; --surface: #0c0c0e; --card: #141417; --muted: #1a1a1e;
+  --fg: #f2f2f4; --fg-2: #e4e4e7; --muted-fg: #a1a1aa; --meta: #71717a;
+  --border: #27272b; --border-soft: #1e1e22;
+  --accent: #16a34a; --accent-hover: #15803d; --accent-soft: rgba(22,163,74,0.12);
+  --success: #22c55e; --success-soft: rgba(34,197,94,0.12);
+  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 14px; --radius-xl: 20px; --radius-pill: 9999px;
+  --font-display: 'Cabinet Grotesk', 'Plus Jakarta Sans', system-ui, sans-serif;
+  --font-body: 'Satoshi', 'Inter', system-ui, sans-serif;
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body { background: var(--bg); color: var(--fg); font-family: var(--font-body); min-height: 100vh; overflow-x: hidden; }
+.glass { background: rgba(255,255,255,0.04); backdrop-filter: blur(20px) saturate(180%); -webkit-backdrop-filter: blur(20px) saturate(180%); border: 1px solid rgba(255,255,255,0.06); box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.4); }
+.card-lift { will-change: transform; transform-style: preserve-3d; transition: box-shadow 0.2s var(--ease-out-expo), border-color 0.2s ease; }
+.card-lift:hover { box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 20px 48px rgba(22,163,74,0.12); }
+.card-lift:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-color: var(--accent); }
+[data-gsap="cards"] > a { position: relative; overflow: hidden; }
+.card-glow { position: absolute; inset: -1px; border-radius: inherit; pointer-events: none; z-index: 0; background: radial-gradient(400px circle at var(--mx,50%) var(--my,50%),rgba(22,163,74,0.12) 0%,transparent 60%); opacity: 0; transition: opacity 0.4s ease; }
+.card-glow ~ * { position: relative; z-index: 1; }
+.orb { position: fixed; border-radius: 50%; pointer-events: none; z-index: 0; filter: blur(80px); will-change: transform; }
+[data-gsap="cards"] { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.75rem; max-width: 520px; margin: 0 auto; perspective: 800px; }
+
+@keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-16px); } }
+.animate-float { animation: float 8s ease-in-out infinite; }
+@media (max-width: 640px) {
+  [data-gsap="cards"] { grid-template-columns: 1fr; max-width: 280px; }
+  [data-gsap="heading"] { font-size: 2.25rem !important; }
+  [data-gsap="logo"] span { font-size: 1.75rem !important; }
+  [data-gsap="features"] { flex-wrap: wrap; }
+  .orb { filter: blur(40px); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-float { animation: none; transform: none; }
+  [data-gsap] { opacity: 1 !important; transform: none !important; }
+}
+@media (prefers-contrast: more) {
+  .glass { border-color: rgba(255,255,255,0.15); }
+  .card-lift:focus-visible { outline-width: 3px; }
+}
+</style>
+</head>
+<body>
+<a href="#main-content" class="skip-link">Skip to content</a>
+<div class="orb animate-float" style="top:-20%;right:-10%;width:600px;height:600px;background:radial-gradient(circle,rgba(22,163,74,0.06) 0%,transparent 70%);"></div>
+
+<main id="main-content" style="position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:2rem;">
+  <div data-od-id="hero" style="max-width:600px;width:100%;text-align:center;">
+    <div data-gsap="logo" style="margin-bottom:0.75rem;">
+      <span style="display:inline-flex;align-items:center;gap:12px;font-family:var(--font-display);font-weight:600;font-size:2.25rem;letter-spacing:-0.04em;">
+        <span style="width:40px;height:40px;border-radius:var(--radius-sm);background:linear-gradient(135deg,#16a34a,#22c55e);display:inline-flex;align-items:center;justify-content:center;font-size:1.125rem;color:white;box-shadow:0 0 20px rgba(22,163,74,0.3);">M</span>
+        ResumeMint
+      </span>
+    </div>
+    <h1 data-gsap="heading" style="font-family:var(--font-display);font-weight:600;font-size:3rem;line-height:1.1;letter-spacing:-0.03em;margin-bottom:0.75rem;">
+      Resumes that <br/>get interviews
+    </h1>
+    <p data-gsap="sub" style="color:var(--muted-fg);font-size:1rem;line-height:1.65;max-width:480px;margin:0 auto 2.5rem;font-family:var(--font-body);">
+      Chat-driven builder with live ATS scoring, smart tailoring per job description, and a glass workspace designed for focus.
+    </p>
+    <div data-od-id="cards" data-gsap="cards">
+      <a href="dashboard.html" aria-label="Open Dashboard" class="glass card-lift" style="padding:1.5rem 1.25rem;border-radius:var(--radius-xl);text-decoration:none;text-align:left;display:flex;flex-direction:column;gap:0.625rem;cursor:pointer;">
+        <span style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="6" height="6" rx="1"/><rect x="11" y="3" width="6" height="6" rx="1"/><rect x="3" y="11" width="6" height="6" rx="1"/><rect x="11" y="11" width="6" height="6" rx="1"/></svg></span>
+        <div style="font-family:var(--font-display);font-weight:600;color:var(--fg);font-size:0.9375rem;letter-spacing:-0.01em;">Dashboard</div>
+        <div style="color:var(--muted-fg);font-size:0.75rem;line-height:1.45;">Your workspace &amp; active projects</div>
+      </a>
+      <a href="career-vault.html" aria-label="Open Career Vault" class="glass card-lift" style="padding:1.5rem 1.25rem;border-radius:var(--radius-xl);text-decoration:none;text-align:left;display:flex;flex-direction:column;gap:0.625rem;cursor:pointer;">
+        <span style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6a2 2 0 012-2h3l1.5 2H17a1 1 0 011 1v7a2 2 0 01-2 2H4a2 2 0 01-2-2V6z"/></svg></span>
+        <div style="font-family:var(--font-display);font-weight:600;color:var(--fg);font-size:0.9375rem;letter-spacing:-0.01em;">Career Vault</div>
+        <div style="color:var(--muted-fg);font-size:0.75rem;line-height:1.45;">Chat to capture your experience</div>
+      </a>
+      <a href="tailoring.html" aria-label="Open Tailor" class="glass card-lift" style="padding:1.5rem 1.25rem;border-radius:var(--radius-xl);text-decoration:none;text-align:left;display:flex;flex-direction:column;gap:0.625rem;cursor:pointer;">
+        <span style="width:40px;height:40px;border-radius:var(--radius-md);background:var(--accent-soft);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:var(--accent);"><svg width="20" height="20" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2.5a2.12 2.12 0 013 3L6 17l-4 1 1-4L14.5 2.5z"/></svg></span>
+        <div style="font-family:var(--font-display);font-weight:600;color:var(--fg);font-size:0.9375rem;letter-spacing:-0.01em;">Tailor</div>
+        <div style="color:var(--muted-fg);font-size:0.75rem;line-height:1.45;">Match your resume to any role</div>
+      </a>
+    </div>
+    <div data-od-id="features" data-gsap="features" style="margin-top:2.5rem;display:flex;align-items:center;justify-content:center;gap:1rem;flex-wrap:wrap;">
+      <span style="display:flex;align-items:center;gap:4px;font-size:0.75rem;color:var(--muted-fg);"><span aria-hidden="true" style="color:var(--accent);font-size:0.5rem;">&#9679;</span> Live ATS scoring</span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:0.75rem;color:var(--muted-fg);"><span aria-hidden="true" style="color:var(--accent);font-size:0.5rem;">&#9679;</span> Per-job tailoring</span>
+      <span style="display:flex;align-items:center;gap:4px;font-size:0.75rem;color:var(--muted-fg);"><span aria-hidden="true" style="color:var(--accent);font-size:0.5rem;">&#9679;</span> Smart version tracking</span>
+    </div>
+  </div>
+</main>
+<script>
+gsap.matchMedia().add('(prefers-reduced-motion: no-preference)', () => {
+  gsap.set('[data-gsap]', { willChange: 'transform, opacity' });
+
+  // Entrance choreography (spring-based)
+  const tl = gsap.timeline({ defaults: { ease: 'back.out(1.7)', duration: 0.7 } });
+  tl.from('[data-gsap="logo"]', { y: 30, scale: 0.9, opacity: 0 })
+    .from('[data-gsap="heading"]', { y: 30, scale: 0.9, opacity: 0 }, '-=0.3')
+    .from('[data-gsap="sub"]', { y: 24, opacity: 0 }, '-=0.2')
+    .from('[data-gsap="cards"] > a', { y: 24, opacity: 0, stagger: 0.12, scale: 0.95 }, '-=0.2')
+    .from('[data-gsap="features"]', { y: 16, opacity: 0 }, '-=0.1');
+
+  // Continuous subtle float + magnetic hover + glow on cards
+  document.querySelectorAll('[data-gsap="cards"] > a').forEach((card, i) => {
+    let floatTween = gsap.to(card, {
+      y: 4,
+      duration: 3 + i * 0.4,
+      repeat: -1,
+      yoyo: true,
+      ease: 'sine.inOut',
+      delay: i * 0.7
+    });
+
+    const glow = document.createElement('span');
+    glow.className = 'card-glow';
+    card.prepend(glow);
+
+    const quickX = gsap.quickTo(card, 'x', { duration: 0.5, ease: 'power2.out' });
+    const quickY = gsap.quickTo(card, 'y', { duration: 0.5, ease: 'power2.out' });
+    const quickRX = gsap.quickTo(card, 'rotationX', { duration: 0.7, ease: 'power2.out' });
+    const quickRY = gsap.quickTo(card, 'rotationY', { duration: 0.7, ease: 'power2.out' });
+
+    card.addEventListener('mouseenter', () => {
+      floatTween.pause();
+      gsap.to(card, { scale: 1.03, duration: 0.4, ease: 'power2.out', overwrite: 'auto' });
+    });
+
+    card.addEventListener('mousemove', (e) => {
+      const rect = card.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = (e.clientX - cx) / (rect.width / 2);
+      const dy = (e.clientY - cy) / (rect.height / 2);
+
+      quickX(dx * 8);
+      quickY(dy * 8);
+      quickRX(dy * -4);
+      quickRY(dx * 4);
+
+      const px = ((e.clientX - rect.left) / rect.width) * 100;
+      const py = ((e.clientY - rect.top) / rect.height) * 100;
+      glow.style.setProperty('--mx', px + '%');
+      glow.style.setProperty('--my', py + '%');
+      glow.style.opacity = '1';
+    });
+
+    card.addEventListener('mouseleave', () => {
+      gsap.killTweensOf(card);
+      gsap.to(card, {
+        x: 0, y: 0, rotationX: 0, rotationY: 0, scale: 1,
+        duration: 0.7,
+        ease: 'elastic.out(1, 0.3)',
+        onComplete: () => {
+          floatTween = gsap.to(card, {
+            y: 4,
+            duration: 3 + i * 0.3,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut',
+            delay: i * 0.5
+          });
+        }
+      });
+      glow.style.opacity = '0';
+    });
+  });
+
+  return () => {
+    gsap.set('[data-gsap], .card-glow', { clearProps: 'all' });
+    document.querySelectorAll('.card-glow').forEach(el => el.remove());
+  };
+});
+</script>
+</body>
+</html>

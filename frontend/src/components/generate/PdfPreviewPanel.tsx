@@ -19,51 +19,55 @@ export function PdfPreviewPanel() {
   }
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-[#525659] relative">
       {/* Toolbar */}
-      <div className="flex items-center justify-between mb-3 px-1">
-        <h2 className="text-xs font-semibold tracking-widest text-content-subtle uppercase">
-          Preview
-        </h2>
+      <div className="absolute top-0 left-0 w-full px-5 py-4 flex items-center justify-between bg-surface/80 backdrop-blur-md border-b border-edge/50 z-10 shadow-sm">
+        <div className="flex items-center gap-3">
+          <h3 className="font-display font-semibold text-[15px] text-fg m-0">Live Preview</h3>
+          <span className="text-[11px] text-content-muted bg-card px-2.5 py-0.5 rounded-[var(--radius-pill)] border border-edge">
+            A4 Format
+          </span>
+        </div>
+        
         {pdfUrl && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {/* Zoom controls */}
-            <div className="flex items-center gap-1 bg-surface border border-edge rounded-[var(--radius-md)] px-1.5 py-1">
+            <div className="flex items-center gap-1 bg-surface border border-edge rounded-[var(--radius-md)] px-1.5 py-1 hidden sm:flex">
               <button
                 onClick={() => setZoom(zoom - 10)}
                 disabled={zoom <= 50}
-                className="flex items-center justify-center w-5 h-5 text-content-subtle hover:text-content disabled:opacity-30 transition-colors"
+                className="flex items-center justify-center w-6 h-6 text-content-subtle hover:text-content disabled:opacity-30 transition-colors rounded hover:bg-muted"
                 aria-label="Zoom out"
               >
-                <Minus size={12} />
+                <Minus size={14} />
               </button>
-              <span className="text-[11px] font-mono text-content-muted min-w-[2.5ch] text-center">
+              <span className="text-[11px] font-mono text-content-muted min-w-[3.5ch] text-center font-medium">
                 {zoom}%
               </span>
               <button
                 onClick={() => setZoom(zoom + 10)}
                 disabled={zoom >= 200}
-                className="flex items-center justify-center w-5 h-5 text-content-subtle hover:text-content disabled:opacity-30 transition-colors"
+                className="flex items-center justify-center w-6 h-6 text-content-subtle hover:text-content disabled:opacity-30 transition-colors rounded hover:bg-muted"
                 aria-label="Zoom in"
               >
-                <Plus size={12} />
+                <Plus size={14} />
               </button>
             </div>
 
             {/* Download */}
             <button
               onClick={handleDownload}
-              className="flex items-center gap-1.5 text-xs px-3 py-1.5 rounded-[var(--radius-md)] bg-brand text-white hover:bg-brand-hover transition-colors"
+              className="flex items-center gap-2 text-[13px] font-medium px-4 py-2 rounded-[var(--radius-md)] bg-brand text-white hover:bg-brand-hover transition-all shadow-[0_0_12px_rgba(22,163,74,0.3)] hover:shadow-[0_0_16px_rgba(22,163,74,0.4)]"
             >
-              <Download size={14} />
-              Download
+              <Download size={16} />
+              Export PDF
             </button>
           </div>
         )}
       </div>
 
       {/* PDF display area */}
-      <div className="flex-1 bg-[#f0f0f0] dark:bg-[#111318] rounded-[var(--radius-md)] overflow-hidden flex items-start justify-center p-4">
+      <div className="flex-1 flex items-start justify-center p-6 pt-24 overflow-auto">
         {isCompiling && (
           <div className="flex items-center gap-3 text-content-muted text-sm mt-12">
             <span className="w-4 h-4 rounded-full border-2 border-brand border-t-transparent animate-spin" />

@@ -155,44 +155,182 @@ export function ProfileChatWorkspace() {
     return null
   }, [profile, editingSection, handleEditSection, handleProfileChange, saveProfile, saving, isDirty, handleBackToSections, handleAskEdit])
 
+  const [activeTab, setActiveTab] = useState<'info'|'education'|'experience'|'projects'|'skills'>('experience')
+
   return (
-    <div className="flex flex-col h-full">
-      <div className="flex-1 overflow-hidden">
-        <ChatContainer
-          mode="PROFILE"
-          renderWidget={handleRenderWidget}
-          renderInput={false}
-        />
+    <div className="flex h-[calc(100vh-2rem)] gap-6 p-6 overflow-hidden">
+      
+      {/* Left Column: Chat Area */}
+      <div className="flex-[4] glass card-lift rounded-[var(--radius-xl)] flex flex-col relative overflow-hidden h-full">
+        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-brand/20 via-brand to-brand/20"></div>
+        
+        {/* Chat Header */}
+        <div className="px-5 py-4 border-b border-edge/50 flex items-center gap-3 bg-surface/30 backdrop-blur-md">
+          <div className="w-8 h-8 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
+            <span className="w-2 h-2 rounded-full bg-brand animate-pulse-glow" />
+          </div>
+          <div>
+            <h3 className="font-display font-semibold text-[15px] text-fg leading-none mb-1">Career Agent</h3>
+            <p className="text-[11px] text-content-muted leading-none">Online &amp; ready to help</p>
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-hidden relative z-10 bg-surface/10">
+          <ChatContainer
+            mode="PROFILE"
+            renderWidget={handleRenderWidget}
+            renderInput={false}
+          />
+        </div>
+
+        <div className="shrink-0 p-4 bg-surface/40 backdrop-blur-md border-t border-edge/50">
+          <div className="flex items-center gap-2 bg-card border border-edge rounded-[var(--radius-md)] px-3 py-2 focus-within:border-brand focus-within:ring-1 focus-within:ring-brand/50 transition-all">
+            <input
+              data-profile-chat-input
+              value={userInput}
+              onChange={(e) => setUserInput(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  if (userInput.trim()) {
+                    handleChatSubmit(userInput.trim())
+                    setUserInput('')
+                  }
+                }
+              }}
+              placeholder="E.g., I led a team of 5 engineers to build a new API..."
+              className="flex-1 bg-transparent text-[13px] text-fg placeholder:text-content-subtle outline-none"
+            />
+            <button
+              onClick={() => {
+                if (userInput.trim()) {
+                  handleChatSubmit(userInput.trim())
+                  setUserInput('')
+                }
+              }}
+              className="flex items-center justify-center h-8 w-8 rounded-[var(--radius-sm)] bg-brand text-brand-fg hover:opacity-90 transition-all shrink-0 hover:-translate-y-px"
+              aria-label="Send"
+            >
+              <ChatCircleDots size={16} weight="fill" />
+            </button>
+          </div>
+        </div>
       </div>
-      <div className="shrink-0 mt-3 mx-3 border border-edge rounded-[var(--radius-md)] bg-card flex items-center gap-2 px-3 py-2">
-        <input
-          data-profile-chat-input
-          value={userInput}
-          onChange={(e) => setUserInput(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-              e.preventDefault()
-              if (userInput.trim()) {
-                handleChatSubmit(userInput.trim())
-                setUserInput('')
-              }
-            }
-          }}
-          placeholder="Type a message..."
-          className="flex-1 bg-transparent text-sm text-content placeholder:text-content-subtle outline-none"
-        />
-        <button
-          onClick={() => {
-            if (userInput.trim()) {
-              handleChatSubmit(userInput.trim())
-              setUserInput('')
-            }
-          }}
-          className="flex items-center justify-center h-7 w-7 rounded-[var(--radius-md)] bg-brand text-brand-fg hover:opacity-90 transition-all shrink-0"
-          aria-label="Send"
-        >
-          <ChatCircleDots size={16} weight="fill" />
-        </button>
+
+      {/* Right Column: Profile Vault Summary */}
+      <div className="flex-[5] glass card-lift rounded-[var(--radius-xl)] flex flex-col overflow-hidden h-full">
+        <div className="px-6 pt-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display font-semibold text-2xl text-fg flex items-center gap-3 m-0">
+              <div className="w-3 h-3 rounded-full bg-brand shadow-[0_0_12px_rgba(22,163,74,0.6)]"></div>
+              Your Career Vault
+            </h2>
+            <span className="text-[11px] text-content-muted bg-surface px-3 py-1 rounded-[var(--radius-pill)] border border-edge">
+              Live Preview
+            </span>
+          </div>
+
+          <div className="flex gap-6 border-b border-edge">
+            {(['info', 'education', 'experience', 'projects', 'skills'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`pb-3 text-sm font-medium transition-colors relative capitalize ${
+                  activeTab === tab ? 'text-brand' : 'text-content-muted hover:text-fg'
+                }`}
+              >
+                {tab}
+                {activeTab === tab && (
+                  <div className="absolute bottom-0 left-0 w-full h-[2px] bg-brand rounded-t-full shadow-[0_0_8px_rgba(22,163,74,0.5)]"></div>
+                )}
+              </button>
+            ))}
+          </div>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-6 bg-surface/20 space-y-4">
+          {activeTab === 'info' && (
+            <div className="space-y-4">
+              <p className="text-sm text-content-muted">Email: {profile?.contact?.email || 'Not set'}</p>
+              <p className="text-sm text-content-muted">Phone: {profile?.contact?.phone || 'Not set'}</p>
+              <p className="text-sm text-content-muted">LinkedIn: {profile?.contact?.linkedin || 'Not set'}</p>
+            </div>
+          )}
+          {activeTab === 'experience' && (
+            profile?.experience && profile.experience.length > 0 ? (
+              profile.experience.map((exp: any, i: number) => (
+                <div key={i} className="bg-card border border-edge rounded-[var(--radius-lg)] p-5 relative group overflow-hidden">
+                  <div className="absolute top-0 left-0 w-1 h-full bg-brand opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                  <h4 className="font-display font-semibold text-lg text-fg">{exp.jobTitle || 'Role'}</h4>
+                  <p className="text-sm text-brand font-medium mb-3">{exp.companyName || 'Company'}</p>
+                  <ul className="space-y-2">
+                    {exp.bullets?.map((b: any, j: number) => (
+                      <li key={j} className="text-[13px] text-content-muted leading-relaxed flex items-start gap-2">
+                        <span className="text-brand text-[10px] mt-1">&#9679;</span>
+                        <span className="flex-1">{b.text || b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-content-subtle">No experience added yet.</p>
+            )
+          )}
+          {activeTab === 'education' && (
+            profile?.education && profile.education.length > 0 ? (
+              profile.education.map((edu: any, i: number) => (
+                <div key={i} className="bg-card border border-edge rounded-[var(--radius-lg)] p-5">
+                  <h4 className="font-display font-semibold text-lg text-fg">{edu.degree || 'Degree'}</h4>
+                  <p className="text-sm text-brand font-medium">{edu.institutionName || 'Institution'}</p>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-content-subtle">No education added yet.</p>
+            )
+          )}
+          {activeTab === 'projects' && (
+            profile?.projects && profile.projects.length > 0 ? (
+              profile.projects.map((proj: any, i: number) => (
+                <div key={i} className="bg-card border border-edge rounded-[var(--radius-lg)] p-5">
+                  <h4 className="font-display font-semibold text-lg text-fg">{proj.projectName || 'Project'}</h4>
+                  <ul className="space-y-2 mt-3">
+                    {proj.bullets?.map((b: any, j: number) => (
+                      <li key={j} className="text-[13px] text-content-muted flex items-start gap-2">
+                        <span className="text-brand text-[10px] mt-1">&#9679;</span>
+                        <span className="flex-1">{b.text || b}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))
+            ) : (
+              <p className="text-sm text-content-subtle">No projects added yet.</p>
+            )
+          )}
+          {activeTab === 'skills' && (
+            <div className="bg-card border border-edge rounded-[var(--radius-lg)] p-5">
+              <h4 className="font-display font-semibold text-sm text-fg mb-3">Languages</h4>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {profile?.skills?.languages?.map((s: string) => (
+                  <span key={s} className="bg-surface border border-edge text-content-muted text-[11px] px-2.5 py-1 rounded-full">{s}</span>
+                )) || <p className="text-xs text-content-subtle">None</p>}
+              </div>
+              <h4 className="font-display font-semibold text-sm text-fg mb-3">Frameworks</h4>
+              <div className="flex flex-wrap gap-2 mb-6">
+                {profile?.skills?.frameworks?.map((s: string) => (
+                  <span key={s} className="bg-surface border border-edge text-content-muted text-[11px] px-2.5 py-1 rounded-full">{s}</span>
+                )) || <p className="text-xs text-content-subtle">None</p>}
+              </div>
+              <h4 className="font-display font-semibold text-sm text-fg mb-3">Tools</h4>
+              <div className="flex flex-wrap gap-2">
+                {profile?.skills?.tools?.map((s: string) => (
+                  <span key={s} className="bg-surface border border-edge text-content-muted text-[11px] px-2.5 py-1 rounded-full">{s}</span>
+                )) || <p className="text-xs text-content-subtle">None</p>}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   )

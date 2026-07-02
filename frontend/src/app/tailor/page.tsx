@@ -121,19 +121,19 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
   }, [cloneId, editId, profile, setProfile, setJobTitle, setCompany, setJobDescription, setSelections, setCurrentStage])
 
   return (
-    <div ref={containerRef} className="flex h-[calc(100dvh-3.5rem)] lg:h-dvh overflow-hidden">
+    <div ref={containerRef} className="flex h-[calc(100dvh-3.5rem)] lg:h-dvh overflow-hidden p-6 gap-6">
       {/* Center panel — full width on mobile, split on desktop */}
-      <div data-panel="center" className="flex flex-col min-w-0 border-r border-edge overflow-hidden max-lg:w-full max-lg:flex-1">
+      <div data-panel="center" className="glass card-lift rounded-[var(--radius-xl)] flex flex-col min-w-0 overflow-hidden max-lg:w-full max-lg:flex-1 relative">
         <GenerateChatWorkspace />
       </div>
 
       {/* Splitter — hidden on mobile */}
-      <div className="hidden lg:block">
+      <div className="hidden lg:block w-2 cursor-col-resize hover:bg-brand/20 transition-colors rounded-full" style={{ alignSelf: 'stretch' }}>
         <Splitter onResize={handleSplitter} />
       </div>
 
       {/* Preview panel — hidden on mobile */}
-      <div data-panel="preview" className="hidden lg:flex flex-col min-w-0 overflow-hidden p-4">
+      <div data-panel="preview" className="glass card-lift rounded-[var(--radius-xl)] hidden lg:flex flex-col min-w-0 overflow-hidden">
         <PdfPreviewPanel />
       </div>
     </div>

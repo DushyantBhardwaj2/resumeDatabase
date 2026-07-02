@@ -14,6 +14,8 @@ import {
   GearSix,
   SignOut,
   Sidebar as SidebarIcon,
+  SquaresFour,
+  FolderOpen
 } from '@phosphor-icons/react'
 interface SidebarProps {
   user?: {
@@ -32,10 +34,10 @@ type NavItemDef = {
 }
 
 const navItems: NavItemDef[] = [
-  { icon: Sparkle, label: 'Generate', href: '/tailor' },
-  { icon: UserCircle, label: 'Profile Builder', href: '/profile' },
+  { icon: SquaresFour, label: 'Home', href: '/dashboard' },
+  { icon: FolderOpen, label: 'Career Vault', href: '/profile' },
+  { icon: Sparkle, label: 'Tailor', href: '/tailor' },
   { icon: ClockCounterClockwise, label: 'History', href: '/history' },
-  { icon: Lightbulb, label: 'Tips', href: '/tips' },
 ]
 
 type HistoryItem = {
@@ -70,16 +72,16 @@ function NavLink({
       href={href}
       onClick={onClick}
       className={[
-        'flex items-center rounded-[var(--radius-md)] text-sm transition-colors duration-150 mb-0.5',
-        collapsed ? 'justify-center py-2 px-0' : 'gap-3 px-3 py-2',
+        'flex items-center rounded-[var(--radius-md)] text-[15px] transition-colors duration-200 mb-2',
+        collapsed ? 'justify-center py-3 px-0' : 'gap-3 px-4 py-3',
         active
           ? 'bg-brand-light text-brand font-medium'
-          : 'text-content-muted hover:bg-surface hover:text-content',
+          : 'text-content-muted hover:bg-surface-subtle hover:text-content',
       ].join(' ')}
       aria-current={active ? 'page' : undefined}
       title={collapsed ? label : undefined}
     >
-      <Icon size={18} weight={active ? 'fill' : 'regular'} className="shrink-0" aria-hidden="true" />
+      <Icon size={20} weight={active ? 'bold' : 'regular'} className="shrink-0" aria-hidden="true" />
       {!collapsed && <span>{label}</span>}
     </Link>
   )
@@ -104,8 +106,9 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
   }, [])
 
   function isActive(href: string): boolean {
-    if (href === '/tailor' && pathname.startsWith('/tailor')) return true
-    return pathname.startsWith(href) && href !== '/tailor'
+    if (href === '/dashboard' && pathname === '/dashboard') return true
+    if (href !== '/dashboard' && pathname.startsWith(href)) return true
+    return false
   }
 
   async function handleSignOut() {
@@ -118,40 +121,37 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
   return (
     <div
       className={[
-        'flex flex-col h-screen sticky top-0 overflow-y-auto transition-all duration-200',
-        collapsed ? 'w-[56px]' : 'w-[228px]',
+        'flex flex-col h-screen sticky top-0 overflow-y-auto transition-all duration-300 z-50',
+        collapsed ? 'w-[72px]' : 'w-[240px]',
       ].join(' ')}
       style={{
-        backgroundColor: 'var(--sidebar-bg)',
-        borderRight: '1px solid var(--sidebar-border)',
+        backgroundColor: 'var(--surface)',
+        borderRight: '1px solid var(--border)',
       }}
     >
       {/* ── Top scrollable section ──────────────────────────────── */}
-      <div className="flex-1 overflow-y-auto">
+      <div className="flex-1 overflow-y-auto pb-4">
         {/* Brand */}
-        <div className={collapsed ? 'px-3 pt-5 pb-3 flex justify-center' : 'px-5 pt-5 pb-3'}>
+        <div className={collapsed ? 'p-4 flex justify-center mb-4' : 'p-6 mb-4 flex items-center gap-3'}>
           {collapsed ? (
-            <Link href="/tailor" className="font-display font-bold text-lg text-content" title="resumint">
-              R
+            <Link href="/dashboard" className="w-8 h-8 rounded-[var(--radius-sm)] bg-gradient-to-br from-[#16a34a] to-[#22c55e] flex items-center justify-center font-display font-bold text-white text-base shadow-[0_0_12px_rgba(22,163,74,0.3)]" title="ResumeMint">
+              M
             </Link>
           ) : (
-            <Link
-              href="/tailor"
-              className="font-display font-bold text-lg text-content inline-flex items-center"
-            >
-              resumint
-              <span className="inline-block w-1.5 h-1.5 rounded-full bg-brand ml-0.5 mb-1" aria-hidden="true" />
-            </Link>
-          )}
-          {!collapsed && (
-            <p className="text-[11px] text-content-subtle mt-1 leading-tight">
-              Your words, sharpened. Never made up.
-            </p>
+            <>
+              <div className="w-8 h-8 rounded-[var(--radius-sm)] bg-gradient-to-br from-[#16a34a] to-[#22c55e] flex items-center justify-center font-display font-bold text-white text-base shadow-[0_0_12px_rgba(22,163,74,0.3)] shrink-0">M</div>
+              <Link
+                href="/dashboard"
+                className="font-display font-semibold text-[1.2rem] tracking-tight text-content"
+              >
+                ResumeMint
+              </Link>
+            </>
           )}
         </div>
 
         {/* Navigation */}
-        <nav className="px-3 mt-1" aria-label="Main navigation">
+        <nav className="px-4" aria-label="Main navigation">
           {navItems.map((item) => (
             <NavLink
               key={item.href}
@@ -166,9 +166,9 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
 
         {/* Previously Built — hide when collapsed */}
         {!collapsed && (
-          <div className="px-5 mt-5">
-            <p className="text-[10px] font-semibold tracking-widest text-content-subtle uppercase mb-2">
-              Previously Built
+          <div className="px-6 mt-8">
+            <p className="text-[10px] font-semibold tracking-widest text-content-subtle uppercase mb-3">
+              Recent Tailors
             </p>
             {historyLoading ? (
               <div className="space-y-2">

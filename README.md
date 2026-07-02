@@ -12,52 +12,44 @@ User Browser
     │       ├── AppLayout (Sidebar desktop + MobileNav drawer)
     │       ├── AuthLayout (two-column split for auth pages)
     │       ├── Better Auth (Google OAuth, session, domain restriction)
-    │       ├── Dashboard: Home, Profile, History, Tailor
-    │       ├── Coming Soon: Resumes, Roles, Templates, ATS Score, Analytics, Settings
+    │       ├── Career Vault & Split-Screen Tailoring Builder
     │       ├── UI Components (Button, Input, Card, Badge, Avatar, Dialog, etc.)
-    │       └── @phosphor-icons/react
+    │       └── Zustand Global State (useBuilderStore, useChatStore)
     │
     ├── Render (Express — Backend API)
-    │       ├── /api/protected/* (authenticated routes: parse, profile, tailor, compile)
+    │       ├── /api/protected/* (all authenticated routes: chat, AI, compile)
     │       ├── /api/health (unauthenticated)
-    │       ├── LaTeX compilation (pdflatex)
-    │       └── Shared domain/core layer (Clean Architecture)
+    │       ├── OpenCode Zen AI Orchestration (Intent Parser, Vault Expander)
+    │       └── LaTeX compilation (pdflatex dynamic PDF generator)
     │
     ├── Supabase PostgreSQL (via Prisma v7)
     └── GitHub API (repo fetch, import)
 ```
 
-Vercel proxies `/api/*` (except `/api/auth/*`) to Render via `vercel.json` rewrites. Auth is handled **directly on Vercel** to keep session cookies on the same domain.
+Vercel proxies `/api/*` (except `/api/auth/*`) to Render via `vercel.json` rewrites. Auth is handled **directly on Vercel** to keep session cookies on the same domain. 
+The backend middleware intercepts `/api/protected/*` and strictly enforces the `better-auth` session.
 
 ## Tech Stack
 
 | Layer | Tech |
 |-------|------|
 | **Frontend** | Next.js 16.2 (App Router, Turbopack), React 19, TypeScript |
-| **Backend** | Express + tsx on Render |
+| **Backend** | Express + Hono + tsx on Render |
 | **Auth** | Better Auth v1.6 (Google OAuth, `@nsut.ac.in` domain restriction) |
 | **Database** | Supabase PostgreSQL via Prisma v7 |
-| **AI** | OpenCode Zen (`deepseek-v4-flash-free`) — parsing, tailoring, bullet generation |
+| **AI** | OpenCode Zen (`deepseek-v4-flash-free`) — intent parsing, vault generation |
 | **PDF** | LaTeX compilation (pdflatex) on Render |
-| **Styling** | Tailwind CSS v4, Satoshi/Inter/JetBrains Mono fonts |
+| **Styling** | Tailwind CSS v4 (Glassmorphism), Satoshi/Inter/JetBrains Mono fonts |
+| **State** | Zustand (Global stores for chat and split-screen builder) |
 | **Icons** | `@phosphor-icons/react` |
-| **Testing** | Vitest 4 + React Testing Library + jsdom |
-| **Deployment** | Vercel (frontend) + Render (backend) |
+| **Deployment**| Vercel (frontend) + Render (backend) |
 
-## UI Components
+## Core Features
 
-All in `src/components/ui/`: `Button` (4 variants, 3 sizes), `Input`/`Textarea`, `Badge` (6 colors), `Card` (3 variants), `Avatar`, `Dialog`, `Progress`, `Separator`, `Skeleton`, `Tooltip`.
-
-Layout components in `src/components/layout/`: `AppLayout` (sidebar + mobile nav), `Sidebar` (228px desktop), `MobileNav` (header + drawer), `AuthLayout` (two-column split).
-
-## Testing
-
-```bash
-npm test         # Run Vitest
-npm run test:ui  # Vitest UI mode
-```
-
-3 test files: sign-in button rendering + click, auth redirect logic, auth flow configuration.
+- **Chat-Driven Onboarding:** A conversational AI interface to build your initial career vault.
+- **Dynamic Vault Expansion:** AI expands simple project descriptions into 10-12 exhaustive bullet points.
+- **Split-Screen Tailoring Builder:** A split view with the Chat Vault on the left and a live-compiling LaTeX PDF preview on the right.
+- **ATS-Optimized PDF Export:** Server-side LaTeX compilation guarantees perfect, ATS-readable text extraction.
 
 ## Getting Started
 
