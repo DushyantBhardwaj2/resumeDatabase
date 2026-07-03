@@ -198,7 +198,7 @@ function ContactEditor({ data, onChange }: { data: Profile; onChange: (d: Profil
         <div key={field}>
           <label className="text-xs text-content-muted mb-1 block">{label}</label>
           <input
-            value={(c as Record<string, string>)[field] || ''}
+            value={((c as unknown) as Record<string, any>)[field] || ''}
             onChange={(e) => set(field, e.target.value)}
             placeholder={placeholder}
             className="w-full h-8 bg-muted-bg border border-edge rounded-[var(--radius-md)] px-2.5 text-sm text-content placeholder:text-content-subtle outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors"

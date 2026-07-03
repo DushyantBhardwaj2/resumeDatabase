@@ -19,7 +19,7 @@ type TailorResponse = {
   original: {
     contact: Record<string, string>
     education: Record<string, unknown>[]
-    experience: Array<{ id?: string; company: string; role: string; startDate?: string; endDate?: string; vaultBullets: VaultBulletData[] }>
+    experience: Array<{ id?: string; company: string; role: string; startDate?: string; endDate?: string; current?: boolean; vaultBullets: VaultBulletData[] }>
     projects: Array<{ id?: string; title: string; url?: string; techStack: string[]; vaultBullets: VaultBulletData[] }>
     skills: { languages: string[]; frameworks: string[]; tools: string[] }
   }
