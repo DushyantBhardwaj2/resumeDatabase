@@ -6,6 +6,8 @@ import type { Container } from '../../di/container'
 export function createAiRouter(container: Container) {
   return new Hono<{ Variables: Variables }>()
     .post('/generate-bullets', async (c) => {
+      const session = c.get('session')
+      if (!session) return c.json({ error: 'Unauthorized' }, 401)
       const { section, rawInput, context } = await c.req.json()
 
       if (!section || !rawInput) {
@@ -21,6 +23,8 @@ export function createAiRouter(container: Container) {
       }
     })
     .post('/expand-vault', async (c) => {
+      const session = c.get('session')
+      if (!session) return c.json({ error: 'Unauthorized' }, 401)
       const body = await c.req.json()
       try {
         const result = await container.chatUseCases.expandVault(body)

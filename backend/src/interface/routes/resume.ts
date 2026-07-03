@@ -22,14 +22,16 @@ const compileLiveSchema = z.object({
   selectedExperienceIds: z.array(z.string().max(100)).max(50).optional(),
   selectedProjectIds: z.array(z.string().max(100)).max(50).optional(),
   contactSelection: z.object({
-    email: z.string().max(500).optional(),
-    phone: z.string().max(100).optional(),
-    linkedin: z.string().max(1000).optional(),
-    github: z.string().max(1000).optional(),
-    portfolio: z.string().max(1000).optional(),
+    name: z.string().max(1000).optional(),
+    email: z.union([z.string().max(500), z.array(z.string().max(500))]).optional(),
+    phone: z.union([z.string().max(100), z.array(z.string().max(100))]).optional(),
+    linkedin: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
+    github: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
+    portfolio: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
+    leetcode: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
   }).optional(),
   profile: z.object({
-    contact: z.record(z.string(), z.string().max(1000).nullable()).optional().nullable(),
+    contact: z.record(z.string(), z.union([z.string(), z.array(z.string())]).nullable()).optional().nullable(),
     education: z.array(z.record(z.string(), z.unknown())).max(10).optional().nullable(),
     experience: z.array(z.object({
       id: z.string().max(100).optional(),
@@ -117,12 +119,12 @@ export function createResumeRouter(container: Container) {
 
       let experienceToKeep = profile.experience || []
       if (selectedExperienceIds) {
-        experienceToKeep = experienceToKeep.filter((e) => selectedExperienceIds.includes(e.id!))
+        experienceToKeep = experienceToKeep.filter((e) => selectedExperienceIds.includes(e.id || ''))
       }
 
       let projectsToKeep = profile.projects || []
       if (selectedProjectIds) {
-        projectsToKeep = projectsToKeep.filter((p) => selectedProjectIds.includes(p.id!))
+        projectsToKeep = projectsToKeep.filter((p) => selectedProjectIds.includes(p.id || ''))
       }
 
       const filteredExperience = filterExperienceBySelection(experienceToKeep, selectedBulletIds)

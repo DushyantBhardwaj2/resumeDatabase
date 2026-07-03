@@ -102,12 +102,6 @@ export function PdfPreviewPanel() {
             <p className="text-xs text-content-subtle mt-1">Fill in the job details and create your resume</p>
           </div>
         )}
-        {!pdfUrl && status === 'selecting' && (
-          <div className="flex items-center gap-3 text-content-muted text-sm mt-12">
-            <span className="w-4 h-4 rounded-full border-2 border-brand border-t-transparent animate-spin" />
-            Compiling initial PDF...
-          </div>
-        )}
       </div>
     </div>
   )

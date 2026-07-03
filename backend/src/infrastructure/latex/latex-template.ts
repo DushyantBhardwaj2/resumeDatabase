@@ -80,19 +80,25 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
     const texPath = join(this.templatesDir, templateId, "template.tex")
     let tex = readFileSync(texPath, "utf-8")
 
-    const data = tailored as TailoredData
+    const data = (tailored as TailoredData) || {}
     const safeContact = contact || {} as Contact
     const safeEducation = education || []
     const safeExperience = experience || []
     const safeProjects = projects || []
     const safeSkills = skills || { languages: [], frameworks: [], tools: [] }
 
-    const name = typeof safeContact.name === "string" && safeContact.name.length > 0 ? safeContact.name : "User"
-    const phone = typeof safeContact.phone === "string" ? safeContact.phone : ""
-    const email = typeof safeContact.email === "string" && safeContact.email.length > 0 ? safeContact.email : "email@example.com"
-    const linkedin = typeof safeContact.linkedin === "string" ? safeContact.linkedin : ""
-    const leetcode = typeof safeContact.leetcode === "string" ? safeContact.leetcode : ""
-    const github = typeof safeContact.github === "string" ? safeContact.github : ""
+    const getString = (val: unknown): string => {
+      if (Array.isArray(val) && val.length > 0) return String(val[0])
+      if (typeof val === "string") return val
+      return ""
+    }
+    
+    const name = getString(safeContact.name) || "User"
+    const phone = getString(safeContact.phone)
+    const email = getString(safeContact.email) || "email@example.com"
+    const linkedin = getString(safeContact.linkedin)
+    const leetcode = getString(safeContact.leetcode)
+    const github = getString(safeContact.github)
 
     tex = tex.replace(/\{\{FULL_NAME\}\}/g, esc(name))
     tex = tex.replace(/\{\{PHONE\}\}/g, esc(phone))

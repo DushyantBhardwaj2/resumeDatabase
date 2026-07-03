@@ -14,7 +14,7 @@ import { SkillsSelectionWidget } from './SkillsSelectionWidget'
 export function GenerateChatWorkspace() {
   const scrollRef = useRef<HTMLDivElement>(null)
   
-  const { entries, generating, handleSubmitJD } = useTailorChat()
+  const { entries, generating, handleSubmitJD, addChatEntry } = useTailorChat()
 
   const profile = useBuilderStore((s) => s.profile)
   const status = useBuilderStore((s) => s.status)
@@ -30,7 +30,7 @@ export function GenerateChatWorkspace() {
     if (scrollRef.current) {
       scrollRef.current.scrollTop = scrollRef.current.scrollHeight
     }
-  }, [entries, profile, status])
+  }, [entries])
 
   // Debounced live recompile on bullet toggle
   const compileTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -113,19 +113,43 @@ export function GenerateChatWorkspace() {
           }
 
           if (entry.type === 'contact-selection') {
-            return <ContactSelectionWidget key={entry.id} content={entry.content} />
+            return (
+              <ContactSelectionWidget 
+                key={entry.id} 
+                content={entry.content} 
+                onNext={() => addChatEntry({ role: 'assistant', type: 'experience-selection', content: "Great! Now let's review your Work Experience." })} 
+              />
+            )
           }
 
           if (entry.type === 'experience-selection') {
-            return <ExperienceSelectionWidget key={entry.id} content={entry.content} />
+            return (
+              <ExperienceSelectionWidget 
+                key={entry.id} 
+                content={entry.content} 
+                onNext={() => addChatEntry({ role: 'assistant', type: 'project-selection', content: "Next up, let's review your Projects." })} 
+              />
+            )
           }
 
           if (entry.type === 'project-selection') {
-            return <ProjectSelectionWidget key={entry.id} content={entry.content} />
+            return (
+              <ProjectSelectionWidget 
+                key={entry.id} 
+                content={entry.content} 
+                onNext={() => addChatEntry({ role: 'assistant', type: 'skills-selection', content: "Finally, let's review your Skills." })} 
+              />
+            )
           }
 
           if (entry.type === 'skills-selection') {
-            return <SkillsSelectionWidget key={entry.id} content={entry.content} />
+            return (
+              <SkillsSelectionWidget 
+                key={entry.id} 
+                content={entry.content} 
+                onNext={() => addChatEntry({ role: 'assistant', type: 'greeting', content: "All done! Your resume is ready to download." })}
+              />
+            )
           }
 
           return null

@@ -6,6 +6,8 @@ import type { Container } from '../../di/container'
 export function createChatRouter(container: Container) {
   return new Hono<{ Variables: Variables }>()
     .post('/interact', async (c) => {
+      const session = c.get('session')
+      if (!session) return c.json({ error: 'Unauthorized' }, 401)
       const body = await c.req.json()
       try {
         const result = await container.chatUseCases.parseIntent(body)

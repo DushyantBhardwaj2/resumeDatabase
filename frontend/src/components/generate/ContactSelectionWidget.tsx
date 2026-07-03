@@ -2,25 +2,24 @@
 
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { Sparkle, EnvelopeSimple, Phone, LinkedinLogo, GithubLogo, Globe } from '@phosphor-icons/react'
-import { useTailorChat } from './useTailorChat'
 
-export function ContactSelectionWidget({ content }: { content?: string }) {
+export function ContactSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
   const contactSelection = useBuilderStore((s) => s.contactSelection)
   const setContactSelection = useBuilderStore((s) => s.setContactSelection)
-  const { addChatEntry } = useTailorChat()
 
   if (!profile || !profile.contact) return null
 
   const handleNext = () => {
-    addChatEntry({ role: 'assistant', type: 'experience-selection', content: "Great! Now let's review your Work Experience." })
+    if (onNext) onNext()
   }
 
-  const emails = profile.contact.email ? [profile.contact.email] : []
-  const phones = profile.contact.phone ? [profile.contact.phone] : []
-  const linkedins = profile.contact.linkedin ? [profile.contact.linkedin] : []
-  const githubs = profile.contact.github ? [profile.contact.github] : []
-  const portfolios = profile.contact.portfolio ? [profile.contact.portfolio] : []
+  const getArray = (val: unknown) => Array.isArray(val) ? val as string[] : (val ? [val as string] : [])
+  const emails = getArray(profile.contact.email).concat(profile.contact.emails || [])
+  const phones = getArray(profile.contact.phone).concat(profile.contact.phones || [])
+  const linkedins = getArray(profile.contact.linkedin).concat(profile.contact.linkedins || [])
+  const githubs = getArray(profile.contact.github).concat(profile.contact.githubs || [])
+  const portfolios = getArray(profile.contact.portfolio).concat(profile.contact.portfolios || [])
 
   const selectedEmail = contactSelection.email ?? emails[0] ?? ''
   const selectedPhone = contactSelection.phone ?? phones[0] ?? ''

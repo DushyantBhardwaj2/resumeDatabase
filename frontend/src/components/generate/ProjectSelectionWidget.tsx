@@ -3,9 +3,8 @@
 import { useState } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { Sparkle, CheckSquare, Square, Plus, MagicWand } from '@phosphor-icons/react'
-import { useTailorChat } from './useTailorChat'
 
-export function ProjectSelectionWidget({ content }: { content?: string }) {
+export function ProjectSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
   const setProfile = useBuilderStore((s) => s.setProfile)
   const selectedProjectIds = useBuilderStore((s) => s.selectedProjectIds)
@@ -14,14 +13,12 @@ export function ProjectSelectionWidget({ content }: { content?: string }) {
   const selectedBulletIds = useBuilderStore((s) => s.selectedBulletIds)
   const toggleBullet = useBuilderStore((s) => s.toggleBullet)
   const setSelections = useBuilderStore((s) => s.setSelections)
-  
-  const { addChatEntry } = useTailorChat()
 
   if (!profile || !profile.projects?.length) {
     return (
       <div className="mt-4 flex justify-end">
         <button 
-          onClick={() => addChatEntry({ role: 'assistant', type: 'skills-selection', content: "Finally, let's review your Skills." })}
+          onClick={() => onNext?.()}
           className="px-4 py-2 bg-brand/10 text-brand hover:bg-brand/20 transition-colors rounded-md text-sm font-medium"
         >
           Skip Projects & Next
@@ -31,7 +28,7 @@ export function ProjectSelectionWidget({ content }: { content?: string }) {
   }
 
   const handleNext = () => {
-    addChatEntry({ role: 'assistant', type: 'skills-selection', content: "Finally, let's review your Skills." })
+    if (onNext) onNext()
   }
 
   const addCustomBullet = (projId: string, text: string) => {

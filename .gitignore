@@ -46,3 +46,6 @@ next-env.d.ts
 
 frontend/src/generated/prisma
 backend/src/generated/prisma
+
+# graphify
+graphify-out/

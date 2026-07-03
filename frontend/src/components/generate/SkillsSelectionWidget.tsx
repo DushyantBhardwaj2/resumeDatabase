@@ -4,7 +4,7 @@ import { useState } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { Sparkle, Plus, X } from '@phosphor-icons/react'
 
-export function SkillsSelectionWidget({ content }: { content?: string }) {
+export function SkillsSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
   const setProfile = useBuilderStore((s) => s.setProfile)
 
@@ -73,7 +73,7 @@ export function SkillsSelectionWidget({ content }: { content?: string }) {
           <button 
             className="px-4 py-2 bg-brand text-brand-fg transition-colors rounded-md text-sm font-medium shadow-md shadow-brand/20"
             onClick={() => {
-              // The PDF Preview automatically compiles on changes, so we just acknowledge completion
+              if (onNext) onNext()
             }}
           >
             Review PDF Preview

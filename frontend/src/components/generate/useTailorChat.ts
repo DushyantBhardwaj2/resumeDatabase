@@ -120,7 +120,7 @@ export function useTailorChat() {
           role: orig.role,
           startDate: orig.startDate || '',
           endDate: orig.endDate || '',
-          current: false,
+          current: orig.current || false,
           vaultBullets: finalBullets,
         }
       })
@@ -162,13 +162,11 @@ export function useTailorChat() {
       setProfile(normalizeProfile(mergedProfile))
       setCurrentStage('reviewing')
       
-      const store = useBuilderStore.getState()
-      store.setSelections(selectedBulletIds)
-      
-      // We also need to update the newly added state properties
+      // Consolidate state updates
       useBuilderStore.setState({
         selectedExperienceIds,
-        selectedProjectIds
+        selectedProjectIds,
+        selectedBulletIds
       })
 
       setPdfUrl(null)
@@ -179,12 +177,7 @@ export function useTailorChat() {
         { id: 'contact-selection-' + Date.now(), role: 'assistant', type: 'contact-selection', content: "I've analyzed your profile against the job description! First, let's confirm your contact details for this resume." },
       ])
 
-      // Trigger initial compile
-      setStatus('compiling')
-      setTimeout(() => {
-        const { triggerCompile } = useBuilderStore.getState()
-        triggerCompile()
-      }, 100)
+      setStatus('compiling') // Will be compiled by GenerateChatWorkspace's debounced useEffect
 
       toast.success('Initial draft generated! Let\'s tailor it.')
       return true

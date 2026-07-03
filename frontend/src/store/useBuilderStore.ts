@@ -77,7 +77,18 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   status: 'idle',
   currentStage: 'collecting',
 
-  setProfile: (profile) => set({ profile }),
+  setProfile: (profile) => {
+    const selectedExperienceIds = profile.experience?.map(e => e.id!) || []
+    const selectedProjectIds = profile.projects?.map(p => p.id!) || []
+    const selectedBulletIds: BuilderSelections = {}
+    profile.experience?.forEach(e => {
+      if (e.id) selectedBulletIds[e.id] = e.vaultBullets.map(b => b.id)
+    })
+    profile.projects?.forEach(p => {
+      if (p.id) selectedBulletIds[p.id] = p.vaultBullets.map(b => b.id)
+    })
+    set({ profile, selectedExperienceIds, selectedProjectIds, selectedBulletIds })
+  },
   setJobTitle: (title) => set({ jobTitle: title }),
   setCompany: (company) => set({ company }),
   setJobDescription: (jd) => set({ jobDescription: jd }),
@@ -217,7 +228,9 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
       console.error('Compile failed:', e instanceof Error ? e.message : e)
       set({ status: 'error' })
     } finally {
-      set({ isCompiling: false })
+      if (compileAbortController?.signal === signal) {
+        set({ isCompiling: false })
+      }
     }
   },
 
@@ -229,6 +242,8 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
       company: '',
       jobDescription: '',
       selectedBulletIds: {},
+      selectedExperienceIds: [],
+      selectedProjectIds: [],
       pdfUrl: null,
       zoom: 100,
       status: 'idle',

@@ -1,3 +1,5 @@
+'use client'
+
 import { useBuilderStore } from '@/store/useBuilderStore'
 import type { TemplateType } from '@/store/useBuilderStore'
 
