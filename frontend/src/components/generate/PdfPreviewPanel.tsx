@@ -67,23 +67,23 @@ export function PdfPreviewPanel() {
       </div>
 
       {/* PDF display area */}
-      <div className="flex-1 flex items-start justify-center p-6 pt-24 overflow-auto">
+      <div className="flex-1 flex items-start justify-center p-6 pt-24 overflow-auto relative">
         {isCompiling && (
-          <div className="flex items-center gap-3 text-content-muted text-sm mt-12">
-            <span className="w-4 h-4 rounded-full border-2 border-brand border-t-transparent animate-spin" />
-            Re-rendering PDF...
+          <div className="absolute top-28 right-8 z-20 flex items-center gap-2 bg-surface/90 border border-edge backdrop-blur-md px-3 py-1.5 rounded-full shadow-md text-xs text-content font-medium">
+            <span className="w-3.5 h-3.5 rounded-full border-2 border-brand border-t-transparent animate-spin" />
+            Updating PDF...
           </div>
         )}
         {status === 'error' && (
-          <div className="flex flex-col items-center mt-12 text-center">
+          <div className="flex flex-col items-center mt-12 text-center z-10">
             <p className="text-sm font-medium text-red-500">Compilation Error</p>
             <p className="text-xs text-content-muted mt-1">Check your LaTeX template for errors.</p>
           </div>
         )}
-        {pdfUrl && status === 'ready' ? (
+        {pdfUrl ? (
           <iframe
             src={`${pdfUrl}#toolbar=0`}
-            className="bg-white shadow-xl transition-all duration-200 border-0"
+            className={`bg-white shadow-xl transition-all duration-200 border-0 ${isCompiling ? 'opacity-75' : ''}`}
             style={{
               width: `${Math.max(8.5 * zoom, 100)}%`,
               height: `${11 * zoom}px`,
@@ -92,15 +92,16 @@ export function PdfPreviewPanel() {
             }}
             title="Resume Preview"
           />
-        ) : null}
-        {!pdfUrl && status === 'idle' && (
-          <div className="flex flex-col items-center mt-12 text-center">
-            <div className="w-16 h-20 border-2 border-dashed border-edge rounded-lg flex items-center justify-center mb-3">
-              <span className="text-2xl text-content-subtle">PDF</span>
+        ) : (
+          status === 'idle' && (
+            <div className="flex flex-col items-center mt-12 text-center">
+              <div className="w-16 h-20 border-2 border-dashed border-edge rounded-lg flex items-center justify-center mb-3">
+                <span className="text-2xl text-content-subtle">PDF</span>
+              </div>
+              <p className="text-sm text-content-muted">Your resume will appear here</p>
+              <p className="text-xs text-content-subtle mt-1">Fill in the job details and create your resume</p>
             </div>
-            <p className="text-sm text-content-muted">Your resume will appear here</p>
-            <p className="text-xs text-content-subtle mt-1">Fill in the job details and create your resume</p>
-          </div>
+          )
         )}
       </div>
     </div>
