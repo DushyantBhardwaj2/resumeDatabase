@@ -7,10 +7,11 @@ if (process.env.VERCEL) {
   console.log('Detected Vercel environment. Installing root dependencies and generating Prisma client...');
   try {
     execSync('npm install --include=dev', { cwd: path.join(process.cwd(), '..'), stdio: 'inherit' });
+    execSync('npm run build --workspace=packages/shared', { cwd: path.join(process.cwd(), '..'), stdio: 'inherit' });
     execSync('npx prisma generate --schema=backend/prisma/schema.prisma', { cwd: path.join(process.cwd(), '..'), stdio: 'inherit' });
-    console.log('Root dependencies installed and Prisma client generated successfully.');
+    console.log('Root dependencies installed, shared packages built, and Prisma client generated successfully.');
   } catch (error) {
-    console.error('Failed to install root dependencies or generate Prisma client:', error);
+    console.error('Failed to install root dependencies, build shared, or generate Prisma client:', error);
     process.exit(1);
   }
 }

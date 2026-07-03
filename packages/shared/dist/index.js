@@ -75,7 +75,12 @@ var contactSchema = import_zod.z.object({
   linkedin: import_zod.z.string().nullable(),
   github: import_zod.z.string().nullable(),
   leetcode: import_zod.z.string().nullable().optional(),
-  portfolio: import_zod.z.string().nullable()
+  portfolio: import_zod.z.string().nullable(),
+  emails: import_zod.z.array(import_zod.z.string()).default([]).optional(),
+  phones: import_zod.z.array(import_zod.z.string()).default([]).optional(),
+  linkedins: import_zod.z.array(import_zod.z.string()).default([]).optional(),
+  githubs: import_zod.z.array(import_zod.z.string()).default([]).optional(),
+  portfolios: import_zod.z.array(import_zod.z.string()).default([]).optional()
 });
 var educationSchema = import_zod.z.object({
   school: import_zod.z.string(),

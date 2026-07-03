@@ -34,6 +34,11 @@ declare const contactSchema: z.ZodObject<{
     github: z.ZodNullable<z.ZodString>;
     leetcode: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     portfolio: z.ZodNullable<z.ZodString>;
+    emails: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+    phones: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+    linkedins: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+    githubs: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+    portfolios: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
 }, "strip", z.ZodTypeAny, {
     name: string | null;
     email: string | null;
@@ -42,6 +47,11 @@ declare const contactSchema: z.ZodObject<{
     github: string | null;
     portfolio: string | null;
     leetcode?: string | null | undefined;
+    emails?: string[] | undefined;
+    phones?: string[] | undefined;
+    linkedins?: string[] | undefined;
+    githubs?: string[] | undefined;
+    portfolios?: string[] | undefined;
 }, {
     name: string | null;
     email: string | null;
@@ -50,6 +60,11 @@ declare const contactSchema: z.ZodObject<{
     github: string | null;
     portfolio: string | null;
     leetcode?: string | null | undefined;
+    emails?: string[] | undefined;
+    phones?: string[] | undefined;
+    linkedins?: string[] | undefined;
+    githubs?: string[] | undefined;
+    portfolios?: string[] | undefined;
 }>;
 type Contact = z.infer<typeof contactSchema>;
 declare const educationSchema: z.ZodObject<{
@@ -382,6 +397,11 @@ declare const profileSchema: z.ZodObject<{
         github: z.ZodNullable<z.ZodString>;
         leetcode: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         portfolio: z.ZodNullable<z.ZodString>;
+        emails: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+        phones: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+        linkedins: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+        githubs: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+        portfolios: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
     }, "strip", z.ZodTypeAny, {
         name: string | null;
         email: string | null;
@@ -390,6 +410,11 @@ declare const profileSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        emails?: string[] | undefined;
+        phones?: string[] | undefined;
+        linkedins?: string[] | undefined;
+        githubs?: string[] | undefined;
+        portfolios?: string[] | undefined;
     }, {
         name: string | null;
         email: string | null;
@@ -398,6 +423,11 @@ declare const profileSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        emails?: string[] | undefined;
+        phones?: string[] | undefined;
+        linkedins?: string[] | undefined;
+        githubs?: string[] | undefined;
+        portfolios?: string[] | undefined;
     }>;
     education: z.ZodArray<z.ZodObject<{
         school: z.ZodString;
@@ -564,6 +594,11 @@ declare const profileSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        emails?: string[] | undefined;
+        phones?: string[] | undefined;
+        linkedins?: string[] | undefined;
+        githubs?: string[] | undefined;
+        portfolios?: string[] | undefined;
     };
     education: {
         school: string;
@@ -622,6 +657,11 @@ declare const profileSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        emails?: string[] | undefined;
+        phones?: string[] | undefined;
+        linkedins?: string[] | undefined;
+        githubs?: string[] | undefined;
+        portfolios?: string[] | undefined;
     };
     education: {
         school: string;
@@ -754,6 +794,11 @@ declare const parsedResumeSchema: z.ZodObject<{
         github: z.ZodNullable<z.ZodString>;
         leetcode: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         portfolio: z.ZodNullable<z.ZodString>;
+        emails: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+        phones: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+        linkedins: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+        githubs: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+        portfolios: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
     }, "strip", z.ZodTypeAny, {
         name: string | null;
         email: string | null;
@@ -762,6 +807,11 @@ declare const parsedResumeSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        emails?: string[] | undefined;
+        phones?: string[] | undefined;
+        linkedins?: string[] | undefined;
+        githubs?: string[] | undefined;
+        portfolios?: string[] | undefined;
     }, {
         name: string | null;
         email: string | null;
@@ -770,6 +820,11 @@ declare const parsedResumeSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        emails?: string[] | undefined;
+        phones?: string[] | undefined;
+        linkedins?: string[] | undefined;
+        githubs?: string[] | undefined;
+        portfolios?: string[] | undefined;
     }>;
     education: z.ZodArray<z.ZodObject<{
         school: z.ZodString;
@@ -973,6 +1028,11 @@ declare const parsedResumeSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        emails?: string[] | undefined;
+        phones?: string[] | undefined;
+        linkedins?: string[] | undefined;
+        githubs?: string[] | undefined;
+        portfolios?: string[] | undefined;
     };
     education: {
         school: string;
@@ -1032,6 +1092,11 @@ declare const parsedResumeSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        emails?: string[] | undefined;
+        phones?: string[] | undefined;
+        linkedins?: string[] | undefined;
+        githubs?: string[] | undefined;
+        portfolios?: string[] | undefined;
     };
     education: {
         school: string;

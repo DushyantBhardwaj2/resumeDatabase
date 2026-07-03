@@ -32,7 +32,12 @@ var contactSchema = z.object({
   linkedin: z.string().nullable(),
   github: z.string().nullable(),
   leetcode: z.string().nullable().optional(),
-  portfolio: z.string().nullable()
+  portfolio: z.string().nullable(),
+  emails: z.array(z.string()).default([]).optional(),
+  phones: z.array(z.string()).default([]).optional(),
+  linkedins: z.array(z.string()).default([]).optional(),
+  githubs: z.array(z.string()).default([]).optional(),
+  portfolios: z.array(z.string()).default([]).optional()
 });
 var educationSchema = z.object({
   school: z.string(),
