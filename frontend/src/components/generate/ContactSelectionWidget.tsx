@@ -16,11 +16,11 @@ export function ContactSelectionWidget({ content }: { content?: string }) {
     addChatEntry({ role: 'assistant', type: 'experience-selection', content: "Great! Now let's review your Work Experience." })
   }
 
-  const emails = profile.contact.emails?.length ? profile.contact.emails : (profile.contact.email ? [profile.contact.email] : [])
-  const phones = profile.contact.phones?.length ? profile.contact.phones : (profile.contact.phone ? [profile.contact.phone] : [])
-  const linkedins = profile.contact.linkedins?.length ? profile.contact.linkedins : (profile.contact.linkedin ? [profile.contact.linkedin] : [])
-  const githubs = profile.contact.githubs?.length ? profile.contact.githubs : (profile.contact.github ? [profile.contact.github] : [])
-  const portfolios = profile.contact.portfolios?.length ? profile.contact.portfolios : (profile.contact.portfolio ? [profile.contact.portfolio] : [])
+  const emails = profile.contact.email ? [profile.contact.email] : []
+  const phones = profile.contact.phone ? [profile.contact.phone] : []
+  const linkedins = profile.contact.linkedin ? [profile.contact.linkedin] : []
+  const githubs = profile.contact.github ? [profile.contact.github] : []
+  const portfolios = profile.contact.portfolio ? [profile.contact.portfolio] : []
 
   const selectedEmail = contactSelection.email ?? emails[0] ?? ''
   const selectedPhone = contactSelection.phone ?? phones[0] ?? ''
