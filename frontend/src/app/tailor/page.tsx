@@ -80,15 +80,18 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
     centerEl.style.flex = 'none'
   }, [setSavedWidths])
 
-  // Clone/edit hydration or fresh workspace reset
+  // Fresh workspace reset on mount
   const reset = useBuilderStore((s) => s.reset)
   useEffect(() => {
-    const id = cloneId || editId
-    if (!id) {
+    if (!cloneId && !editId) {
       reset()
-      return
     }
-    if (profile || loaded.current) return
+  }, [cloneId, editId, reset])
+
+  // Clone/edit hydration
+  useEffect(() => {
+    const id = cloneId || editId
+    if (!id || profile || loaded.current) return
     loaded.current = true
 
     async function loadClone() {

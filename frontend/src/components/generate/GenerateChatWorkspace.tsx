@@ -23,6 +23,7 @@ export function GenerateChatWorkspace() {
   const selectedProjectIds = useBuilderStore((s) => s.selectedProjectIds)
   const contactSelection = useBuilderStore((s) => s.contactSelection)
   const currentStage = useBuilderStore((s) => s.currentStage)
+  const setCurrentStage = useBuilderStore((s) => s.setCurrentStage)
   const triggerCompile = useBuilderStore((s) => s.triggerCompile)
 
   // Auto-scroll
@@ -147,7 +148,10 @@ export function GenerateChatWorkspace() {
               <SkillsSelectionWidget 
                 key={entry.id} 
                 content={entry.content} 
-                onNext={() => addChatEntry({ role: 'assistant', type: 'greeting', content: "All done! Your resume is ready to download." })}
+                onNext={() => {
+                  setCurrentStage('ready')
+                  addChatEntry({ role: 'assistant', type: 'greeting', content: "All done! Your resume is ready to download." })
+                }}
               />
             )
           }
@@ -156,7 +160,14 @@ export function GenerateChatWorkspace() {
         })}
       </div>
 
-      <ChatComposer onSubmit={handleSubmitJD} generating={generating} />
+      {currentStage === 'ready' ? (
+        <div className="p-5 border-t border-edge/50 bg-surface/30 backdrop-blur-md text-center">
+          <p className="text-sm font-semibold text-fg">Resume tailoring is complete!</p>
+          <p className="text-xs text-content-muted mt-1">You can now download the PDF or make further adjustments directly on the right panel.</p>
+        </div>
+      ) : (
+        <ChatComposer onSubmit={handleSubmitJD} generating={generating} />
+      )}
     </div>
   )
 }
