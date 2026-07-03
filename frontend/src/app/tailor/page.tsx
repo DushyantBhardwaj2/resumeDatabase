@@ -82,11 +82,12 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
 
   // Fresh workspace reset on mount
   const reset = useBuilderStore((s) => s.reset)
+  const currentStage = useBuilderStore((s) => s.currentStage)
   useEffect(() => {
-    if (!cloneId && !editId) {
+    if (!cloneId && !editId && currentStage === 'collecting') {
       reset()
     }
-  }, [cloneId, editId, reset])
+  }, [cloneId, editId, currentStage, reset])
 
   // Clone/edit hydration
   useEffect(() => {

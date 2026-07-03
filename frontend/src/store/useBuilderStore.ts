@@ -1,5 +1,6 @@
 import { create } from 'zustand'
 import { api } from '@/config/api-client'
+import { toast } from 'sonner'
 
 import type { Profile } from '@resumint/shared'
 export type BuilderSelections = Record<string, string[]>
@@ -226,6 +227,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
         return
       }
       console.error('Compile failed:', e instanceof Error ? e.message : e)
+      toast.error(e instanceof Error ? e.message : 'PDF compilation failed')
       set({ status: 'error' })
     } finally {
       if (compileAbortController?.signal === signal) {
@@ -238,12 +240,14 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     const { pdfUrl } = get()
     if (pdfUrl) URL.revokeObjectURL(pdfUrl)
     set({
+      profile: null,
       jobTitle: '',
       company: '',
       jobDescription: '',
       selectedBulletIds: {},
       selectedExperienceIds: [],
       selectedProjectIds: [],
+      contactSelection: {},
       pdfUrl: null,
       zoom: 100,
       status: 'idle',
