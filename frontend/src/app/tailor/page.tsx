@@ -102,15 +102,21 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
         setProfile(normalizeProfile(original))
 
         const selections: Record<string, string[]> = {}
+        const selectedExperienceIds: string[] = []
+        const selectedProjectIds: string[] = []
+        
         for (const exp of (td.tailored?.experience || [])) {
           const eid = (exp.id as string) || crypto.randomUUID()
           selections[eid] = ((exp.vaultBullets || []) as Array<{ id: string }>).map((b) => b.id)
+          selectedExperienceIds.push(eid)
         }
         for (const proj of (td.tailored?.projects || [])) {
           const pid = (proj.id as string) || crypto.randomUUID()
           selections[pid] = ((proj.vaultBullets || []) as Array<{ id: string }>).map((b) => b.id)
+          selectedProjectIds.push(pid)
         }
         setSelections(selections)
+        useBuilderStore.setState({ selectedExperienceIds, selectedProjectIds })
         setCurrentStage('reviewing')
       } catch {
         toast.error('Failed to load cloned resume. Starting with a blank workspace.')

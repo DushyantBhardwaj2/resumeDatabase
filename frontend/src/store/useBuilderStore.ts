@@ -10,12 +10,23 @@ export type GenerationStatus = 'idle' | 'selecting' | 'queued' | 'compiling' | '
 
 export type CurrentStage = 'idle' | 'collecting' | 'generating' | 'reviewing' | 'compiling' | 'ready' | 'error'
 
+export interface ResumeContactSelection {
+  email?: string
+  phone?: string
+  linkedin?: string
+  github?: string
+  portfolio?: string
+}
+
 interface BuilderStore {
   profile: Profile | null
   jobTitle: string
   company: string
   jobDescription: string
   selectedBulletIds: BuilderSelections
+  selectedExperienceIds: string[]
+  selectedProjectIds: string[]
+  contactSelection: ResumeContactSelection
   isCompiling: boolean
   pdfUrl: string | null
   zoom: number
@@ -29,6 +40,9 @@ interface BuilderStore {
   setCompany: (company: string) => void
   setJobDescription: (jd: string) => void
   toggleBullet: (itemId: string, bulletId: string) => void
+  toggleExperience: (id: string) => void
+  toggleProject: (id: string) => void
+  setContactSelection: (contact: ResumeContactSelection) => void
   setSelections: (selections: BuilderSelections) => void
   setCompiling: (compiling: boolean) => void
   setPdfUrl: (url: string | null) => void
@@ -52,6 +66,9 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   company: '',
   jobDescription: '',
   selectedBulletIds: {},
+  selectedExperienceIds: [],
+  selectedProjectIds: [],
+  contactSelection: {},
   isCompiling: false,
   pdfUrl: null,
   zoom: 100,
@@ -76,6 +93,28 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
         selectedBulletIds: { ...state.selectedBulletIds, [itemId]: newList },
       }
     }),
+
+  toggleExperience: (id) =>
+    set((state) => {
+      const exists = state.selectedExperienceIds.includes(id)
+      return {
+        selectedExperienceIds: exists
+          ? state.selectedExperienceIds.filter((x) => x !== id)
+          : [...state.selectedExperienceIds, id],
+      }
+    }),
+
+  toggleProject: (id) =>
+    set((state) => {
+      const exists = state.selectedProjectIds.includes(id)
+      return {
+        selectedProjectIds: exists
+          ? state.selectedProjectIds.filter((x) => x !== id)
+          : [...state.selectedProjectIds, id],
+      }
+    }),
+
+  setContactSelection: (contact) => set({ contactSelection: contact }),
 
   setSelections: (selections) => set({ selectedBulletIds: selections }),
 
@@ -102,7 +141,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   },
 
   triggerCompile: async () => {
-    const { profile, selectedBulletIds, template } = get()
+    const { profile, selectedBulletIds, selectedExperienceIds, selectedProjectIds, contactSelection, template } = get()
     if (!profile) return
 
     // Cancel any previous polling loop that's still running
@@ -115,7 +154,14 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     try {
       // ── Step 1: Enqueue the job ────────────────────────────────────────────
       const enqueueRes = await api.api.protected.resume['compile-live'].$post({
-        json: { profile, selectedBulletIds, templateId: template },
+        json: { 
+          profile, 
+          selectedBulletIds, 
+          selectedExperienceIds,
+          selectedProjectIds,
+          contactSelection,
+          templateId: template 
+        },
       }, { init: { signal } })
       
       if (!enqueueRes.ok) {

@@ -19,6 +19,15 @@ const vaultBulletSchema = z.object({
 const compileLiveSchema = z.object({
   templateId: z.enum(['nsut-canonical', 'ats-clean', 'modern', 'compact']),
   selectedBulletIds: z.record(z.string().max(100), z.array(z.string().max(100)).max(200)).optional().default({}),
+  selectedExperienceIds: z.array(z.string().max(100)).max(50).optional(),
+  selectedProjectIds: z.array(z.string().max(100)).max(50).optional(),
+  contactSelection: z.object({
+    email: z.string().max(500).optional(),
+    phone: z.string().max(100).optional(),
+    linkedin: z.string().max(1000).optional(),
+    github: z.string().max(1000).optional(),
+    portfolio: z.string().max(1000).optional(),
+  }).optional(),
   profile: z.object({
     contact: z.record(z.string(), z.string().max(1000).nullable()).optional().nullable(),
     education: z.array(z.record(z.string(), z.unknown())).max(10).optional().nullable(),
@@ -104,14 +113,29 @@ export function createResumeRouter(container: Container) {
       return c.json({ message: 'Not implemented in backend yet' }, 501)
     })
     .post('/compile-live', zValidator('json', compileLiveSchema), async (c) => {
-      const { profile, selectedBulletIds, templateId: safeTemplateId } = c.req.valid('json')
+      const { profile, selectedBulletIds, selectedExperienceIds, selectedProjectIds, contactSelection, templateId: safeTemplateId } = c.req.valid('json')
 
-      const filteredExperience = filterExperienceBySelection(profile.experience || [], selectedBulletIds)
-      const filteredProjects = filterProjectsBySelection(profile.projects || [], selectedBulletIds)
+      let experienceToKeep = profile.experience || []
+      if (selectedExperienceIds) {
+        experienceToKeep = experienceToKeep.filter((e) => selectedExperienceIds.includes(e.id!))
+      }
+
+      let projectsToKeep = profile.projects || []
+      if (selectedProjectIds) {
+        projectsToKeep = projectsToKeep.filter((p) => selectedProjectIds.includes(p.id!))
+      }
+
+      const filteredExperience = filterExperienceBySelection(experienceToKeep, selectedBulletIds)
+      const filteredProjects = filterProjectsBySelection(projectsToKeep, selectedBulletIds)
+
+      const effectiveContact = {
+        ...(profile.contact || {}),
+        ...(contactSelection || {})
+      }
 
       const latexSource = container.latexTemplate.fill(
         safeTemplateId,
-        profile.contact || null,
+        effectiveContact,
         profile.education || null,
         filteredExperience,
         filteredProjects,

@@ -5,8 +5,11 @@ import { Sparkle } from '@phosphor-icons/react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { useTailorChat } from './useTailorChat'
 import { JobDetailsForm } from './JobDetailsForm'
-import { BulletChecklist } from './BulletChecklist'
 import { ChatComposer } from './ChatComposer'
+import { ContactSelectionWidget } from './ContactSelectionWidget'
+import { ExperienceSelectionWidget } from './ExperienceSelectionWidget'
+import { ProjectSelectionWidget } from './ProjectSelectionWidget'
+import { SkillsSelectionWidget } from './SkillsSelectionWidget'
 
 export function GenerateChatWorkspace() {
   const scrollRef = useRef<HTMLDivElement>(null)
@@ -16,6 +19,9 @@ export function GenerateChatWorkspace() {
   const profile = useBuilderStore((s) => s.profile)
   const status = useBuilderStore((s) => s.status)
   const selectedBulletIds = useBuilderStore((s) => s.selectedBulletIds)
+  const selectedExperienceIds = useBuilderStore((s) => s.selectedExperienceIds)
+  const selectedProjectIds = useBuilderStore((s) => s.selectedProjectIds)
+  const contactSelection = useBuilderStore((s) => s.contactSelection)
   const currentStage = useBuilderStore((s) => s.currentStage)
   const triggerCompile = useBuilderStore((s) => s.triggerCompile)
 
@@ -35,7 +41,7 @@ export function GenerateChatWorkspace() {
     return () => {
       if (compileTimer.current) clearTimeout(compileTimer.current)
     }
-  }, [selectedBulletIds, profile, currentStage, triggerCompile])
+  }, [selectedBulletIds, selectedExperienceIds, selectedProjectIds, contactSelection, profile, currentStage, triggerCompile])
 
   return (
     <div className="flex flex-col h-full relative">
@@ -106,12 +112,20 @@ export function GenerateChatWorkspace() {
             )
           }
 
-          if (entry.type === 'checklist') {
-            return (
-              <div key={entry.id}>
-                <BulletChecklist />
-              </div>
-            )
+          if (entry.type === 'contact-selection') {
+            return <ContactSelectionWidget key={entry.id} content={entry.content} />
+          }
+
+          if (entry.type === 'experience-selection') {
+            return <ExperienceSelectionWidget key={entry.id} content={entry.content} />
+          }
+
+          if (entry.type === 'project-selection') {
+            return <ProjectSelectionWidget key={entry.id} content={entry.content} />
+          }
+
+          if (entry.type === 'skills-selection') {
+            return <SkillsSelectionWidget key={entry.id} content={entry.content} />
           }
 
           return null

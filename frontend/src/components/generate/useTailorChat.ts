@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 export type ChatEntry = {
   id: string
   role: 'assistant' | 'user'
-  type: 'greeting' | 'job-details-form' | 'user-jd' | 'generating' | 'checklist' | 'error'
+  type: 'greeting' | 'job-details-form' | 'user-jd' | 'generating' | 'contact-selection' | 'experience-selection' | 'project-selection' | 'skills-selection' | 'error'
   content?: string
 }
 
@@ -87,68 +87,96 @@ export function useTailorChat() {
       }
       const data: TailorResponse = (await res.json()) as unknown as TailorResponse
 
-      // Merge original contact/education with tailored experience/projects/skills
-      const originalExpMap = new Map(data.original.experience.map((e) => [e.company + '|' + e.role, e]))
-      const originalProjMap = new Map(data.original.projects.map((p) => [p.title, p]))
+      // Map tailored items for quick lookup
+      const tailoredExpMap = new Map(data.tailored.experience.map((e) => [e.company + '|' + e.role, e]))
+      const tailoredProjMap = new Map(data.tailored.projects.map((p) => [p.title, p]))
+
+      const selectedBulletIds: Record<string, string[]> = {}
+      const selectedExperienceIds: string[] = []
+      const selectedProjectIds: string[] = []
+
+      // Keep ALL original experiences, but inject tailored bullets at the top if AI selected them
+      const mergedExperience = data.original.experience.map((orig) => {
+        const id = orig.id || crypto.randomUUID()
+        const tailored = tailoredExpMap.get(orig.company + '|' + orig.role)
+        
+        let finalBullets = orig.vaultBullets.map(b => ({ ...b, isAIGenerated: false }))
+        
+        if (tailored) {
+          selectedExperienceIds.push(id)
+          const newTailoredBullets = tailored.vaultBullets.map(b => {
+            const bId = b.id || crypto.randomUUID()
+            return { id: bId, text: b.text, keywords: b.keywords || [], isAIGenerated: true }
+          })
+          // AI selected these, so add to selectedBulletIds
+          selectedBulletIds[id] = newTailoredBullets.map(b => b.id)
+          // Prepend tailored bullets to the original ones
+          finalBullets = [...newTailoredBullets, ...finalBullets]
+        }
+        
+        return {
+          id,
+          company: orig.company,
+          role: orig.role,
+          startDate: orig.startDate || '',
+          endDate: orig.endDate || '',
+          current: false,
+          vaultBullets: finalBullets,
+        }
+      })
+
+      // Keep ALL original projects
+      const mergedProjects = data.original.projects.map((orig) => {
+        const id = orig.id || crypto.randomUUID()
+        const tailored = tailoredProjMap.get(orig.title)
+        
+        let finalBullets = orig.vaultBullets.map(b => ({ ...b, isAIGenerated: false }))
+        
+        if (tailored) {
+          selectedProjectIds.push(id)
+          const newTailoredBullets = tailored.vaultBullets.map(b => {
+            const bId = b.id || crypto.randomUUID()
+            return { id: bId, text: b.text, keywords: b.keywords || [], isAIGenerated: true }
+          })
+          selectedBulletIds[id] = newTailoredBullets.map(b => b.id)
+          finalBullets = [...newTailoredBullets, ...finalBullets]
+        }
+        
+        return {
+          id,
+          title: orig.title,
+          url: orig.url || '',
+          techStack: orig.techStack || [],
+          vaultBullets: finalBullets,
+        }
+      })
 
       const mergedProfile = {
         contact: data.original.contact,
         education: data.original.education,
-        experience: data.tailored.experience.map((exp) => {
-          const orig = originalExpMap.get(exp.company + '|' + exp.role)
-          const origBullets = new Map(orig?.vaultBullets.map((ob) => [ob.text, ob.keywords]) || [])
-          return {
-            id: exp.id || orig?.id || crypto.randomUUID(),
-            company: exp.company,
-            role: exp.role,
-            startDate: orig?.startDate || '',
-            endDate: orig?.endDate || '',
-            current: false,
-            vaultBullets: exp.vaultBullets.map((b) => ({
-              id: b.id || crypto.randomUUID(),
-              text: b.text,
-              keywords: origBullets.get(b.text) || [],
-              isAIGenerated: true,
-            })),
-          }
-        }),
-        projects: data.tailored.projects.map((proj) => {
-          const orig = originalProjMap.get(proj.title)
-          const origProjBullets = new Map(orig?.vaultBullets.map((ob) => [ob.text, ob.keywords]) || [])
-          return {
-            id: proj.id || orig?.id || crypto.randomUUID(),
-            title: proj.title,
-            url: orig?.url || proj.url || '',
-            techStack: orig?.techStack || proj.techStack || [],
-            vaultBullets: proj.vaultBullets.map((b) => ({
-              id: b.id || crypto.randomUUID(),
-              text: b.text,
-              keywords: origProjBullets.get(b.text) || [],
-              isAIGenerated: true,
-            })),
-          }
-        }),
-        skills: data.tailored.skills,
+        experience: mergedExperience,
+        projects: mergedProjects,
+        skills: data.tailored.skills, // we can use tailored skills or original + tailored
       }
 
       setProfile(normalizeProfile(mergedProfile))
       setCurrentStage('reviewing')
+      
+      const store = useBuilderStore.getState()
+      store.setSelections(selectedBulletIds)
+      
+      // We also need to update the newly added state properties
+      useBuilderStore.setState({
+        selectedExperienceIds,
+        selectedProjectIds
+      })
 
-      // Select all bullets by default
-      const defaultSelections: Record<string, string[]> = {}
-      for (const exp of mergedProfile.experience) {
-        defaultSelections[exp.id] = exp.vaultBullets.map((b) => b.id)
-      }
-      for (const proj of mergedProfile.projects) {
-        defaultSelections[proj.id] = proj.vaultBullets.map((b) => b.id)
-      }
-      setSelections(defaultSelections)
       setPdfUrl(null)
 
-      // Replace generating message with checklist
+      // Start the multi-step chat flow with contact selection
       setEntries((prev) => [
         ...prev.filter((e) => e.type !== 'generating'),
-        { id: 'checklist-' + Date.now(), role: 'assistant', type: 'checklist' },
+        { id: 'contact-selection-' + Date.now(), role: 'assistant', type: 'contact-selection', content: "I've analyzed your profile against the job description! First, let's confirm your contact details for this resume." },
       ])
 
       // Trigger initial compile
@@ -158,7 +186,7 @@ export function useTailorChat() {
         triggerCompile()
       }, 100)
 
-      toast.success('Resume generated! Toggle bullets to customize.')
+      toast.success('Initial draft generated! Let\'s tailor it.')
       return true
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Generation failed'
@@ -173,7 +201,6 @@ export function useTailorChat() {
       }
       setCurrentStage('collecting')
       setGenerating(false)
-      // Remove generating message and add an error entry
       setEntries((prev) => [
         ...prev.filter((e) => e.type !== 'generating'),
         { id: 'error-' + Date.now(), role: 'assistant', type: 'error', content: isTimeout ? 'The AI took too long. Try a shorter job description.' : 'Generation failed. Please try again.' },
@@ -184,9 +211,14 @@ export function useTailorChat() {
     }
   }, [jobTitle, company, generating, templateValue, setJobDescription, setProfile, setSelections, setPdfUrl, setStatus, setCurrentStage])
 
+  const addChatEntry = useCallback((entry: Omit<ChatEntry, 'id'>) => {
+    setEntries((prev) => [...prev, { ...entry, id: entry.type + '-' + Date.now() }])
+  }, [])
+
   return {
     entries,
     generating,
     handleSubmitJD,
+    addChatEntry,
   }
 }

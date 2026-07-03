@@ -48,6 +48,12 @@ export const contactSchema = z.object({
   github: z.string().nullable(),
   leetcode: z.string().nullable().optional(),
   portfolio: z.string().nullable(),
+  
+  emails: z.array(z.string()).default([]).optional(),
+  phones: z.array(z.string()).default([]).optional(),
+  linkedins: z.array(z.string()).default([]).optional(),
+  githubs: z.array(z.string()).default([]).optional(),
+  portfolios: z.array(z.string()).default([]).optional(),
 });
 
 export type Contact = z.infer<typeof contactSchema>;
