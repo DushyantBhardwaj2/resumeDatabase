@@ -61,6 +61,11 @@ export function useTailorChat() {
       return false
     }
 
+    if (trimmed.length < 30) {
+      toast.error('Please provide a job description or role details (at least 30 characters) to tailor your resume.')
+      return false
+    }
+
     setGenerating(true)
     setCurrentStage('generating')
 
