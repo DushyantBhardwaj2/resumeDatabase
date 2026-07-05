@@ -98,9 +98,19 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     set((state) => {
       const currentList = state.selectedBulletIds[itemId] || []
       const exists = currentList.includes(bulletId)
-      const newList = exists
-        ? currentList.filter((id) => id !== bulletId)
-        : [...currentList, bulletId]
+      if (exists) {
+        return {
+          selectedBulletIds: { ...state.selectedBulletIds, [itemId]: currentList.filter((id) => id !== bulletId) },
+        }
+      }
+      const item = state.profile?.experience?.find(e => e.id === itemId) || state.profile?.projects?.find(p => p.id === itemId)
+      const originalOrder = item?.vaultBullets || []
+      const newList = [...currentList, bulletId]
+      newList.sort((a, b) => {
+        const ai = originalOrder.findIndex(vb => vb.id === a)
+        const bi = originalOrder.findIndex(vb => vb.id === b)
+        return ai - bi
+      })
       return {
         selectedBulletIds: { ...state.selectedBulletIds, [itemId]: newList },
       }
@@ -109,21 +119,33 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   toggleExperience: (id) =>
     set((state) => {
       const exists = state.selectedExperienceIds.includes(id)
-      return {
-        selectedExperienceIds: exists
-          ? state.selectedExperienceIds.filter((x) => x !== id)
-          : [...state.selectedExperienceIds, id],
+      if (exists) {
+        return { selectedExperienceIds: state.selectedExperienceIds.filter((x) => x !== id) }
       }
+      const originalOrder = state.profile?.experience || []
+      const newList = [...state.selectedExperienceIds, id]
+      newList.sort((a, b) => {
+        const ai = originalOrder.findIndex(e => e.id === a)
+        const bi = originalOrder.findIndex(e => e.id === b)
+        return ai - bi
+      })
+      return { selectedExperienceIds: newList }
     }),
 
   toggleProject: (id) =>
     set((state) => {
       const exists = state.selectedProjectIds.includes(id)
-      return {
-        selectedProjectIds: exists
-          ? state.selectedProjectIds.filter((x) => x !== id)
-          : [...state.selectedProjectIds, id],
+      if (exists) {
+        return { selectedProjectIds: state.selectedProjectIds.filter((x) => x !== id) }
       }
+      const originalOrder = state.profile?.projects || []
+      const newList = [...state.selectedProjectIds, id]
+      newList.sort((a, b) => {
+        const ai = originalOrder.findIndex(p => p.id === a)
+        const bi = originalOrder.findIndex(p => p.id === b)
+        return ai - bi
+      })
+      return { selectedProjectIds: newList }
     }),
 
   setContactSelection: (contact) => set({ contactSelection: contact }),

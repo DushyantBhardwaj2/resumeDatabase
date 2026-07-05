@@ -4,10 +4,9 @@ import { useBuilderStore } from '@/store/useBuilderStore'
 import type { TemplateType } from '@/store/useBuilderStore'
 
 const TEMPLATES: { value: TemplateType; label: string }[] = [
-  { value: 'nsut-canonical', label: 'NSUT Canonical' },
-  { value: 'ats-clean', label: 'ATS Clean' },
-  { value: 'modern', label: 'Modern' },
-  { value: 'compact', label: 'Compact' },
+  { value: 'nsut-canonical', label: 'NSUT Official' },
+  { value: 'ats-clean', label: 'Off-Campus (ATS Clean)' },
+  { value: 'modern', label: 'Off-Campus (Modern)' },
 ]
 
 export function JobDetailsForm() {

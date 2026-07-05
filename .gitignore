@@ -49,3 +49,4 @@ backend/src/generated/prisma
 
 # graphify
 graphify-out/
+.vercel

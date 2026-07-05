@@ -34,6 +34,7 @@ function esc(s: string): string {
 }
 
 function bulletLine(b: string): string {
+  if (!b) return ''
   return `        \\item ${esc(b)}`
 }
 
@@ -210,6 +211,9 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
     tex = tex.replace(/\{\{SKILLS_FRAMEWORKS\}\}/g, esc((tailoredSkills.frameworks ?? safeSkills.frameworks ?? []).join(", ")))
     tex = tex.replace(/\{\{SKILLS_BACKEND\}\}/g, esc(""))
     tex = tex.replace(/\{\{SKILLS_COURSEWORK\}\}/g, esc(""))
+
+    // Remove any dangling \item lines that had their placeholder replaced with empty content
+    tex = tex.replace(/^\s*\\item\s*(\\textbf\{[^}]*\}:?)?\s*$/gm, "")
 
     return tex
   }
