@@ -21,6 +21,7 @@ model User {
 
   sessions    Session[]
   accounts    Account[]
+  chatMessages ChatMessage[]
 }
 
 model Session {
@@ -91,6 +92,17 @@ model GitHubRepo {
   syncedAt         DateTime @default(now())
 
   @@unique([userId, repoUrl])
+}
+
+model ChatMessage {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role      String
+  content   String
+  widget    String?
+  mode      String
+  createdAt DateTime @default(now())
 }
 
 model TailoredResume {

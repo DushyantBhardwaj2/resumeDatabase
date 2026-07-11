@@ -12,11 +12,13 @@ export type GenerationStatus = 'idle' | 'selecting' | 'queued' | 'compiling' | '
 export type CurrentStage = 'idle' | 'collecting' | 'generating' | 'reviewing' | 'compiling' | 'ready' | 'error'
 
 export interface ResumeContactSelection {
+  name?: string
   email?: string
   phone?: string
   linkedin?: string
   github?: string
   portfolio?: string
+  leetcode?: string
 }
 
 interface BuilderStore {
@@ -88,7 +90,17 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     profile.projects?.forEach(p => {
       if (p.id) selectedBulletIds[p.id] = p.vaultBullets.map(b => b.id)
     })
-    set({ profile, selectedExperienceIds, selectedProjectIds, selectedBulletIds })
+    const contact = profile.contact || {}
+    const contactSelection: ResumeContactSelection = {
+      name: (typeof contact.name === 'string' ? contact.name : '') || undefined,
+      email: (typeof contact.email === 'string' ? contact.email : '') || undefined,
+      phone: (typeof contact.phone === 'string' ? contact.phone : '') || undefined,
+      linkedin: (typeof contact.linkedin === 'string' ? contact.linkedin : '') || undefined,
+      github: (typeof contact.github === 'string' ? contact.github : '') || undefined,
+      portfolio: (typeof contact.portfolio === 'string' ? contact.portfolio : '') || undefined,
+      leetcode: (typeof contact.leetcode === 'string' ? contact.leetcode : '') || undefined,
+    }
+    set({ profile, selectedExperienceIds, selectedProjectIds, selectedBulletIds, contactSelection })
   },
   setJobTitle: (title) => set({ jobTitle: title }),
   setCompany: (company) => set({ company }),

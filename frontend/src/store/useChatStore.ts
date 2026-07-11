@@ -130,6 +130,20 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           ? mapWidgetToPhase(data.targetWidget)
           : state.currentPhase,
       }))
+
+      // Persist both messages to chat history
+      fetch('/api/protected/chat/save', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ role: 'user', content: text, mode }),
+      }).catch(() => {})
+      if (data.reply) {
+        fetch('/api/protected/chat/save', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ role: 'assistant', content: data.reply, widget: data.targetWidget, mode }),
+        }).catch(() => {})
+      }
     } catch {
       set((state) => ({
         messagesByMode: {

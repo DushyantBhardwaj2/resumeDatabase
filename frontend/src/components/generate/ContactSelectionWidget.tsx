@@ -1,7 +1,7 @@
 'use client'
 
 import { useBuilderStore } from '@/store/useBuilderStore'
-import { Sparkle, EnvelopeSimple, Phone, LinkedinLogo, GithubLogo, Globe } from '@phosphor-icons/react'
+import { Sparkle, EnvelopeSimple, Phone, LinkedinLogo, GithubLogo, Globe, User, Code } from '@phosphor-icons/react'
 
 export function ContactSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
@@ -21,11 +21,13 @@ export function ContactSelectionWidget({ content, onNext }: { content?: string, 
   const githubs = getArray(profile.contact.github).concat(profile.contact.githubs || [])
   const portfolios = getArray(profile.contact.portfolio).concat(profile.contact.portfolios || [])
 
+  const name = contactSelection.name || (typeof profile.contact.name === 'string' ? profile.contact.name : '')
   const selectedEmail = contactSelection.email ?? emails[0] ?? ''
   const selectedPhone = contactSelection.phone ?? phones[0] ?? ''
   const selectedLinkedin = contactSelection.linkedin ?? linkedins[0] ?? ''
   const selectedGithub = contactSelection.github ?? githubs[0] ?? ''
   const selectedPortfolio = contactSelection.portfolio ?? portfolios[0] ?? ''
+  const selectedLeetcode = contactSelection.leetcode || (typeof profile.contact.leetcode === 'string' ? profile.contact.leetcode : '')
 
   return (
     <div className="flex flex-col gap-3">
@@ -42,6 +44,16 @@ export function ContactSelectionWidget({ content, onNext }: { content?: string, 
         <h4 className="text-sm font-semibold text-fg mb-4">Contact Information</h4>
         
         <div className="space-y-4">
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-content-muted flex items-center gap-2"><User weight="duotone" /> Full Name</label>
+            <input 
+              className="bg-background border border-edge rounded-md p-2 text-sm text-content outline-none focus:border-brand/50 transition-colors"
+              value={name}
+              onChange={(e) => setContactSelection({ ...contactSelection, name: e.target.value })}
+              placeholder="Your full name"
+            />
+          </div>
+
           {emails.length > 0 && (
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium text-content-muted flex items-center gap-2"><EnvelopeSimple weight="duotone" /> Email</label>
@@ -94,6 +106,16 @@ export function ContactSelectionWidget({ content, onNext }: { content?: string, 
             </div>
           )}
           
+          <div className="flex flex-col gap-2">
+            <label className="text-xs font-medium text-content-muted flex items-center gap-2"><Code weight="duotone" /> LeetCode URL</label>
+            <input 
+              className="bg-background border border-edge rounded-md p-2 text-sm text-content outline-none focus:border-brand/50 transition-colors"
+              value={selectedLeetcode}
+              onChange={(e) => setContactSelection({ ...contactSelection, leetcode: e.target.value })}
+              placeholder="https://leetcode.com/u/your-profile"
+            />
+          </div>
+
           {portfolios.length > 0 && (
             <div className="flex flex-col gap-2">
               <label className="text-xs font-medium text-content-muted flex items-center gap-2"><Globe weight="duotone" /> Portfolio</label>

@@ -118,7 +118,7 @@ export function GenerateChatWorkspace() {
               <ContactSelectionWidget 
                 key={entry.id} 
                 content={entry.content} 
-                onNext={() => addChatEntry({ role: 'assistant', type: 'experience-selection', content: "Great! Now let's review your Work Experience." })} 
+                onNext={() => addChatEntry({ role: 'assistant', type: 'experience-selection' })} 
               />
             )
           }
@@ -128,7 +128,7 @@ export function GenerateChatWorkspace() {
               <ExperienceSelectionWidget 
                 key={entry.id} 
                 content={entry.content} 
-                onNext={() => addChatEntry({ role: 'assistant', type: 'project-selection', content: "Next up, let's review your Projects." })} 
+                onNext={() => addChatEntry({ role: 'assistant', type: 'project-selection' })} 
               />
             )
           }
@@ -138,7 +138,7 @@ export function GenerateChatWorkspace() {
               <ProjectSelectionWidget 
                 key={entry.id} 
                 content={entry.content} 
-                onNext={() => addChatEntry({ role: 'assistant', type: 'skills-selection', content: "Finally, let's review your Skills." })} 
+                onNext={() => addChatEntry({ role: 'assistant', type: 'skills-selection' })} 
               />
             )
           }
@@ -150,7 +150,7 @@ export function GenerateChatWorkspace() {
                 content={entry.content} 
                 onNext={() => {
                   setCurrentStage('ready')
-                  addChatEntry({ role: 'assistant', type: 'greeting', content: "All done! Your resume is ready to download." })
+                  addChatEntry({ role: 'assistant', type: 'greeting' })
                 }}
               />
             )
