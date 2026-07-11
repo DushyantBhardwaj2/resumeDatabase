@@ -7,6 +7,7 @@ import { useTailorChat } from './useTailorChat'
 import { JobDetailsForm } from './JobDetailsForm'
 import { ChatComposer } from './ChatComposer'
 import { ContactSelectionWidget } from './ContactSelectionWidget'
+import { EducationSelectionWidget } from './EducationSelectionWidget'
 import { ExperienceSelectionWidget } from './ExperienceSelectionWidget'
 import { ProjectSelectionWidget } from './ProjectSelectionWidget'
 import { SkillsSelectionWidget } from './SkillsSelectionWidget'
@@ -117,6 +118,16 @@ export function GenerateChatWorkspace() {
           if (entry.type === 'contact-selection') {
             return (
               <ContactSelectionWidget 
+                key={entry.id} 
+                content={entry.content} 
+                onNext={() => addChatEntry({ role: 'assistant', type: 'education-selection' })} 
+              />
+            )
+          }
+
+          if (entry.type === 'education-selection') {
+            return (
+              <EducationSelectionWidget 
                 key={entry.id} 
                 content={entry.content} 
                 onNext={() => addChatEntry({ role: 'assistant', type: 'experience-selection' })} 

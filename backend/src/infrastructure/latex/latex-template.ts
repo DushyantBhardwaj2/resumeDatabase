@@ -14,6 +14,8 @@ type TailoredData = {
   skills: { languages: string[]; frameworks: string[]; tools: string[] }
 }
 
+type Extracurricular = { id: string; title: string; description: string; date?: string | null }
+
 function getBulletTexts(item: { vaultBullets?: Array<{ id: string; text: string; keywords?: string[] }>; bullets?: string[] }): string[] {
   if (item.vaultBullets && item.vaultBullets.length > 0) {
     return item.vaultBullets.map(b => b.text)
@@ -75,7 +77,8 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
     experience: Experience | null,
     projects: Projects | null,
     skills: Skills | null,
-    tailored: unknown
+    tailored: unknown,
+    extracurriculars?: Extracurricular[] | null
   ): string {
     const config = this.getTemplateConfig(templateId)
     const texPath = join(this.templatesDir, templateId, "template.tex")
@@ -87,6 +90,7 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
     const safeExperience = experience || []
     const safeProjects = projects || []
     const safeSkills = skills || { languages: [], frameworks: [], tools: [] }
+    const safeExtracurriculars = extracurriculars || []
 
     const getString = (val: unknown): string => {
       if (Array.isArray(val) && val.length > 0) return String(val[0])
@@ -94,6 +98,15 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
       return ""
     }
     
+    const getContactArray = (val: unknown): string[] => {
+      if (Array.isArray(val)) return val.map(String)
+      if (typeof val === 'string') return [val]
+      return []
+    }
+    const enabledSocials = getContactArray(safeContact.enabledSocials).length > 0
+      ? getContactArray(safeContact.enabledSocials)
+      : ['linkedin', 'github', 'leetcode', 'portfolio']
+
     const name = getString(safeContact.name) || "User"
     const phone = getString(safeContact.phone)
     const email = getString(safeContact.email) || "email@example.com"
@@ -105,9 +118,9 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
     tex = tex.replace(/\{\{PHONE\}\}/g, esc(phone))
     tex = tex.replace(/\{\{EMAIL\}\}/g, esc(email))
     tex = tex.replace(/\{\{EMAIL_DISPLAY\}\}/g, esc(email))
-    tex = tex.replace(/\{\{LINKEDIN_URL\}\}/g, linkedin)
-    tex = tex.replace(/\{\{LEETCODE_URL\}\}/g, leetcode || "https://leetcode.com")
-    tex = tex.replace(/\{\{GITHUB_URL\}\}/g, github)
+    tex = tex.replace(/\{\{LINKEDIN_URL\}\}/g, enabledSocials.includes('linkedin') ? linkedin : '')
+    tex = tex.replace(/\{\{LEETCODE_URL\}\}/g, enabledSocials.includes('leetcode') ? leetcode : '')
+    tex = tex.replace(/\{\{GITHUB_URL\}\}/g, enabledSocials.includes('github') ? github : '')
 
     // NSUT_logo.png is served from each template directory and copied to the compile
     // temp directory by the compile-live endpoint. Keep the includegraphics line.
@@ -214,7 +227,17 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
 
     const hasExtras = tex.includes("EXTRA-CURRICULAR ACTIVITIES")
     if (hasExtras) {
-      tex = stripSection(tex, "EXTRA-CURRICULAR ACTIVITIES \\& ACHIEVEMENTS")
+      if (safeExtracurriculars.length > 0) {
+        const extrasBullets = safeExtracurriculars.map(ec =>
+          `        \\item ${esc(ec.title)}${ec.description ? ` — ${esc(ec.description)}` : ''}${ec.date ? ` (${esc(ec.date)})` : ''}`
+        ).join('\n')
+        tex = tex.replace(
+          /\\resheading\{EXTRA-CURRICULAR ACTIVITIES \\& ACHIEVEMENTS\}[\s\S]*?(?=\\resheading\{|\\end\{document\})/,
+          `\\resheading{EXTRA-CURRICULAR ACTIVITIES \\& ACHIEVEMENTS}\n      \\begin{itemize}\n${extrasBullets}\n      \\end{itemize}\n`
+        )
+      } else {
+        tex = stripSection(tex, "EXTRA-CURRICULAR ACTIVITIES \\& ACHIEVEMENTS")
+      }
     }
 
     const tailoredSkills = data?.skills || { languages: [], frameworks: [], tools: [] }

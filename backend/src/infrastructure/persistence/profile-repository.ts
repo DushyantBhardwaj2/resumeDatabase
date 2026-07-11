@@ -96,6 +96,13 @@ const certificateSchema = z.object({
   date: z.string().optional(),
 })
 
+const extracurricularItemSchema = z.object({
+  id: z.string().catch(() => crypto.randomUUID()),
+  title: z.string().catch(""),
+  description: z.string().catch(""),
+  date: z.string().nullable().catch(null),
+})
+
 // Safe mapper to ensure drift doesn't crash the app
 function mapRowToProfile(row: any): Profile {
   return {
@@ -105,6 +112,7 @@ function mapRowToProfile(row: any): Profile {
     projects: z.array(projectSchema).catch([]).parse(migrateProjects(row.projects)),
     skills: skillsSchema.parse(row.skills || {}),
     certificates: z.array(certificateSchema).catch([]).parse(row.certificates || []),
+    extracurriculars: z.array(extracurricularItemSchema).catch([]).parse(row.extracurriculars || []),
     githubUsername: typeof row.githubUsername === 'string' ? row.githubUsername : null,
   }
 }
@@ -124,6 +132,7 @@ export class ProfileRepository implements IProfileRepository {
     if (data.projects !== undefined) updateData.projects = toJson(data.projects)
     if (data.skills !== undefined) updateData.skills = toJson(data.skills)
     if (data.certificates !== undefined) updateData.certificates = toJson(data.certificates)
+    if (data.extracurriculars !== undefined) updateData.extracurriculars = toJson(data.extracurriculars)
     if (data.githubUsername !== undefined) updateData.githubUsername = data.githubUsername
 
     const row = await prisma.profile.upsert({
@@ -145,6 +154,7 @@ export class ProfileRepository implements IProfileRepository {
       projects: toJson(parsed.projects),
       skills: toJson(parsed.skills),
       certificates: toJson(parsed.certificates),
+      extracurriculars: toJson(parsed.extracurriculars ?? []),
     }
     const row = await prisma.profile.upsert({
       where: { userId },

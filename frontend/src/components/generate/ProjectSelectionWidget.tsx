@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
+import { useProfileStore } from '@/store/useProfileStore'
 import { Sparkle, CheckSquare, Square, Plus, MagicWand } from '@phosphor-icons/react'
 
 export function ProjectSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
@@ -42,6 +43,11 @@ export function ProjectSelectionWidget({ content, onNext }: { content?: string, 
       return p
     })
     setProfile({ ...profile, projects: newProj })
+    
+    const updatedProj = useBuilderStore.getState().profile?.projects?.find(p => p.id === projId)
+    if (updatedProj) {
+      useProfileStore.getState().updateProject(projId, updatedProj)
+    }
     
     const currentList = selectedBulletIds[projId] || []
     setSelections({ ...selectedBulletIds, [projId]: [...currentList, newBullet.id] })

@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
+import { useProfileStore } from '@/store/useProfileStore'
 import { Sparkle, Plus, X } from '@phosphor-icons/react'
 
 export function SkillsSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
@@ -12,26 +13,30 @@ export function SkillsSelectionWidget({ content, onNext }: { content?: string, o
 
   const removeSkill = (category: 'languages' | 'frameworks' | 'tools', skill: string) => {
     const current = profile.skills[category] || []
+    const updatedSkills = {
+      ...profile.skills,
+      [category]: current.filter(s => s !== skill)
+    }
     setProfile({
       ...profile,
-      skills: {
-        ...profile.skills,
-        [category]: current.filter(s => s !== skill)
-      }
+      skills: updatedSkills
     })
+    useProfileStore.getState().updateSkills(updatedSkills)
   }
 
   const addSkill = (category: 'languages' | 'frameworks' | 'tools', skill: string) => {
     if (!skill.trim()) return
     const current = profile.skills[category] || []
     if (current.includes(skill.trim())) return
+    const updatedSkills = {
+      ...profile.skills,
+      [category]: [...current, skill.trim()]
+    }
     setProfile({
       ...profile,
-      skills: {
-        ...profile.skills,
-        [category]: [...current, skill.trim()]
-      }
+      skills: updatedSkills
     })
+    useProfileStore.getState().updateSkills(updatedSkills)
   }
 
   return (

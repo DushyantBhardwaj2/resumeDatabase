@@ -19,6 +19,7 @@ export interface ResumeContactSelection {
   github?: string
   portfolio?: string
   leetcode?: string
+  enabledSocials?: string[]
 }
 
 interface BuilderStore {
@@ -29,6 +30,7 @@ interface BuilderStore {
   selectedBulletIds: BuilderSelections
   selectedExperienceIds: string[]
   selectedProjectIds: string[]
+  selectedEducationIds: string[]
   contactSelection: ResumeContactSelection
   isCompiling: boolean
   pdfUrl: string | null
@@ -45,6 +47,7 @@ interface BuilderStore {
   toggleBullet: (itemId: string, bulletId: string) => void
   toggleExperience: (id: string) => void
   toggleProject: (id: string) => void
+  toggleEducation: (id: string) => void
   setContactSelection: (contact: ResumeContactSelection) => void
   setSelections: (selections: BuilderSelections) => void
   setCompiling: (compiling: boolean) => void
@@ -71,6 +74,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   selectedBulletIds: {},
   selectedExperienceIds: [],
   selectedProjectIds: [],
+  selectedEducationIds: [],
   contactSelection: {},
   isCompiling: false,
   pdfUrl: null,
@@ -83,6 +87,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   setProfile: (profile) => {
     const selectedExperienceIds = profile.experience?.map(e => e.id!) || []
     const selectedProjectIds = profile.projects?.map(p => p.id!) || []
+    const selectedEducationIds = profile.education?.map((e) => e.school + '|' + e.degree) || []
     const selectedBulletIds: BuilderSelections = {}
     profile.experience?.forEach(e => {
       if (e.id) selectedBulletIds[e.id] = e.vaultBullets.map(b => b.id)
@@ -99,8 +104,9 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
       github: (typeof contact.github === 'string' ? contact.github : '') || undefined,
       portfolio: (typeof contact.portfolio === 'string' ? contact.portfolio : '') || undefined,
       leetcode: (typeof contact.leetcode === 'string' ? contact.leetcode : '') || undefined,
+      enabledSocials: ['linkedin', 'github', 'leetcode', 'portfolio'],
     }
-    set({ profile, selectedExperienceIds, selectedProjectIds, selectedBulletIds, contactSelection })
+    set({ profile, selectedExperienceIds, selectedProjectIds, selectedEducationIds, selectedBulletIds, contactSelection })
   },
   setJobTitle: (title) => set({ jobTitle: title }),
   setCompany: (company) => set({ company }),
@@ -142,6 +148,22 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
         return ai - bi
       })
       return { selectedExperienceIds: newList }
+    }),
+
+  toggleEducation: (id) =>
+    set((state) => {
+      const exists = state.selectedEducationIds.includes(id)
+      if (exists) {
+        return { selectedEducationIds: state.selectedEducationIds.filter((x) => x !== id) }
+      }
+      const originalOrder = state.profile?.education || []
+      const newList = [...state.selectedEducationIds, id]
+      newList.sort((a, b) => {
+        const ai = originalOrder.findIndex(e => (e.school + '|' + e.degree) === a)
+        const bi = originalOrder.findIndex(e => (e.school + '|' + e.degree) === b)
+        return ai - bi
+      })
+      return { selectedEducationIds: newList }
     }),
 
   toggleProject: (id) =>
@@ -187,7 +209,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   },
 
   triggerCompile: async () => {
-    const { profile, selectedBulletIds, selectedExperienceIds, selectedProjectIds, contactSelection, template } = get()
+    const { profile, selectedBulletIds, selectedExperienceIds, selectedProjectIds, selectedEducationIds, contactSelection, template } = get()
     if (!profile) return
 
     // Cancel any previous polling loop that's still running
@@ -210,6 +232,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
           selectedBulletIds, 
           selectedExperienceIds,
           selectedProjectIds,
+          selectedEducationIds,
           contactSelection: cleanContactSelection,
           templateId: template 
         },
@@ -286,6 +309,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
       selectedBulletIds: {},
       selectedExperienceIds: [],
       selectedProjectIds: [],
+      selectedEducationIds: [],
       contactSelection: {},
       pdfUrl: null,
       zoom: 100,

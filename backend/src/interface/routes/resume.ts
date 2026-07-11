@@ -21,6 +21,7 @@ const compileLiveSchema = z.object({
   selectedBulletIds: z.record(z.string().max(100), z.array(z.string().max(100)).max(200)).optional().default({}),
   selectedExperienceIds: z.array(z.string().max(100)).max(50).optional(),
   selectedProjectIds: z.array(z.string().max(100)).max(50).optional(),
+  selectedEducationIds: z.array(z.string().max(200)).max(20).optional(),
   contactSelection: z.object({
     name: z.string().max(1000).optional(),
     email: z.union([z.string().max(500), z.array(z.string().max(500))]).optional(),
@@ -29,6 +30,7 @@ const compileLiveSchema = z.object({
     github: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
     portfolio: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
     leetcode: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
+    enabledSocials: z.array(z.string().max(50)).max(10).optional(),
   }).optional(),
   profile: z.object({
     contact: z.record(z.string(), z.union([z.string(), z.array(z.string())]).nullable()).optional().nullable(),
@@ -54,6 +56,12 @@ const compileLiveSchema = z.object({
       frameworks: z.array(z.string().max(200)).max(100).optional().default([]),
       tools: z.array(z.string().max(200)).max(100).optional().default([]),
     }).optional().nullable(),
+    extracurriculars: z.array(z.object({
+      id: z.string().max(100).default(() => crypto.randomUUID()),
+      title: z.string().max(500),
+      description: z.string().max(5000),
+      date: z.string().max(100).nullable().optional(),
+    })).max(20).optional().nullable(),
   }),
 })
 
@@ -115,7 +123,7 @@ export function createResumeRouter(container: Container) {
       return c.json({ message: 'Not implemented in backend yet' }, 501)
     })
     .post('/compile-live', zValidator('json', compileLiveSchema), async (c) => {
-      const { profile, selectedBulletIds, selectedExperienceIds, selectedProjectIds, contactSelection, templateId: safeTemplateId } = c.req.valid('json')
+      const { profile, selectedBulletIds, selectedExperienceIds, selectedProjectIds, selectedEducationIds, contactSelection, templateId: safeTemplateId } = c.req.valid('json')
 
       let experienceToKeep = profile.experience || []
       if (selectedExperienceIds) {
@@ -130,6 +138,13 @@ export function createResumeRouter(container: Container) {
       const filteredExperience = filterExperienceBySelection(experienceToKeep, selectedBulletIds)
       const filteredProjects = filterProjectsBySelection(projectsToKeep, selectedBulletIds)
 
+      let educationToKeep = profile.education || []
+      if (selectedEducationIds) {
+        educationToKeep = educationToKeep.filter((e) =>
+          selectedEducationIds.includes(`${(e as Record<string, unknown>).school || ''}|${(e as Record<string, unknown>).degree || ''}`)
+        )
+      }
+
       const effectiveContact = {
         ...(profile.contact || {}),
         ...(contactSelection || {})
@@ -138,7 +153,7 @@ export function createResumeRouter(container: Container) {
       const latexSource = container.latexTemplate.fill(
         safeTemplateId,
         effectiveContact,
-        profile.education || null,
+        educationToKeep,
         filteredExperience,
         filteredProjects,
         profile.skills || null,
@@ -146,7 +161,8 @@ export function createResumeRouter(container: Container) {
           experience: filteredExperience,
           projects: filteredProjects,
           skills: profile.skills || { languages: [], frameworks: [], tools: [] },
-        }
+        },
+        profile.extracurriculars || []
       )
 
       try {

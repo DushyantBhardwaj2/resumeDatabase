@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 export type ChatEntry = {
   id: string
   role: 'assistant' | 'user'
-  type: 'greeting' | 'job-details-form' | 'user-jd' | 'generating' | 'contact-selection' | 'experience-selection' | 'project-selection' | 'skills-selection' | 'error'
+  type: 'greeting' | 'job-details-form' | 'user-jd' | 'generating' | 'contact-selection' | 'education-selection' | 'experience-selection' | 'project-selection' | 'skills-selection' | 'error'
   content?: string
 }
 

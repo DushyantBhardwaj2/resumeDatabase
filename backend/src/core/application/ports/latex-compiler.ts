@@ -12,6 +12,8 @@ export type TemplateConfig = {
   sections: string[]
 }
 
+export type Extracurricular = { id: string; title: string; description: string; date?: string | null }
+
 export interface ILatexTemplateFiller {
   getTemplateConfig(templateId: string): TemplateConfig
   fill(
@@ -21,6 +23,7 @@ export interface ILatexTemplateFiller {
     experience: Array<Record<string, unknown>> | null,
     projects: Array<Record<string, unknown>> | null,
     skills: Record<string, string[]> | null,
-    tailored: unknown
+    tailored: unknown,
+    extracurriculars?: Extracurricular[] | null
   ): string
 }

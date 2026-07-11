@@ -70,6 +70,17 @@ export const educationSchema = z.object({
 
 export type Education = z.infer<typeof educationSchema>;
 
+// ── Extra-Curricular Schema ────────────────────────────────────────────────────
+
+export const extracurricularItemSchema = z.object({
+  id: z.string().default(() => crypto.randomUUID()),
+  title: z.string(),
+  description: z.string(),
+  date: z.string().nullable().optional(),
+});
+
+export type ExtracurricularItem = z.infer<typeof extracurricularItemSchema>;
+
 // ── Skills Schema ─────────────────────────────────────────────────────────────
 
 export const skillsSchema = z.object({
@@ -164,6 +175,7 @@ export const profileSchema = z.object({
   projects: z.array(projectSchema),
   skills: skillsSchema,
   certificates: z.array(certificateSchema).default([]),
+  extracurriculars: z.array(extracurricularItemSchema).default([]),
   githubUsername: z.string().nullable().optional(),
 });
 

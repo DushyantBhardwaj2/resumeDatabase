@@ -1,7 +1,8 @@
 'use client'
 
 import { useBuilderStore } from '@/store/useBuilderStore'
-import { Sparkle, EnvelopeSimple, Phone, LinkedinLogo, GithubLogo, Globe, User, Code } from '@phosphor-icons/react'
+import { useProfileStore } from '@/store/useProfileStore'
+import { Sparkle, EnvelopeSimple, Phone, LinkedinLogo, GithubLogo, Globe, User, Code, CheckSquare, Square } from '@phosphor-icons/react'
 
 export function ContactSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
@@ -11,6 +12,10 @@ export function ContactSelectionWidget({ content, onNext }: { content?: string, 
   if (!profile || !profile.contact) return null
 
   const handleNext = () => {
+    // Persist name changes back to vault
+    if (contactSelection.name && contactSelection.name !== profile.contact.name) {
+      useProfileStore.getState().updateContact({ ...profile.contact, name: contactSelection.name })
+    }
     if (onNext) onNext()
   }
 
@@ -28,6 +33,15 @@ export function ContactSelectionWidget({ content, onNext }: { content?: string, 
   const selectedGithub = contactSelection.github ?? githubs[0] ?? ''
   const selectedPortfolio = contactSelection.portfolio ?? portfolios[0] ?? ''
   const selectedLeetcode = contactSelection.leetcode || (typeof profile.contact.leetcode === 'string' ? profile.contact.leetcode : '')
+
+  const enabledSocials = contactSelection.enabledSocials || ['linkedin', 'github', 'leetcode', 'portfolio']
+  
+  const toggleSocial = (social: string) => {
+    const next = enabledSocials.includes(social)
+      ? enabledSocials.filter(s => s !== social)
+      : [...enabledSocials, social]
+    setContactSelection({ ...contactSelection, enabledSocials: next })
+  }
 
   return (
     <div className="flex flex-col gap-3">
@@ -128,6 +142,32 @@ export function ContactSelectionWidget({ content, onNext }: { content?: string, 
               </select>
             </div>
           )}
+
+          <div className="border-t border-edge/50 pt-4">
+            <label className="text-xs font-medium text-content-muted mb-3 block">Show on Resume</label>
+            <div className="flex flex-wrap gap-3">
+              {[
+                { key: 'linkedin', label: 'LinkedIn', icon: <LinkedinLogo size={14} /> },
+                { key: 'github', label: 'GitHub', icon: <GithubLogo size={14} /> },
+                { key: 'leetcode', label: 'LeetCode', icon: <Code size={14} /> },
+                { key: 'portfolio', label: 'Portfolio', icon: <Globe size={14} /> },
+              ].map(social => (
+                <button
+                  key={social.key}
+                  onClick={() => toggleSocial(social.key)}
+                  className="flex items-center gap-1.5 text-xs text-content-muted hover:text-content transition-colors"
+                >
+                  {enabledSocials.includes(social.key) ? (
+                    <CheckSquare size={14} className="text-brand" weight="fill" />
+                  ) : (
+                    <Square size={14} className="text-content-muted" />
+                  )}
+                  {social.icon}
+                  {social.label}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
 
         <div className="mt-6 flex justify-end">

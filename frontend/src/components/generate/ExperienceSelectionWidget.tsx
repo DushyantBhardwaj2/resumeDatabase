@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
+import { useProfileStore } from '@/store/useProfileStore'
 import { Sparkle, CheckSquare, Square, Plus, MagicWand } from '@phosphor-icons/react'
 
 export function ExperienceSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
@@ -42,6 +43,11 @@ export function ExperienceSelectionWidget({ content, onNext }: { content?: strin
       return e
     })
     setProfile({ ...profile, experience: newExp })
+    
+    const updatedExp = useBuilderStore.getState().profile?.experience?.find(e => e.id === expId)
+    if (updatedExp) {
+      useProfileStore.getState().updateExperience(expId, updatedExp)
+    }
     
     const currentList = selectedBulletIds[expId] || []
     setSelections({ ...selectedBulletIds, [expId]: [...currentList, newBullet.id] })

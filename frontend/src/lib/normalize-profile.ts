@@ -59,6 +59,7 @@ export function normalizeProfile(raw: unknown): Profile {
       tools: Array.isArray(skills?.tools) ? skills!.tools : [],
     },
     certificates: normalizeCertificates(certificates),
+    extracurriculars: normalizeExtracurriculars(r.extracurriculars),
     githubUsername: typeof githubUsername === 'string' ? githubUsername : '',
   }
 }
@@ -138,14 +139,25 @@ function normalizeCertificates(certs: unknown): Profile['certificates'] {
   }))
 }
 
+function normalizeExtracurriculars(ec: unknown): Profile['extracurriculars'] {
+  if (!ec || !Array.isArray(ec)) return []
+  return ec.map((e) => ({
+    id: typeof e.id === 'string' ? e.id : genId(),
+    title: typeof e.title === 'string' ? e.title : '',
+    description: typeof e.description === 'string' ? e.description : '',
+    date: typeof e.date === 'string' ? e.date : null,
+  }))
+}
+
 export function getEmptyProfile(): Profile {
   return {
-    contact: { name: '', email: '', phone: '', linkedin: '', github: '', leetcode: '', portfolio: '' },
+    contact: { name: '', email: '', phone: '', linkedin: '', github: '', leetcode: '', portfolio: '', emails: [], phones: [], linkedins: [], githubs: [], portfolios: [] },
     education: [],
     experience: [],
     projects: [],
     skills: { languages: [], frameworks: [], tools: [] },
     certificates: [],
+    extracurriculars: [],
     githubUsername: '',
   }
 }
@@ -158,6 +170,7 @@ export function countSectionItems(data: Profile): Record<string, number> {
     projects: data.projects.length,
     skills: data.skills.languages.length + data.skills.frameworks.length + data.skills.tools.length,
     certificates: data.certificates.length,
+    extracurriculars: data.extracurriculars.length,
   }
 }
 
