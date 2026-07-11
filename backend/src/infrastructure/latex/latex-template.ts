@@ -138,9 +138,10 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
 
     const expConfig = config.placeholders.experience
     const tailoredExperience = data?.experience || []
+    const isTailoredMode = !!data?.experience
     const maxExpEntries = Math.min(expConfig.maxEntries, tailoredExperience.length, safeExperience.length || tailoredExperience.length)
     for (let i = 1; i <= expConfig.maxEntries; i++) {
-      const exp: Record<string, unknown> = tailoredExperience[i - 1] || safeExperience[i - 1] || {}
+      const exp: Record<string, unknown> = tailoredExperience[i - 1] || (isTailoredMode ? {} : safeExperience[i - 1]) || {}
       if (Object.keys(exp).length > 0) {
         const title = `${exp.role || ""} -- ${exp.company || ""}`
         tex = tex.replace(new RegExp(`\\{\\{EXP_TITLE_${i}\\}\\}`, "g"), esc(title))
@@ -175,7 +176,7 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
     const projConfig = config.placeholders.projects
     const tailoredProjects = data?.projects || []
     for (let i = 1; i <= projConfig.maxEntries; i++) {
-      const proj: Record<string, unknown> = tailoredProjects[i - 1] || safeProjects[i - 1] || {}
+      const proj: Record<string, unknown> = tailoredProjects[i - 1] || (isTailoredMode ? {} : safeProjects[i - 1]) || {}
       if (Object.keys(proj).length > 0) {
         tex = tex.replace(new RegExp(`\\{\\{PROJ_NAME_${i}\\}\\}`, "g"), esc(String(proj.title ?? "")))
         const dates = proj.dates

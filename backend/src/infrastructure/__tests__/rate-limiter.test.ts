@@ -24,6 +24,7 @@ vi.mock('../queue/redis', () => ({
 
 function makeRedis(count: number, pttl: number, shouldError = false) {
   return {
+    status: 'ready',
     multi: vi.fn(() => ({
       incr: vi.fn(() => ({
         pttl: vi.fn(() => ({

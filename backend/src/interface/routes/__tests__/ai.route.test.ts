@@ -25,7 +25,7 @@ function buildApp(overrides: Record<string, unknown> = {}) {
     },
     chatUseCases: {
       expandVault: vi.fn().mockResolvedValue({ vaultBullets: [] }),
-      selectBullets: vi.fn().mockResolvedValue({ selections: {}, rationale: 'ok' }),
+      selectBullets: vi.fn().mockResolvedValue({ selectedExperienceIds: [], selectedProjectIds: [], selections: {}, rationale: 'ok' }),
     },
     profileUseCases: {
       getProfile: vi.fn().mockResolvedValue(PROFILE),

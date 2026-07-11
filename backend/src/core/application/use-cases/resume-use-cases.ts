@@ -5,7 +5,10 @@ import type { IPDFParser } from "../ports/pdf-parser"
 import type { ILatexTemplateFiller, TemplateConfig } from "../ports/latex-compiler"
 
 type BulletSelection = {
+  selectedExperienceIds: string[]
+  selectedProjectIds: string[]
   selections: Record<string, string[]>
+  skills?: { languages: string[]; frameworks: string[]; tools: string[] }
   rationale: string
 }
 
@@ -50,41 +53,48 @@ function assignItemIds(profile: Profile): Profile {
 
 function buildTailoredFromSelections(
   profile: Profile,
-  selections: Record<string, string[]>
+  selections: Record<string, string[]>,
+  selectedExperienceIds: string[],
+  selectedProjectIds: string[],
+  tailoredSkills?: { languages: string[]; frameworks: string[]; tools: string[] }
 ): TailoredOutput {
-  const expMap = new Map<string, Experience>()
+  const selectedExpSet = new Set(selectedExperienceIds)
+  const experiences: Experience[] = []
   for (const exp of profile.experience) {
     const id = (exp as unknown as Record<string, unknown>).id as string
+    if (!selectedExpSet.has(id)) continue
     const selectedIds = selections[id]
     if (selectedIds && selectedIds.length > 0) {
-      expMap.set(id, {
+      experiences.push({
         ...exp,
         vaultBullets: exp.vaultBullets.filter((b) => selectedIds.includes(b.id)),
       })
     } else {
-      expMap.set(id, { ...exp })
+      experiences.push({ ...exp })
     }
   }
 
-  const projMap = new Map<string, Project>()
+  const selectedProjSet = new Set(selectedProjectIds)
+  const projectsList: Project[] = []
   for (const proj of profile.projects) {
     const id = (proj as unknown as Record<string, unknown>).id as string
+    if (!selectedProjSet.has(id)) continue
     const selectedIds = selections[id]
     if (selectedIds && selectedIds.length > 0) {
-      projMap.set(id, {
+      projectsList.push({
         ...proj,
         vaultBullets: proj.vaultBullets.filter((b) => selectedIds.includes(b.id)),
       })
     } else {
-      projMap.set(id, { ...proj })
+      projectsList.push({ ...proj })
     }
   }
 
   return {
     summary: null,
-    experience: Array.from(expMap.values()),
-    projects: Array.from(projMap.values()),
-    skills: profile.skills,
+    experience: experiences,
+    projects: projectsList,
+    skills: tailoredSkills || profile.skills,
   }
 }
 
@@ -97,7 +107,7 @@ export class ResumeUseCases {
     private latexTemplate: ILatexTemplateFiller,
     private parsePrompt: string,
     private parseSchema: ISchema<unknown>,
-    private bulletSelectorPrompt: string,
+    private bulletSelectorPrompt: (templateId: string) => string,
     private bulletSelectorSchema: ISchema<unknown>
   ) {}
 
@@ -131,14 +141,16 @@ export class ResumeUseCases {
         title: p.title,
         vaultBullets: p.vaultBullets.map((b) => ({ id: b.id, text: b.text, keywords: b.keywords })),
       })),
+      skills: profile.skills,
     }
     const userContent = JSON.stringify({
       jobDescription: input.jobDescription,
       profile: compactProfile,
     })
     // Start both AI generation tasks in parallel to avoid Vercel timeouts
+    const selectionPrompt = this.bulletSelectorPrompt(templateId)
     const selectionPromise = this.aiService.generateStructuredData(
-      this.bulletSelectorPrompt,
+      selectionPrompt,
       userContent,
       this.bulletSelectorSchema
     ) as Promise<unknown>
@@ -156,7 +168,13 @@ export class ResumeUseCases {
     const [selectionResultRaw, summary] = await Promise.all([selectionPromise, summaryPromise])
     const selectionResult = selectionResultRaw as BulletSelection
 
-    const tailored = buildTailoredFromSelections(profile, selectionResult.selections)
+    const tailored = buildTailoredFromSelections(
+      profile,
+      selectionResult.selections,
+      selectionResult.selectedExperienceIds,
+      selectionResult.selectedProjectIds,
+      selectionResult.skills
+    )
 
     // Apply template config constraints (truncate entries/bullets)
     const templateConfig = this.latexTemplate.getTemplateConfig(templateId)

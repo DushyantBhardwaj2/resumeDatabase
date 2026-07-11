@@ -196,8 +196,120 @@ RULES:
 
 Return valid JSON exactly matching this schema:
 {
-  "selections": { "experience_or_project_id": ["bullet_id_1", "bullet_id_2", ...] },
+  "selectedExperienceIds": ["exp_id_1", ...],
+  "selectedProjectIds": ["proj_id_1", ...],
+  "selections": { "experience_or_project_id": ["bullet_id_1", ...] },
+  "skills": { "languages": [], "frameworks": [], "tools": [] },
   "rationale": "Brief explanation of selection strategy"
 }
 
 Do NOT include any text outside the JSON object. No markdown, no code fences.`
+
+type SelectionConfig = {
+  maxProjects: number
+  maxExperiences: number
+  maxBulletsPerExperience: number
+  maxBulletsPerProject: number
+  maxSkillsPerCategory: number
+  includeExtracurricular: boolean
+  pageConstraint: 'strict-1-page' | 'flexible' | 'dense'
+}
+
+const TEMPLATE_SELECTION_CONFIGS: Record<string, SelectionConfig> = {
+  'nsut-canonical': {
+    maxProjects: 2,
+    maxExperiences: 3,
+    maxBulletsPerExperience: 3,
+    maxBulletsPerProject: 3,
+    maxSkillsPerCategory: 8,
+    includeExtracurricular: false,
+    pageConstraint: 'strict-1-page',
+  },
+  'ats-clean': {
+    maxProjects: 2,
+    maxExperiences: 4,
+    maxBulletsPerExperience: 5,
+    maxBulletsPerProject: 5,
+    maxSkillsPerCategory: 12,
+    includeExtracurricular: true,
+    pageConstraint: 'flexible',
+  },
+  'modern': {
+    maxProjects: 2,
+    maxExperiences: 4,
+    maxBulletsPerExperience: 4,
+    maxBulletsPerProject: 4,
+    maxSkillsPerCategory: 10,
+    includeExtracurricular: true,
+    pageConstraint: 'flexible',
+  },
+  'compact': {
+    maxProjects: 2,
+    maxExperiences: 2,
+    maxBulletsPerExperience: 3,
+    maxBulletsPerProject: 3,
+    maxSkillsPerCategory: 6,
+    includeExtracurricular: false,
+    pageConstraint: 'dense',
+  },
+}
+
+function buildPrompt(config: SelectionConfig): string {
+  return `You are an expert resume tailoring agent. Your job is to select the strongest content from a candidate's Career Vault to fit a specific Job Description (JD), respecting the constraints of the template layout.
+
+## TEMPLATE CONSTRAINTS
+- Page limit: ${config.pageConstraint === 'strict-1-page' ? 'STRICT ONE PAGE. Every bullet counts. Omit weak matches.' : config.pageConstraint === 'dense' ? 'DENSE LAYOUT. Very limited space. Be ruthless.' : 'Reasonable space available, but still concise.'}
+- ${config.includeExtracurricular ? 'Extra-curricular activities MAY be included if space permits and they add value.' : 'Extra-curricular activities MUST be omitted — there is no space on this template.'}
+
+## PROJECT SELECTION
+You will receive an array of projects. Each has an id, title, techStack, and vaultBullets[].
+- Select EXACTLY the best ${config.maxProjects} projects that most closely match the JD keywords, technologies, and domain.
+- Output their IDs in selectedProjectIds.
+- Omit ALL other projects completely.
+
+## EXPERIENCE SELECTION
+You will receive an array of experiences. Each has an id, company, role, and vaultBullets[].
+- Select at most ${config.maxExperiences} experiences that demonstrate the most relevant background for this JD.
+- Output their IDs in selectedExperienceIds.
+- Omit experiences that are irrelevant or too junior for the target role.
+
+## BULLET FILTERING
+Within each selected experience and project:
+- For each experience: select the top ${config.maxBulletsPerExperience} bullets that best match the JD. Prioritize bullets with quantified impact, relevant keywords, and strong action verbs.
+- For each project: select the top ${config.maxBulletsPerProject} bullets.
+- Never select a bullet that uses personal pronouns (I, my, we, our).
+- Never modify bullet text — only select from existing vaultBullets.
+- If no bullets match well for an entry, select the first 2 as fallback.
+
+## SKILLS TAILORING
+You will receive the candidate's full skills object: { languages, frameworks, tools }.
+- Filter each category to ONLY include skills that are relevant to or mentioned in the JD.
+- Limit each category to at most ${config.maxSkillsPerCategory} items.
+- Do NOT invent skills not present in the candidate's original vault.
+- Order by relevance to the JD (most relevant first).
+
+## OUTPUT FORMAT
+Return ONLY valid JSON matching this schema, with no text outside it:
+{
+  "selectedExperienceIds": ["id1", "id2", ...],
+  "selectedProjectIds": ["id1", "id2"],
+  "selections": {
+    "experience_or_project_id": ["bullet_id_1", "bullet_id_2", ...]
+  },
+  "skills": {
+    "languages": ["Python", ...],
+    "frameworks": ["React", ...],
+    "tools": ["Docker", ...]
+  },
+  "rationale": "Brief 1-2 sentence summary of selection strategy"
+}`
+}
+
+export function getBulletSelectorPrompt(templateId: string): string {
+  const config = TEMPLATE_SELECTION_CONFIGS[templateId]
+  if (!config) {
+    console.warn(`[getBulletSelectorPrompt] Unknown template "${templateId}", falling back to ats-clean`)
+    return buildPrompt(TEMPLATE_SELECTION_CONFIGS['ats-clean'])
+  }
+  return buildPrompt(config)
+}

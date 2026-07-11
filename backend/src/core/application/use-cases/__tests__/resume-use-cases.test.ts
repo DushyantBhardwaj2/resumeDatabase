@@ -81,6 +81,8 @@ function makeTailorRepo(): ITailoredResumeRepository {
 
 function makeAiService(selectionResult?: object, summaryResult?: object): IAIService {
   const defaultSelection = {
+    selectedExperienceIds: ['exp-1'],
+    selectedProjectIds: ['proj-1'],
     selections: { 'exp-1': ['b1', 'b2'], 'proj-1': ['pb1'] },
     rationale: 'good match',
   }
@@ -121,7 +123,7 @@ function buildUseCases(profileRepo: IProfileRepository, overrides?: {
     overrides?.latexTemplate ?? makeLatexFiller(),
     'parse prompt',
     schema,
-    'bullet selector prompt',
+    () => 'bullet selector prompt',
     schema,
   )
 }
@@ -155,7 +157,7 @@ describe('ResumeUseCases.tailorResume', () => {
       projects: [{ title: 'P', url: null, techStack: [], vaultBullets: [] } as any],
     })
     const profileRepo = makeProfileRepo(profile)
-    const aiService = makeAiService({ selections: {}, rationale: '' })
+    const aiService = makeAiService({ selectedExperienceIds: [], selectedProjectIds: [], selections: {}, rationale: '' })
     const uc = buildUseCases(profileRepo, { aiService })
     const result = await uc.tailorResume('user-1', { jobTitle: 'SWE', company: 'G', jobDescription: 'JD' })
     // The assigned IDs flow through to the original profile used for tailoring
@@ -174,6 +176,8 @@ describe('ResumeUseCases.tailorResume', () => {
   it('filters vault bullets based on AI selections', async () => {
     const profile = makeProfile()
     const aiService = makeAiService({
+      selectedExperienceIds: ['exp-1'],
+      selectedProjectIds: ['proj-1'],
       selections: { 'exp-1': ['b1'], 'proj-1': [] },
       rationale: 'matched',
     })
@@ -187,7 +191,7 @@ describe('ResumeUseCases.tailorResume', () => {
   it('preserves all bullets when entry key is absent from selections', async () => {
     const profile = makeProfile()
     // 'exp-1' absent from selections → all bullets kept
-    const aiService = makeAiService({ selections: {}, rationale: '' })
+    const aiService = makeAiService({ selectedExperienceIds: ['exp-1'], selectedProjectIds: ['proj-1'], selections: {}, rationale: '' })
     const uc = buildUseCases(makeProfileRepo(profile), { aiService })
     const result = await uc.tailorResume('user-1', { jobTitle: 'SWE', company: 'G', jobDescription: 'JD' })
     const tailoredExp = result.tailored.experience.find(e => (e as any).id === 'exp-1')
@@ -238,6 +242,8 @@ describe('ResumeUseCases.tailorResume', () => {
     const latexTemplate = makeLatexFiller(config)
     // AI selects all 8
     const aiService = makeAiService({
+      selectedExperienceIds: ['exp-1'],
+      selectedProjectIds: [],
       selections: { 'exp-1': manyBullets.map(b => b.id) },
       rationale: '',
     })
@@ -250,7 +256,7 @@ describe('ResumeUseCases.tailorResume', () => {
   it('sets summary when AI generates one', async () => {
     const profile = makeProfile()
     const aiService = makeAiService(
-      { selections: {}, rationale: '' },
+      { selectedExperienceIds: ['exp-1'], selectedProjectIds: ['proj-1'], selections: {}, rationale: '' },
       { summary: 'A great candidate.' }
     )
     const uc = buildUseCases(makeProfileRepo(profile), { aiService })
@@ -264,7 +270,7 @@ describe('ResumeUseCases.tailorResume', () => {
     const aiService: IAIService = {
       generateStructuredData: vi.fn().mockImplementation(() => {
         callCount++
-        if (callCount === 1) return Promise.resolve({ selections: {}, rationale: '' })
+        if (callCount === 1) return Promise.resolve({ selectedExperienceIds: ['exp-1'], selectedProjectIds: ['proj-1'], selections: {}, rationale: '' })
         return Promise.reject(new Error('Summary failed'))
       }),
     }

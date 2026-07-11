@@ -36,7 +36,14 @@ const vaultExpandAISchema = z.object({
 })
 
 const bulletSelectAISchema = z.object({
+  selectedExperienceIds: z.array(z.string()),
+  selectedProjectIds: z.array(z.string()),
   selections: z.record(z.string(), z.array(z.string())),
+  skills: z.object({
+    languages: z.array(z.string()),
+    frameworks: z.array(z.string()),
+    tools: z.array(z.string()),
+  }).optional(),
   rationale: z.string(),
 })
 
@@ -136,7 +143,10 @@ export class ChatUseCases {
       makeSchema(bulletSelectAISchema)
     )
     return {
+      selectedExperienceIds: result.selectedExperienceIds ?? [],
+      selectedProjectIds: result.selectedProjectIds ?? [],
       selections: result.selections,
+      skills: result.skills,
       rationale: result.rationale,
     }
   }

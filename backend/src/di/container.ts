@@ -13,7 +13,7 @@ import { GitHubRepoRepository } from "../infrastructure/persistence/github-repo-
 import { OpenCodeZenAIService } from "../infrastructure/ai"
 import { PDFParser } from "../infrastructure/pdf"
 import { LatexTemplateFiller } from "../infrastructure/latex/latex-template"
-import { GENERATE_BULLETS, PARSE_RESUME, GITHUB_README_BULLETS, CHAT_INTENT_PARSER, VAULT_EXPANDER, BULLET_SELECTOR } from "../infrastructure/prompts"
+import { GENERATE_BULLETS, PARSE_RESUME, GITHUB_README_BULLETS, CHAT_INTENT_PARSER, VAULT_EXPANDER, BULLET_SELECTOR, getBulletSelectorPrompt } from "../infrastructure/prompts"
 import { SECTION_SCHEMAS, parsedResumeSchema, bulletSelectionSchema } from "../shared"
 import { z } from "zod"
 
@@ -49,7 +49,7 @@ class Container {
         this.latexTemplate,
         PARSE_RESUME,
         parsedResumeSchema,
-        BULLET_SELECTOR,
+        getBulletSelectorPrompt,
         bulletSelectionSchema
       )
     }

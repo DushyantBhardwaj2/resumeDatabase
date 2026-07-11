@@ -232,7 +232,10 @@ export const tailorOutputSchema = z.object({
 });
 
 export const bulletSelectionSchema = z.object({
+  selectedExperienceIds: z.array(z.string()),
+  selectedProjectIds: z.array(z.string()),
   selections: z.record(z.string(), z.array(z.string())),
+  skills: skillsSchema.optional(),
   rationale: z.string(),
 });
 

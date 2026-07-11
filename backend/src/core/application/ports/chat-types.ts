@@ -65,6 +65,9 @@ export type BulletSelectionRequest = {
 }
 
 export type BulletSelectionResponse = {
+  selectedExperienceIds: string[]
+  selectedProjectIds: string[]
   selections: Record<string, string[]> // itemId -> selected bullet IDs
+  skills?: { languages: string[]; frameworks: string[]; tools: string[] }
   rationale: string
 }
