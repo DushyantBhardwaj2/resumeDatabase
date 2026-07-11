@@ -149,8 +149,13 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
       }
     }
 
-    const expConfig = config.placeholders.experience
     const tailoredExperience = data?.experience || []
+    const hasAnyExperience = safeExperience.length > 0 || tailoredExperience.length > 0
+    if (!hasAnyExperience) {
+      tex = stripSection(tex, "EXPERIENCE")
+    }
+
+    const expConfig = config.placeholders.experience
     const isTailoredMode = !!data?.experience
     const maxExpEntries = Math.min(expConfig.maxEntries, tailoredExperience.length, safeExperience.length || tailoredExperience.length)
     for (let i = 1; i <= expConfig.maxEntries; i++) {
@@ -186,8 +191,13 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
       }
     }
 
-    const projConfig = config.placeholders.projects
     const tailoredProjects = data?.projects || []
+    const hasAnyProjects = safeProjects.length > 0 || tailoredProjects.length > 0
+    if (!hasAnyProjects) {
+      tex = stripSection(tex, "PROJECTS")
+    }
+
+    const projConfig = config.placeholders.projects
     for (let i = 1; i <= projConfig.maxEntries; i++) {
       const proj: Record<string, unknown> = tailoredProjects[i - 1] || (isTailoredMode ? {} : safeProjects[i - 1]) || {}
       if (Object.keys(proj).length > 0) {
@@ -240,10 +250,19 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
       }
     }
 
-    const tailoredSkills = data?.skills || { languages: [], frameworks: [], tools: [] }
-    tex = tex.replace(/\{\{SKILLS_LANGUAGES\}\}/g, esc((tailoredSkills.languages ?? safeSkills.languages ?? []).join(", ")))
-    tex = tex.replace(/\{\{SKILLS_TOOLS\}\}/g, esc((tailoredSkills.tools ?? safeSkills.tools ?? []).join(", ")))
-    tex = tex.replace(/\{\{SKILLS_FRAMEWORKS\}\}/g, esc((tailoredSkills.frameworks ?? safeSkills.frameworks ?? []).join(", ")))
+    const resolvedSkills = {
+      languages: (data?.skills?.languages ?? safeSkills.languages ?? []),
+      frameworks: (data?.skills?.frameworks ?? safeSkills.frameworks ?? []),
+      tools: (data?.skills?.tools ?? safeSkills.tools ?? []),
+    }
+    const hasAnySkills = resolvedSkills.languages.length > 0 || resolvedSkills.frameworks.length > 0 || resolvedSkills.tools.length > 0
+    if (!hasAnySkills) {
+      tex = stripSection(tex, "TECHNICAL SKILLS")
+    }
+
+    tex = tex.replace(/\{\{SKILLS_LANGUAGES\}\}/g, esc(resolvedSkills.languages.join(", ")))
+    tex = tex.replace(/\{\{SKILLS_TOOLS\}\}/g, esc(resolvedSkills.tools.join(", ")))
+    tex = tex.replace(/\{\{SKILLS_FRAMEWORKS\}\}/g, esc(resolvedSkills.frameworks.join(", ")))
     tex = tex.replace(/\{\{SKILLS_BACKEND\}\}/g, esc(""))
     tex = tex.replace(/\{\{SKILLS_COURSEWORK\}\}/g, esc(""))
 

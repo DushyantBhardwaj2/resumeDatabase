@@ -48,11 +48,13 @@ export const contactSchema = z.object({
   github: z.string().nullable(),
   leetcode: z.string().nullable().optional(),
   portfolio: z.string().nullable(),
-  
+
+  names: z.array(z.string()).default([]).optional(),
   emails: z.array(z.string()).default([]).optional(),
   phones: z.array(z.string()).default([]).optional(),
   linkedins: z.array(z.string()).default([]).optional(),
   githubs: z.array(z.string()).default([]).optional(),
+  leetcodes: z.array(z.string()).default([]).optional(),
   portfolios: z.array(z.string()).default([]).optional(),
 });
 

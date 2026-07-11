@@ -32,6 +32,7 @@ __export(index_exports, {
   educationSchema: () => educationSchema,
   experienceEntrySchema: () => experienceEntrySchema,
   experienceSchema: () => experienceSchema,
+  extracurricularItemSchema: () => extracurricularItemSchema,
   parsedResumeSchema: () => parsedResumeSchema,
   profileSchema: () => profileSchema,
   projectEntrySchema: () => projectEntrySchema,
@@ -76,10 +77,12 @@ var contactSchema = import_zod.z.object({
   github: import_zod.z.string().nullable(),
   leetcode: import_zod.z.string().nullable().optional(),
   portfolio: import_zod.z.string().nullable(),
+  names: import_zod.z.array(import_zod.z.string()).default([]).optional(),
   emails: import_zod.z.array(import_zod.z.string()).default([]).optional(),
   phones: import_zod.z.array(import_zod.z.string()).default([]).optional(),
   linkedins: import_zod.z.array(import_zod.z.string()).default([]).optional(),
   githubs: import_zod.z.array(import_zod.z.string()).default([]).optional(),
+  leetcodes: import_zod.z.array(import_zod.z.string()).default([]).optional(),
   portfolios: import_zod.z.array(import_zod.z.string()).default([]).optional()
 });
 var educationSchema = import_zod.z.object({
@@ -88,6 +91,12 @@ var educationSchema = import_zod.z.object({
   gpa: import_zod.z.string().nullable(),
   startYear: import_zod.z.number().nullable(),
   endYear: import_zod.z.number().nullable()
+});
+var extracurricularItemSchema = import_zod.z.object({
+  id: import_zod.z.string().default(() => crypto.randomUUID()),
+  title: import_zod.z.string(),
+  description: import_zod.z.string(),
+  date: import_zod.z.string().nullable().optional()
 });
 var skillsSchema = import_zod.z.object({
   languages: import_zod.z.array(import_zod.z.string()),
@@ -155,6 +164,7 @@ var profileSchema = import_zod.z.object({
   projects: import_zod.z.array(projectSchema),
   skills: skillsSchema,
   certificates: import_zod.z.array(certificateSchema).default([]),
+  extracurriculars: import_zod.z.array(extracurricularItemSchema).default([]),
   githubUsername: import_zod.z.string().nullable().optional()
 });
 var legacyBulletsSchema = import_zod.z.object({
@@ -235,7 +245,10 @@ var tailorOutputSchema = import_zod.z.object({
   skills: skillsSchema
 });
 var bulletSelectionSchema = import_zod.z.object({
+  selectedExperienceIds: import_zod.z.array(import_zod.z.string()),
+  selectedProjectIds: import_zod.z.array(import_zod.z.string()),
   selections: import_zod.z.record(import_zod.z.string(), import_zod.z.array(import_zod.z.string())),
+  skills: skillsSchema.optional(),
   rationale: import_zod.z.string()
 });
 // Annotate the CommonJS export names for ESM import in node:
@@ -252,6 +265,7 @@ var bulletSelectionSchema = import_zod.z.object({
   educationSchema,
   experienceEntrySchema,
   experienceSchema,
+  extracurricularItemSchema,
   parsedResumeSchema,
   profileSchema,
   projectEntrySchema,

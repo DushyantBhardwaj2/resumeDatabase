@@ -44,10 +44,12 @@ export function normalizeProfile(raw: unknown): Profile {
       github: typeof contact?.github === 'string' ? contact.github : '',
       leetcode: typeof contact?.leetcode === 'string' ? contact.leetcode : '',
       portfolio: typeof contact?.portfolio === 'string' ? contact.portfolio : '',
+      names: Array.isArray(contact?.names) ? contact.names as string[] : [],
       emails: Array.isArray(contact?.emails) ? contact.emails as string[] : [],
       phones: Array.isArray(contact?.phones) ? contact.phones as string[] : [],
       linkedins: Array.isArray(contact?.linkedins) ? contact.linkedins as string[] : [],
       githubs: Array.isArray(contact?.githubs) ? contact.githubs as string[] : [],
+      leetcodes: Array.isArray(contact?.leetcodes) ? contact.leetcodes as string[] : [],
       portfolios: Array.isArray(contact?.portfolios) ? contact.portfolios as string[] : [],
     },
     education: normalizeEducation(education),
@@ -151,7 +153,7 @@ function normalizeExtracurriculars(ec: unknown): Profile['extracurriculars'] {
 
 export function getEmptyProfile(): Profile {
   return {
-    contact: { name: '', email: '', phone: '', linkedin: '', github: '', leetcode: '', portfolio: '', emails: [], phones: [], linkedins: [], githubs: [], portfolios: [] },
+    contact: { name: '', email: '', phone: '', linkedin: '', github: '', leetcode: '', portfolio: '', names: [], emails: [], phones: [], linkedins: [], githubs: [], leetcodes: [], portfolios: [] },
     education: [],
     experience: [],
     projects: [],

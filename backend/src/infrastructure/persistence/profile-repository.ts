@@ -47,7 +47,14 @@ const contactSchema = z.object({
   github: z.string().nullable().catch(null),
   leetcode: z.string().nullable().catch(null),
   portfolio: z.string().nullable().catch(null),
-}).catch({ name: null, email: null, phone: null, linkedin: null, github: null, leetcode: null, portfolio: null })
+  names: z.array(z.string()).catch([]),
+  emails: z.array(z.string()).catch([]),
+  phones: z.array(z.string()).catch([]),
+  linkedins: z.array(z.string()).catch([]),
+  githubs: z.array(z.string()).catch([]),
+  leetcodes: z.array(z.string()).catch([]),
+  portfolios: z.array(z.string()).catch([]),
+}).catch({ name: null, email: null, phone: null, linkedin: null, github: null, leetcode: null, portfolio: null, names: [], emails: [], phones: [], linkedins: [], githubs: [], leetcodes: [], portfolios: [] })
 
 const educationSchema = z.object({
   school: z.string().catch(""),

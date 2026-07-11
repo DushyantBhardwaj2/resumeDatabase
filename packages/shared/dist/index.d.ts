@@ -34,10 +34,12 @@ declare const contactSchema: z.ZodObject<{
     github: z.ZodNullable<z.ZodString>;
     leetcode: z.ZodOptional<z.ZodNullable<z.ZodString>>;
     portfolio: z.ZodNullable<z.ZodString>;
+    names: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
     emails: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
     phones: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
     linkedins: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
     githubs: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+    leetcodes: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
     portfolios: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
 }, "strip", z.ZodTypeAny, {
     name: string | null;
@@ -47,10 +49,12 @@ declare const contactSchema: z.ZodObject<{
     github: string | null;
     portfolio: string | null;
     leetcode?: string | null | undefined;
+    names?: string[] | undefined;
     emails?: string[] | undefined;
     phones?: string[] | undefined;
     linkedins?: string[] | undefined;
     githubs?: string[] | undefined;
+    leetcodes?: string[] | undefined;
     portfolios?: string[] | undefined;
 }, {
     name: string | null;
@@ -60,10 +64,12 @@ declare const contactSchema: z.ZodObject<{
     github: string | null;
     portfolio: string | null;
     leetcode?: string | null | undefined;
+    names?: string[] | undefined;
     emails?: string[] | undefined;
     phones?: string[] | undefined;
     linkedins?: string[] | undefined;
     githubs?: string[] | undefined;
+    leetcodes?: string[] | undefined;
     portfolios?: string[] | undefined;
 }>;
 type Contact = z.infer<typeof contactSchema>;
@@ -87,6 +93,23 @@ declare const educationSchema: z.ZodObject<{
     endYear: number | null;
 }>;
 type Education = z.infer<typeof educationSchema>;
+declare const extracurricularItemSchema: z.ZodObject<{
+    id: z.ZodDefault<z.ZodString>;
+    title: z.ZodString;
+    description: z.ZodString;
+    date: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+}, "strip", z.ZodTypeAny, {
+    id: string;
+    title: string;
+    description: string;
+    date?: string | null | undefined;
+}, {
+    title: string;
+    description: string;
+    id?: string | undefined;
+    date?: string | null | undefined;
+}>;
+type ExtracurricularItem = z.infer<typeof extracurricularItemSchema>;
 declare const skillsSchema: z.ZodObject<{
     languages: z.ZodArray<z.ZodString, "many">;
     frameworks: z.ZodArray<z.ZodString, "many">;
@@ -286,6 +309,7 @@ declare const projectSchema: z.ZodObject<{
     }>, "many">>;
 }, "strip", z.ZodTypeAny, {
     id: string;
+    title: string;
     url: string | null;
     vaultBullets: {
         id: string;
@@ -294,11 +318,10 @@ declare const projectSchema: z.ZodObject<{
         isAIGenerated: boolean;
         category?: "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL" | undefined;
     }[];
-    title: string;
     techStack: string[];
 }, {
-    url: string | null;
     title: string;
+    url: string | null;
     techStack: string[];
     id?: string | undefined;
     vaultBullets?: {
@@ -335,6 +358,7 @@ declare const projectEntrySchema: z.ZodEffects<z.ZodObject<{
     }>, "many">>;
     bulletPoints: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
 }, "strip", z.ZodTypeAny, {
+    title: string;
     url: string | null;
     vaultBullets: {
         id: string;
@@ -343,12 +367,11 @@ declare const projectEntrySchema: z.ZodEffects<z.ZodObject<{
         isAIGenerated: boolean;
         category?: "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL" | undefined;
     }[];
-    title: string;
     techStack: string[];
     bulletPoints?: string[] | undefined;
 }, {
-    url: string | null;
     title: string;
+    url: string | null;
     techStack: string[];
     vaultBullets?: {
         id: string;
@@ -371,13 +394,13 @@ declare const projectEntrySchema: z.ZodEffects<z.ZodObject<{
         keywords: never[];
         isAIGenerated: boolean;
     }[];
-    url: string | null;
     title: string;
+    url: string | null;
     techStack: string[];
     bulletPoints?: string[] | undefined;
 }, {
-    url: string | null;
     title: string;
+    url: string | null;
     techStack: string[];
     vaultBullets?: {
         id: string;
@@ -397,10 +420,12 @@ declare const profileSchema: z.ZodObject<{
         github: z.ZodNullable<z.ZodString>;
         leetcode: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         portfolio: z.ZodNullable<z.ZodString>;
+        names: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
         emails: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
         phones: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
         linkedins: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
         githubs: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+        leetcodes: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
         portfolios: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
     }, "strip", z.ZodTypeAny, {
         name: string | null;
@@ -410,10 +435,12 @@ declare const profileSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        names?: string[] | undefined;
         emails?: string[] | undefined;
         phones?: string[] | undefined;
         linkedins?: string[] | undefined;
         githubs?: string[] | undefined;
+        leetcodes?: string[] | undefined;
         portfolios?: string[] | undefined;
     }, {
         name: string | null;
@@ -423,10 +450,12 @@ declare const profileSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        names?: string[] | undefined;
         emails?: string[] | undefined;
         phones?: string[] | undefined;
         linkedins?: string[] | undefined;
         githubs?: string[] | undefined;
+        leetcodes?: string[] | undefined;
         portfolios?: string[] | undefined;
     }>;
     education: z.ZodArray<z.ZodObject<{
@@ -529,6 +558,7 @@ declare const profileSchema: z.ZodObject<{
         }>, "many">>;
     }, "strip", z.ZodTypeAny, {
         id: string;
+        title: string;
         url: string | null;
         vaultBullets: {
             id: string;
@@ -537,11 +567,10 @@ declare const profileSchema: z.ZodObject<{
             isAIGenerated: boolean;
             category?: "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL" | undefined;
         }[];
-        title: string;
         techStack: string[];
     }, {
-        url: string | null;
         title: string;
+        url: string | null;
         techStack: string[];
         id?: string | undefined;
         vaultBullets?: {
@@ -584,6 +613,22 @@ declare const profileSchema: z.ZodObject<{
         url: string;
         date?: string | undefined;
     }>, "many">>;
+    extracurriculars: z.ZodDefault<z.ZodArray<z.ZodObject<{
+        id: z.ZodDefault<z.ZodString>;
+        title: z.ZodString;
+        description: z.ZodString;
+        date: z.ZodOptional<z.ZodNullable<z.ZodString>>;
+    }, "strip", z.ZodTypeAny, {
+        id: string;
+        title: string;
+        description: string;
+        date?: string | null | undefined;
+    }, {
+        title: string;
+        description: string;
+        id?: string | undefined;
+        date?: string | null | undefined;
+    }>, "many">>;
     githubUsername: z.ZodOptional<z.ZodNullable<z.ZodString>>;
 }, "strip", z.ZodTypeAny, {
     contact: {
@@ -594,10 +639,12 @@ declare const profileSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        names?: string[] | undefined;
         emails?: string[] | undefined;
         phones?: string[] | undefined;
         linkedins?: string[] | undefined;
         githubs?: string[] | undefined;
+        leetcodes?: string[] | undefined;
         portfolios?: string[] | undefined;
     };
     education: {
@@ -624,6 +671,7 @@ declare const profileSchema: z.ZodObject<{
     }[];
     projects: {
         id: string;
+        title: string;
         url: string | null;
         vaultBullets: {
             id: string;
@@ -632,7 +680,6 @@ declare const profileSchema: z.ZodObject<{
             isAIGenerated: boolean;
             category?: "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL" | undefined;
         }[];
-        title: string;
         techStack: string[];
     }[];
     skills: {
@@ -647,6 +694,12 @@ declare const profileSchema: z.ZodObject<{
         url: string;
         date?: string | undefined;
     }[];
+    extracurriculars: {
+        id: string;
+        title: string;
+        description: string;
+        date?: string | null | undefined;
+    }[];
     githubUsername?: string | null | undefined;
 }, {
     contact: {
@@ -657,10 +710,12 @@ declare const profileSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        names?: string[] | undefined;
         emails?: string[] | undefined;
         phones?: string[] | undefined;
         linkedins?: string[] | undefined;
         githubs?: string[] | undefined;
+        leetcodes?: string[] | undefined;
         portfolios?: string[] | undefined;
     };
     education: {
@@ -686,8 +741,8 @@ declare const profileSchema: z.ZodObject<{
         }[] | undefined;
     }[];
     projects: {
-        url: string | null;
         title: string;
+        url: string | null;
         techStack: string[];
         id?: string | undefined;
         vaultBullets?: {
@@ -709,6 +764,12 @@ declare const profileSchema: z.ZodObject<{
         issuer: string;
         url: string;
         date?: string | undefined;
+    }[] | undefined;
+    extracurriculars?: {
+        title: string;
+        description: string;
+        id?: string | undefined;
+        date?: string | null | undefined;
     }[] | undefined;
     githubUsername?: string | null | undefined;
 }>;
@@ -794,10 +855,12 @@ declare const parsedResumeSchema: z.ZodObject<{
         github: z.ZodNullable<z.ZodString>;
         leetcode: z.ZodOptional<z.ZodNullable<z.ZodString>>;
         portfolio: z.ZodNullable<z.ZodString>;
+        names: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
         emails: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
         phones: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
         linkedins: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
         githubs: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
+        leetcodes: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
         portfolios: z.ZodOptional<z.ZodDefault<z.ZodArray<z.ZodString, "many">>>;
     }, "strip", z.ZodTypeAny, {
         name: string | null;
@@ -807,10 +870,12 @@ declare const parsedResumeSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        names?: string[] | undefined;
         emails?: string[] | undefined;
         phones?: string[] | undefined;
         linkedins?: string[] | undefined;
         githubs?: string[] | undefined;
+        leetcodes?: string[] | undefined;
         portfolios?: string[] | undefined;
     }, {
         name: string | null;
@@ -820,10 +885,12 @@ declare const parsedResumeSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        names?: string[] | undefined;
         emails?: string[] | undefined;
         phones?: string[] | undefined;
         linkedins?: string[] | undefined;
         githubs?: string[] | undefined;
+        leetcodes?: string[] | undefined;
         portfolios?: string[] | undefined;
     }>;
     education: z.ZodArray<z.ZodObject<{
@@ -953,6 +1020,7 @@ declare const parsedResumeSchema: z.ZodObject<{
         bullets: z.ZodOptional<z.ZodArray<z.ZodString, "many">>;
         url: z.ZodNullable<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
+        title: string;
         url: string | null;
         vaultBullets: {
             id: string;
@@ -961,12 +1029,11 @@ declare const parsedResumeSchema: z.ZodObject<{
             isAIGenerated: boolean;
             category?: "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL" | undefined;
         }[];
-        title: string;
         techStack: string[];
         bullets?: string[] | undefined;
     }, {
-        url: string | null;
         title: string;
+        url: string | null;
         techStack: string[];
         vaultBullets?: {
             id: string;
@@ -989,13 +1056,13 @@ declare const parsedResumeSchema: z.ZodObject<{
             keywords: never[];
             isAIGenerated: boolean;
         }[];
-        url: string | null;
         title: string;
+        url: string | null;
         techStack: string[];
         bullets?: string[] | undefined;
     }, {
-        url: string | null;
         title: string;
+        url: string | null;
         techStack: string[];
         vaultBullets?: {
             id: string;
@@ -1028,10 +1095,12 @@ declare const parsedResumeSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        names?: string[] | undefined;
         emails?: string[] | undefined;
         phones?: string[] | undefined;
         linkedins?: string[] | undefined;
         githubs?: string[] | undefined;
+        leetcodes?: string[] | undefined;
         portfolios?: string[] | undefined;
     };
     education: {
@@ -1073,8 +1142,8 @@ declare const parsedResumeSchema: z.ZodObject<{
             keywords: never[];
             isAIGenerated: boolean;
         }[];
-        url: string | null;
         title: string;
+        url: string | null;
         techStack: string[];
         bullets?: string[] | undefined;
     }[];
@@ -1092,10 +1161,12 @@ declare const parsedResumeSchema: z.ZodObject<{
         github: string | null;
         portfolio: string | null;
         leetcode?: string | null | undefined;
+        names?: string[] | undefined;
         emails?: string[] | undefined;
         phones?: string[] | undefined;
         linkedins?: string[] | undefined;
         githubs?: string[] | undefined;
+        leetcodes?: string[] | undefined;
         portfolios?: string[] | undefined;
     };
     education: {
@@ -1120,8 +1191,8 @@ declare const parsedResumeSchema: z.ZodObject<{
         bullets?: string[] | undefined;
     }[];
     projects: {
-        url: string | null;
         title: string;
+        url: string | null;
         techStack: string[];
         vaultBullets?: {
             id: string;
@@ -1213,6 +1284,7 @@ declare const tailorOutputSchema: z.ZodObject<{
         }>, "many">>;
         url: z.ZodNullable<z.ZodString>;
     }, "strip", z.ZodTypeAny, {
+        title: string;
         url: string | null;
         vaultBullets: {
             id: string;
@@ -1221,11 +1293,10 @@ declare const tailorOutputSchema: z.ZodObject<{
             isAIGenerated: boolean;
             category?: "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL" | undefined;
         }[];
-        title: string;
         techStack: string[];
     }, {
-        url: string | null;
         title: string;
+        url: string | null;
         techStack: string[];
         vaultBullets?: {
             id: string;
@@ -1263,6 +1334,7 @@ declare const tailorOutputSchema: z.ZodObject<{
         }[];
     }[];
     projects: {
+        title: string;
         url: string | null;
         vaultBullets: {
             id: string;
@@ -1271,7 +1343,6 @@ declare const tailorOutputSchema: z.ZodObject<{
             isAIGenerated: boolean;
             category?: "FRONTEND" | "BACKEND" | "DEVOPS" | "LEADERSHIP" | "GENERAL" | undefined;
         }[];
-        title: string;
         techStack: string[];
     }[];
     skills: {
@@ -1295,8 +1366,8 @@ declare const tailorOutputSchema: z.ZodObject<{
         }[] | undefined;
     }[];
     projects: {
-        url: string | null;
         title: string;
+        url: string | null;
         techStack: string[];
         vaultBullets?: {
             id: string;
@@ -1314,14 +1385,43 @@ declare const tailorOutputSchema: z.ZodObject<{
     summary: string | null;
 }>;
 declare const bulletSelectionSchema: z.ZodObject<{
+    selectedExperienceIds: z.ZodArray<z.ZodString, "many">;
+    selectedProjectIds: z.ZodArray<z.ZodString, "many">;
     selections: z.ZodRecord<z.ZodString, z.ZodArray<z.ZodString, "many">>;
+    skills: z.ZodOptional<z.ZodObject<{
+        languages: z.ZodArray<z.ZodString, "many">;
+        frameworks: z.ZodArray<z.ZodString, "many">;
+        tools: z.ZodArray<z.ZodString, "many">;
+    }, "strip", z.ZodTypeAny, {
+        languages: string[];
+        frameworks: string[];
+        tools: string[];
+    }, {
+        languages: string[];
+        frameworks: string[];
+        tools: string[];
+    }>>;
     rationale: z.ZodString;
 }, "strip", z.ZodTypeAny, {
+    selectedExperienceIds: string[];
+    selectedProjectIds: string[];
     selections: Record<string, string[]>;
     rationale: string;
+    skills?: {
+        languages: string[];
+        frameworks: string[];
+        tools: string[];
+    } | undefined;
 }, {
+    selectedExperienceIds: string[];
+    selectedProjectIds: string[];
     selections: Record<string, string[]>;
     rationale: string;
+    skills?: {
+        languages: string[];
+        frameworks: string[];
+        tools: string[];
+    } | undefined;
 }>;
 interface TailoredOutput {
     summary: string | null;
@@ -1351,4 +1451,4 @@ interface AiGeneratedExperience {
 }
 type SectionType = "experience" | "projects" | "skills" | "summary" | "project" | "experience_entry";
 
-export { type AiGeneratedExperience, type AiGeneratedProject, type BulletCategory, BulletCategoryEnum, type Certificate, type Contact, type Education, type Experience, type GitHubRepoInfo, type Profile, type Project, SECTION_LABELS, SECTION_ORDER, SECTION_SCHEMAS, type SectionName, SectionNameEnum, type SectionType, type Skills, type TailoredOutput, type VaultBullet, bulletSelectionSchema, bulletsSchema, certificateSchema, contactSchema, educationSchema, experienceEntrySchema, experienceSchema, parsedResumeSchema, profileSchema, projectEntrySchema, projectSchema, skillsSchema, summarySchema, tailorOutputSchema, vaultBulletSchema };
+export { type AiGeneratedExperience, type AiGeneratedProject, type BulletCategory, BulletCategoryEnum, type Certificate, type Contact, type Education, type Experience, type ExtracurricularItem, type GitHubRepoInfo, type Profile, type Project, SECTION_LABELS, SECTION_ORDER, SECTION_SCHEMAS, type SectionName, SectionNameEnum, type SectionType, type Skills, type TailoredOutput, type VaultBullet, bulletSelectionSchema, bulletsSchema, certificateSchema, contactSchema, educationSchema, experienceEntrySchema, experienceSchema, extracurricularItemSchema, parsedResumeSchema, profileSchema, projectEntrySchema, projectSchema, skillsSchema, summarySchema, tailorOutputSchema, vaultBulletSchema };

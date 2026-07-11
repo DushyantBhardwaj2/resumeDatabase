@@ -33,10 +33,12 @@ var contactSchema = z.object({
   github: z.string().nullable(),
   leetcode: z.string().nullable().optional(),
   portfolio: z.string().nullable(),
+  names: z.array(z.string()).default([]).optional(),
   emails: z.array(z.string()).default([]).optional(),
   phones: z.array(z.string()).default([]).optional(),
   linkedins: z.array(z.string()).default([]).optional(),
   githubs: z.array(z.string()).default([]).optional(),
+  leetcodes: z.array(z.string()).default([]).optional(),
   portfolios: z.array(z.string()).default([]).optional()
 });
 var educationSchema = z.object({
@@ -45,6 +47,12 @@ var educationSchema = z.object({
   gpa: z.string().nullable(),
   startYear: z.number().nullable(),
   endYear: z.number().nullable()
+});
+var extracurricularItemSchema = z.object({
+  id: z.string().default(() => crypto.randomUUID()),
+  title: z.string(),
+  description: z.string(),
+  date: z.string().nullable().optional()
 });
 var skillsSchema = z.object({
   languages: z.array(z.string()),
@@ -112,6 +120,7 @@ var profileSchema = z.object({
   projects: z.array(projectSchema),
   skills: skillsSchema,
   certificates: z.array(certificateSchema).default([]),
+  extracurriculars: z.array(extracurricularItemSchema).default([]),
   githubUsername: z.string().nullable().optional()
 });
 var legacyBulletsSchema = z.object({
@@ -192,7 +201,10 @@ var tailorOutputSchema = z.object({
   skills: skillsSchema
 });
 var bulletSelectionSchema = z.object({
+  selectedExperienceIds: z.array(z.string()),
+  selectedProjectIds: z.array(z.string()),
   selections: z.record(z.string(), z.array(z.string())),
+  skills: skillsSchema.optional(),
   rationale: z.string()
 });
 export {
@@ -208,6 +220,7 @@ export {
   educationSchema,
   experienceEntrySchema,
   experienceSchema,
+  extracurricularItemSchema,
   parsedResumeSchema,
   profileSchema,
   projectEntrySchema,
