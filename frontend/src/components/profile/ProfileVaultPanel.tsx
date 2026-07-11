@@ -175,7 +175,7 @@ export function ProfileVaultPanel() {
 
 function PersonalInfoTab({ profile }: { profile: ReturnType<typeof useProfileStore.getState>['profile'] }) {
   const c = profile.contact
-  const hasContact = c.name || c.email || c.phone || c.linkedin || c.github || c.portfolio
+  const hasContact = c.name || c.email || c.phone || c.linkedin || c.github || c.leetcode || c.portfolio
   const hasSkills = profile.skills.languages.length > 0 || profile.skills.frameworks.length > 0 || profile.skills.tools.length > 0
 
   return (
@@ -200,6 +200,12 @@ function PersonalInfoTab({ profile }: { profile: ReturnType<typeof useProfileSto
               <a href={c.github} target="_blank" rel="noopener noreferrer"
                 className="flex items-center gap-2 text-xs text-content-muted hover:text-brand transition-colors">
                 <GithubLogo size={13} /> {c.github}
+              </a>
+            )}
+            {c.leetcode && (
+              <a href={c.leetcode} target="_blank" rel="noopener noreferrer"
+                className="flex items-center gap-2 text-xs text-content-muted hover:text-brand transition-colors">
+                <Code size={13} /> {c.leetcode}
               </a>
             )}
             {c.portfolio && (

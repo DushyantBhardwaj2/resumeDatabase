@@ -180,31 +180,102 @@ function VaultBulletEditor({
 
 // ── Contact Editor ───────────────────────────────────────────────
 
+function MultiValueField({ values, onAdd, onRemove }: {
+  values: string[]
+  onAdd: (val: string) => void
+  onRemove: (val: string) => void
+}) {
+  const [input, setInput] = useState('')
+  const add = () => {
+    const val = input.trim()
+    if (val && !values.includes(val)) {
+      onAdd(val)
+    }
+    setInput('')
+  }
+  return (
+    <div className="space-y-1.5">
+      <div className="flex flex-wrap gap-1.5">
+        {values.map((v) => (
+          <span key={v} className="inline-flex items-center gap-1 bg-muted-bg border border-edge rounded-full px-2 py-0.5 text-xs text-content">
+            {v}
+            <button onClick={() => onRemove(v)} className="text-content-subtle hover:text-red-500 transition-colors">
+              <X size={10} weight="bold" />
+            </button>
+          </span>
+        ))}
+      </div>
+      <div className="flex gap-1.5">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') add() }}
+          placeholder="Add..."
+          className="flex-1 h-7 bg-muted-bg border border-edge rounded-[var(--radius-sm)] px-2 text-xs text-content placeholder:text-content-subtle outline-none focus:border-brand"
+        />
+        <button onClick={add} className="h-7 px-2 text-xs bg-brand/10 text-brand rounded-[var(--radius-sm)] hover:bg-brand/20 transition-colors">
+          Add
+        </button>
+      </div>
+    </div>
+  )
+}
+
 function ContactEditor({ data, onChange }: { data: Profile; onChange: (d: Profile) => void }) {
   const c = data.contact
   const set = (field: string, val: string) =>
     onChange({ ...data, contact: { ...c, [field]: val } })
+
+  const setArray = (listField: string, updater: (vals: string[]) => string[]) =>
+    onChange({ ...data, contact: { ...c, [listField]: updater((c as unknown as Record<string, string[]>)[listField] ?? []) } })
+
+  const singularFields = [
+    { label: 'Full Name', field: 'name', placeholder: 'Your name' },
+    { label: 'Email', field: 'email', placeholder: 'you@example.com' },
+    { label: 'Phone', field: 'phone', placeholder: '+91 98765 43210' },
+    { label: 'LinkedIn', field: 'linkedin', placeholder: 'linkedin.com/in/you' },
+    { label: 'GitHub', field: 'github', placeholder: 'github.com/you' },
+    { label: 'LeetCode', field: 'leetcode', placeholder: 'leetcode.com/u/you' },
+    { label: 'Portfolio', field: 'portfolio', placeholder: 'yoursite.dev' },
+  ]
+
+  const arrayFields: { label: string; listField: string }[] = [
+    { label: 'Alternate Emails', listField: 'emails' },
+    { label: 'Alternate Phones', listField: 'phones' },
+    { label: 'LinkedIn URLs', listField: 'linkedins' },
+    { label: 'GitHub URLs', listField: 'githubs' },
+    { label: 'LeetCode URLs', listField: 'leetcodes' },
+    { label: 'Portfolio URLs', listField: 'portfolios' },
+  ]
+
   return (
-    <div className="space-y-2.5">
-      {[
-        { label: 'Full Name', field: 'name', placeholder: 'Your name' },
-        { label: 'Email', field: 'email', placeholder: 'you@example.com' },
-        { label: 'Phone', field: 'phone', placeholder: '+91 98765 43210' },
-        { label: 'LinkedIn', field: 'linkedin', placeholder: 'linkedin.com/in/you' },
-        { label: 'GitHub', field: 'github', placeholder: 'github.com/you' },
-        { label: 'LeetCode', field: 'leetcode', placeholder: 'leetcode.com/u/you' },
-        { label: 'Portfolio', field: 'portfolio', placeholder: 'yoursite.dev' },
-      ].map(({ label, field, placeholder }) => (
-        <div key={field}>
-          <label className="text-xs text-content-muted mb-1 block">{label}</label>
-          <input
-            value={((c as unknown) as Record<string, any>)[field] || ''}
-            onChange={(e) => set(field, e.target.value)}
-            placeholder={placeholder}
-            className="w-full h-8 bg-muted-bg border border-edge rounded-[var(--radius-md)] px-2.5 text-sm text-content placeholder:text-content-subtle outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors"
-          />
-        </div>
-      ))}
+    <div className="space-y-4">
+      <div className="space-y-2.5">
+        {singularFields.map(({ label, field, placeholder }) => (
+          <div key={field}>
+            <label className="text-xs text-content-muted mb-1 block">{label}</label>
+            <input
+              value={((c as unknown) as Record<string, any>)[field] || ''}
+              onChange={(e) => set(field, e.target.value)}
+              placeholder={placeholder}
+              className="w-full h-8 bg-muted-bg border border-edge rounded-[var(--radius-md)] px-2.5 text-sm text-content placeholder:text-content-subtle outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 transition-colors"
+            />
+          </div>
+        ))}
+      </div>
+      <div className="border-t border-edge/50 pt-3 space-y-3">
+        <p className="text-xs font-medium text-content-muted">Vault Lists (saved for reuse)</p>
+        {arrayFields.map(({ label, listField }) => (
+          <div key={listField}>
+            <label className="text-xs text-content-muted mb-1.5 block">{label}</label>
+            <MultiValueField
+              values={(c as unknown as Record<string, string[]>)[listField] ?? []}
+              onAdd={(val) => setArray(listField, (vals) => [...vals, val])}
+              onRemove={(val) => setArray(listField, (vals) => vals.filter((v) => v !== val))}
+            />
+          </div>
+        ))}
+      </div>
     </div>
   )
 }
