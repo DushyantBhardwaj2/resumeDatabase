@@ -113,10 +113,11 @@ export function useTailorChat() {
             const bId = b.id || crypto.randomUUID()
             return { id: bId, text: b.text, keywords: b.keywords || [], isAIGenerated: true }
           })
-          // AI selected these, so add to selectedBulletIds
           selectedBulletIds[id] = newTailoredBullets.map(b => b.id)
-          // Prepend tailored bullets to the original ones
           finalBullets = [...newTailoredBullets, ...finalBullets]
+        } else {
+          selectedExperienceIds.push(id)
+          selectedBulletIds[id] = orig.vaultBullets.map(b => b.id)
         }
         
         return {
@@ -145,6 +146,9 @@ export function useTailorChat() {
           })
           selectedBulletIds[id] = newTailoredBullets.map(b => b.id)
           finalBullets = [...newTailoredBullets, ...finalBullets]
+        } else {
+          selectedProjectIds.push(id)
+          selectedBulletIds[id] = orig.vaultBullets.map(b => b.id)
         }
         
         return {

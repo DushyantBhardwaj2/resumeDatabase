@@ -199,13 +199,18 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
 
     try {
       // ── Step 1: Enqueue the job ────────────────────────────────────────────
+      // Filter out undefined/empty values from contactSelection so they don't
+      // overwrite profile.contact defaults during backend merge
+      const cleanContactSelection = Object.fromEntries(
+        Object.entries(contactSelection).filter(([, v]) => v !== undefined && v !== '')
+      )
       const enqueueRes = await api.api.protected.resume['compile-live'].$post({
         json: { 
           profile, 
           selectedBulletIds, 
           selectedExperienceIds,
           selectedProjectIds,
-          contactSelection,
+          contactSelection: cleanContactSelection,
           templateId: template 
         },
       }, { init: { signal } })

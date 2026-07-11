@@ -24,6 +24,7 @@ export function GenerateChatWorkspace() {
   const contactSelection = useBuilderStore((s) => s.contactSelection)
   const currentStage = useBuilderStore((s) => s.currentStage)
   const setCurrentStage = useBuilderStore((s) => s.setCurrentStage)
+  const template = useBuilderStore((s) => s.template)
   const triggerCompile = useBuilderStore((s) => s.triggerCompile)
 
   // Auto-scroll
@@ -36,13 +37,13 @@ export function GenerateChatWorkspace() {
   // Debounced live recompile on bullet toggle
   const compileTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   useEffect(() => {
-    if (!profile || currentStage !== 'reviewing') return
+    if (!profile || (currentStage !== 'reviewing' && currentStage !== 'ready')) return
     if (compileTimer.current) clearTimeout(compileTimer.current)
     compileTimer.current = setTimeout(() => { triggerCompile() }, 600)
     return () => {
       if (compileTimer.current) clearTimeout(compileTimer.current)
     }
-  }, [selectedBulletIds, selectedExperienceIds, selectedProjectIds, contactSelection, profile, currentStage, triggerCompile])
+  }, [selectedBulletIds, selectedExperienceIds, selectedProjectIds, contactSelection, profile, template, currentStage, triggerCompile])
 
   return (
     <div className="flex flex-col h-full relative">

@@ -117,12 +117,19 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
       const entry = safeEducation[i - 1]
       if (entry) {
         tex = tex.replace(new RegExp(`\\{\\{EDU_DEGREE_${i}\\}\\}`, "g"), esc(String(entry.degree ?? "")))
-        tex = tex.replace(new RegExp(`\\{\\{EDU_YEAR_${i}\\}\\}`, "g"), esc(String(entry.yearRange ?? "")))
+        const yearRange = entry.startYear && entry.endYear
+          ? `${String(entry.startYear)} -- ${String(entry.endYear)}`
+          : entry.startYear
+            ? String(entry.startYear)
+            : entry.endYear
+              ? String(entry.endYear)
+              : ""
+        tex = tex.replace(new RegExp(`\\{\\{EDU_YEAR_${i}\\}\\}`, "g"), esc(yearRange))
         tex = tex.replace(new RegExp(`\\{\\{EDU_INSTITUTION_${i}\\}\\}`, "g"), esc(String(entry.school ?? "")))
         tex = tex.replace(new RegExp(`\\{\\{EDU_SCORE_${i}\\}\\}`, "g"), esc(String(entry.gpa ?? "")))
       } else {
         const rowPattern = new RegExp(
-          `\\\\textbf\\{\\{\\{EDU_DEGREE_${i}\\}\\}\\}.*\\\\\\\\\\\\\\n?(?=\\\\textbf\\{\\{\\{EDU_DEGREE_${i + 1}\\}\\}|\\\\end\\{tabular\\*\\})`,
+          `\\\\textbf\\{\\{\\{EDU_DEGREE_${i}\\}\\}\\}.*\\\\\\\\\\n?(?=\\\\textbf\\{\\{\\{EDU_DEGREE_${i + 1}\\}\\}|\\\\end\\{tabular\\*\\})`,
           "g"
         )
         tex = tex.replace(rowPattern, "")
@@ -158,7 +165,7 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
         }
       } else {
         const blockPattern = new RegExp(
-          `%% --- Experience Entry ${i} ---[\\s\\S]*?(?=%% --- Experience Entry ${i + 1}|\\\\end\\{itemize\\}|%% --- PROJECTS)`,
+          `%% --- Experience Entry ${i} ---[\\s\\S]*?(?=%% --- Experience Entry ${i + 1}|\\\\resheading\\{PROJECTS\\})`,
           "g"
         )
         tex = tex.replace(blockPattern, "")
@@ -171,7 +178,11 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
       const proj: Record<string, unknown> = tailoredProjects[i - 1] || safeProjects[i - 1] || {}
       if (Object.keys(proj).length > 0) {
         tex = tex.replace(new RegExp(`\\{\\{PROJ_NAME_${i}\\}\\}`, "g"), esc(String(proj.title ?? "")))
-        const dates = proj.dates || proj.yearRange || ""
+        const dates = proj.dates
+          ? esc(String(proj.dates))
+          : proj.startDate
+            ? esc(`${String(proj.startDate)}${proj.endDate ? ` -- ${String(proj.endDate)}` : ""}`)
+            : ""
         tex = tex.replace(new RegExp(`\\{\\{PROJ_DATES_${i}\\}\\}`, "g"), esc(String(dates)))
         const purpose = proj.purpose || ""
         tex = tex.replace(new RegExp(`\\{\\{PROJ_PURPOSE_${i}\\}\\}`, "g"), esc(String(purpose)))
@@ -193,7 +204,7 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
         tex = tex.replace(new RegExp(`\\{\\{PROJ_GITHUB_LABEL_${i}\\}\\}`, "g"), ghUrl ? "GitHub" : "")
       } else {
         const blockPattern = new RegExp(
-          `%% --- Project Entry ${i} ---[\\s\\S]*?(?=%% --- Project Entry ${i + 1}|%% --- Add more project|\\\\end\\{itemize\\}|%% --- TECHNICAL SKILLS)`,
+          `%% --- Project Entry ${i} ---[\\s\\S]*?(?=%% --- Project Entry ${i + 1}|\\\\resheading\\{TECHNICAL SKILLS\\})`,
           "g"
         )
         tex = tex.replace(blockPattern, "")
