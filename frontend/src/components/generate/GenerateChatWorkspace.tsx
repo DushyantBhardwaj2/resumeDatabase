@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from 'react'
 import { Sparkle, Chat, User, GraduationCap, Briefcase, Folder, Wrench } from '@phosphor-icons/react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { useTailorChat } from './useTailorChat'
+import { toast } from 'sonner'
+import { api } from '@/config/api-client'
 import { JobDetailsForm } from './JobDetailsForm'
 import { ChatComposer } from './ChatComposer'
 import { ContactSelectionWidget } from './ContactSelectionWidget'
@@ -28,6 +30,22 @@ export function GenerateChatWorkspace() {
   const setCurrentStage = useBuilderStore((s) => s.setCurrentStage)
   const template = useBuilderStore((s) => s.template)
   const triggerCompile = useBuilderStore((s) => s.triggerCompile)
+  const setJobTitle = useBuilderStore((s) => s.setJobTitle)
+  const setCompany = useBuilderStore((s) => s.setCompany)
+
+  const [historyItems, setHistoryItems] = useState<any[]>([])
+
+  useEffect(() => {
+    ;(async () => {
+      try {
+        const res = await api.api.protected.history.$get()
+        if (res.ok) {
+          const data = await res.json()
+          setHistoryItems(data)
+        }
+      } catch { /* ignore */ }
+    })()
+  }, [])
 
   // Auto-scroll
   useEffect(() => {
@@ -212,7 +230,48 @@ export function GenerateChatWorkspace() {
               <p className="text-xs text-content-muted mt-1">You can now download the PDF or make further adjustments directly on the right panel.</p>
             </div>
           ) : (
-            <ChatComposer onSubmit={handleSubmitJD} generating={generating} />
+            <div className="flex flex-col border-t border-edge bg-surface/30">
+              {historyItems.length > 0 && (
+                <div className="px-4 py-2 border-b border-edge/50 flex items-center justify-between gap-2 text-xs">
+                  <span className="text-content-muted font-medium">Load recent JD:</span>
+                  <select
+                    onChange={async (e) => {
+                      const val = e.target.value
+                      if (!val) return
+                      const selectedItem = historyItems.find(item => item.id === val)
+                      if (selectedItem) {
+                        try {
+                          const detailRes = await api.api.protected.history[':id'].$get({
+                            param: { id: selectedItem.id }
+                          })
+                          if (detailRes.ok) {
+                            const detailData = await detailRes.json()
+                            const jd = detailData.jobDescription || ''
+                            setJobTitle(detailData.jobTitle || '')
+                            setCompany(detailData.companyName || '')
+                            useBuilderStore.setState({ jobDescription: jd })
+                            window.dispatchEvent(new CustomEvent('autofill-composer', { detail: jd }))
+                            toast.success('Loaded from history')
+                          }
+                        } catch {
+                          toast.error('Failed to load item')
+                        }
+                      }
+                      e.target.value = '' // Reset selection
+                    }}
+                    className="bg-background border border-edge rounded px-2 py-1 text-[11px] outline-none max-w-[200px] truncate"
+                  >
+                    <option value="">Select past role...</option>
+                    {historyItems.map(item => (
+                      <option key={item.id} value={item.id}>
+                        {item.jobTitle} at {item.companyName}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+              <ChatComposer onSubmit={handleSubmitJD} generating={generating} />
+            </div>
           )}
         </>
       ) : (

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PaperPlaneRight } from '@phosphor-icons/react'
 
 export function ChatComposer({
@@ -11,6 +11,15 @@ export function ChatComposer({
   generating: boolean
 }) {
   const [composerText, setComposerText] = useState('')
+
+  useEffect(() => {
+    const handleAutofill = (e: Event) => {
+      const customEvent = e as CustomEvent<string>
+      setComposerText(customEvent.detail || '')
+    }
+    window.addEventListener('autofill-composer', handleAutofill)
+    return () => window.removeEventListener('autofill-composer', handleAutofill)
+  }, [])
 
   return (
     <div className="shrink-0 border-t border-edge p-3 md:p-4">

@@ -123,8 +123,28 @@ export function ContactSelectionWidget({ content, onNext }: { content?: string, 
   }
 
   const handleNext = () => {
-    if (selectedName && selectedName !== vault.name) {
-      const updatedContact = { ...vault, name: selectedName }
+    const updatedContact = {
+      ...vault,
+      name: selectedName,
+      email: selectedEmail,
+      phone: selectedPhone,
+      linkedin: selectedLinkedin,
+      github: selectedGithub,
+      leetcode: selectedLeetcode,
+      portfolio: selectedPortfolio,
+    }
+    
+    // Check if any default field changed
+    const hasChanges = 
+      selectedName !== vault.name ||
+      selectedEmail !== vault.email ||
+      selectedPhone !== vault.phone ||
+      selectedLinkedin !== vault.linkedin ||
+      selectedGithub !== vault.github ||
+      selectedLeetcode !== vault.leetcode ||
+      selectedPortfolio !== vault.portfolio;
+
+    if (hasChanges) {
       updateProfile({ ...profile, contact: updatedContact })
       useProfileStore.getState().updateContact(updatedContact)
     }
