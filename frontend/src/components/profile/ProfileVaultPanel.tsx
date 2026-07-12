@@ -299,29 +299,89 @@ function EducationTab({ profile }: { profile: ReturnType<typeof useProfileStore.
 }
 
 function CertificatesTab({ profile }: { profile: ReturnType<typeof useProfileStore.getState>['profile'] }) {
+  const updateCertificate = useProfileStore((s) => s.updateCertificate)
+
   if (profile.certificates.length === 0) {
     return <p className="text-xs text-content-muted italic py-4">No certificates yet.</p>
   }
   return (
     <div className="space-y-2.5">
       {profile.certificates.map((cert) => (
-        <div key={cert.id} className="rounded-[var(--radius-md)] border border-edge bg-card p-3">
-          <div className="flex items-start justify-between gap-2">
-            <div className="min-w-0">
-              <p className="text-xs font-medium text-content">{cert.name}</p>
-              <p className="text-[11px] text-content-muted mt-0.5">
-                {[cert.issuer, cert.date].filter(Boolean).join(' · ')}
-              </p>
-            </div>
-            {cert.url && (
-              <a href={cert.url} target="_blank" rel="noopener noreferrer"
-                className="text-content-subtle hover:text-brand transition-colors shrink-0 mt-0.5">
-                <LinkIcon size={13} />
-              </a>
-            )}
-          </div>
-        </div>
+        <CertificateItem 
+          key={cert.id} 
+          cert={cert} 
+          onSaveLink={(url) => updateCertificate(cert.id, { ...cert, url })} 
+        />
       ))}
+    </div>
+  )
+}
+
+function CertificateItem({ cert, onSaveLink }: { cert: any; onSaveLink: (url: string) => void }) {
+  const [isEditing, setIsEditing] = useState(false)
+  const [urlInput, setUrlInput] = useState(cert.url || '')
+
+  const handleSave = () => {
+    onSaveLink(urlInput)
+    setIsEditing(false)
+  }
+
+  return (
+    <div className="rounded-[var(--radius-md)] border border-edge bg-card p-3 space-y-2">
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-xs font-medium text-content">{cert.name}</p>
+          <p className="text-[11px] text-content-muted mt-0.5">
+            {[cert.issuer, cert.date].filter(Boolean).join(' · ')}
+          </p>
+        </div>
+      </div>
+
+      <div>
+        {isEditing ? (
+          <div className="flex gap-2 items-center">
+            <input
+              type="url"
+              value={urlInput}
+              onChange={(e) => setUrlInput(e.target.value)}
+              placeholder="Paste verification link (e.g. https://...)"
+              className="flex-1 bg-background border border-edge rounded px-2 py-0.5 text-xs text-content outline-none focus:border-brand/50"
+              onKeyDown={e => { if (e.key === 'Enter') handleSave() }}
+              autoFocus
+            />
+            <button onClick={handleSave} className="text-[10px] bg-brand text-brand-fg px-2 py-0.5 rounded font-medium shrink-0">Save</button>
+            <button onClick={() => setIsEditing(false)} className="text-[10px] text-content-muted px-1 shrink-0">Cancel</button>
+          </div>
+        ) : !cert.url ? (
+          <div className="text-[10px] bg-brand/5 border border-brand/10 text-brand px-2 py-1 rounded flex items-center justify-between">
+            <span className="font-medium">⚠️ No verification link added.</span>
+            <button 
+              onClick={() => setIsEditing(true)}
+              className="text-[10px] font-semibold underline text-brand hover:text-brand-dark ml-2 shrink-0"
+            >
+              Add Link
+            </button>
+          </div>
+        ) : (
+          <div className="text-[10px] text-content-muted flex items-center justify-between bg-surface-subtle border border-edge/60 px-2.5 py-1 rounded">
+            <div className="flex items-center gap-1 min-w-0">
+              <span className="font-medium text-[8px] uppercase tracking-wider text-content-subtle shrink-0">Link:</span>
+              <a href={cert.url} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline font-medium truncate">
+                {cert.url}
+              </a>
+            </div>
+            <button
+              onClick={() => {
+                setUrlInput(cert.url || '')
+                setIsEditing(true)
+              }}
+              className="text-[10px] font-semibold underline text-brand hover:text-brand-dark shrink-0 ml-2"
+            >
+              Edit
+            </button>
+          </div>
+        )}
+      </div>
     </div>
   )
 }

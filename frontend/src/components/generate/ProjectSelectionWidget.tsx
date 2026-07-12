@@ -53,6 +53,22 @@ export function ProjectSelectionWidget({ content, onNext }: { content?: string, 
     setSelections({ ...selectedBulletIds, [projId]: [...currentList, newBullet.id] })
   }
 
+  const handleSaveProjectLink = (projId: string, url: string) => {
+    if (!profile) return
+    const newProj = profile.projects.map(p => {
+      if (p.id === projId) {
+        return { ...p, url: url.trim() || null }
+      }
+      return p
+    })
+    updateProfile({ ...profile, projects: newProj })
+    
+    const updatedProj = newProj.find(p => p.id === projId)
+    if (updatedProj) {
+      useProfileStore.getState().updateProject(projId, updatedProj)
+    }
+  }
+
   return (
     <div className="flex flex-col gap-3">
       <div className="flex items-start gap-3">
@@ -77,6 +93,7 @@ export function ProjectSelectionWidget({ content, onNext }: { content?: string, 
               selectedBulletIds={selectedBulletIds[proj.id] || []}
               onToggleBullet={toggleBullet}
               onAddCustomBullet={addCustomBullet}
+              onSaveProjectLink={handleSaveProjectLink}
             />
           ))}
         </div>
@@ -94,14 +111,21 @@ export function ProjectSelectionWidget({ content, onNext }: { content?: string, 
   )
 }
 
-function ProjectGroup({ proj, isSelected, onToggleProj, selectedBulletIds, onToggleBullet, onAddCustomBullet }: any) {
+function ProjectGroup({ proj, isSelected, onToggleProj, selectedBulletIds, onToggleBullet, onAddCustomBullet, onSaveProjectLink }: any) {
   const [isAdding, setIsAdding] = useState(false)
   const [newText, setNewText] = useState('')
+  const [isEditingLink, setIsEditingLink] = useState(false)
+  const [linkInput, setLinkInput] = useState(proj.url || '')
 
   const handleAdd = () => {
     onAddCustomBullet(proj.id, newText)
     setIsAdding(false)
     setNewText('')
+  }
+
+  const handleSaveLink = () => {
+    onSaveProjectLink(proj.id, linkInput)
+    setIsEditingLink(false)
   }
 
   return (
@@ -120,6 +144,53 @@ function ProjectGroup({ proj, isSelected, onToggleProj, selectedBulletIds, onTog
       
       {isSelected && (
         <div className="divide-y divide-edge bg-background/50">
+          {/* Link Editor / Elicitor Block */}
+          <div className="px-3 py-2.5 bg-surface-subtle/50">
+            {isEditingLink ? (
+              <div className="flex gap-2 items-center">
+                <input
+                  type="url"
+                  value={linkInput}
+                  onChange={(e) => setLinkInput(e.target.value)}
+                  placeholder="Paste GitHub or deployment URL (e.g. https://...)"
+                  className="flex-1 bg-background border border-edge rounded px-2 py-1 text-xs text-content outline-none focus:border-brand/50"
+                  onKeyDown={e => { if (e.key === 'Enter') handleSaveLink() }}
+                  autoFocus
+                />
+                <button onClick={handleSaveLink} className="text-[10px] bg-brand text-brand-fg px-2 py-1 rounded font-medium shrink-0">Save</button>
+                <button onClick={() => setIsEditingLink(false)} className="text-[10px] text-content-muted px-1 shrink-0">Cancel</button>
+              </div>
+            ) : !proj.url ? (
+              <div className="text-[11px] bg-brand/5 border border-brand/10 text-brand px-3 py-1.5 rounded-md flex items-center justify-between">
+                <span className="font-medium">⚠️ No live link or deployment URL added.</span>
+                <button 
+                  onClick={() => setIsEditingLink(true)}
+                  className="text-[11px] font-semibold underline text-brand hover:text-brand-dark ml-2 shrink-0"
+                >
+                  Add Link
+                </button>
+              </div>
+            ) : (
+              <div className="text-[11px] text-content-muted flex items-center justify-between bg-surface-subtle border border-edge/60 px-3 py-1 rounded-md">
+                <div className="flex items-center gap-1.5 min-w-0">
+                  <span className="font-medium text-[9px] uppercase tracking-wider text-content-subtle shrink-0">Link:</span>
+                  <a href={proj.url} target="_blank" rel="noopener noreferrer" className="text-brand hover:underline font-medium truncate">
+                    {proj.url}
+                  </a>
+                </div>
+                <button
+                  onClick={() => {
+                    setLinkInput(proj.url || '')
+                    setIsEditingLink(true)
+                  }}
+                  className="text-[11px] font-semibold underline text-brand hover:text-brand-dark shrink-0 ml-2"
+                >
+                  Edit
+                </button>
+              </div>
+            )}
+          </div>
+
           {proj.vaultBullets.map((bullet: any) => {
             const isSelectedBullet = selectedBulletIds.includes(bullet.id)
             return (

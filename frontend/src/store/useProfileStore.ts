@@ -31,6 +31,9 @@ interface ProfileStore {
   deleteProject: (id: string) => void
   updateContact: (contact: Contact) => void
   updateSkills: (skills: Skills) => void
+  updateCertificate: (id: string, item: Certificate) => void
+  deleteCertificate: (id: string) => void
+  updateExtracurricular: (id: string, item: any) => void
 }
 
 export const useProfileStore = create<ProfileStore>((set, get) => ({
@@ -167,6 +170,36 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
   updateSkills: (skills) => {
     const { profile } = get()
     const updated = { ...profile, skills }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  updateCertificate: (id, item) => {
+    const { profile } = get()
+    const updated = {
+      ...profile,
+      certificates: profile.certificates.map(c => c.id === id ? item : c)
+    }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  deleteCertificate: (id) => {
+    const { profile } = get()
+    const updated = {
+      ...profile,
+      certificates: profile.certificates.filter(c => c.id !== id)
+    }
+    set({ profile: updated })
+    get().saveProfile()
+  },
+
+  updateExtracurricular: (id, item) => {
+    const { profile } = get()
+    const updated = {
+      ...profile,
+      extracurriculars: (profile.extracurriculars || []).map((e: any) => e.id === id ? item : e)
+    }
     set({ profile: updated })
     get().saveProfile()
   },
