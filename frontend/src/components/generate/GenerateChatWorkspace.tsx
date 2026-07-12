@@ -245,7 +245,7 @@ export function GenerateChatWorkspace() {
                             param: { id: selectedItem.id }
                           })
                           if (detailRes.ok) {
-                            const detailData = await detailRes.json()
+                            const detailData = await detailRes.json() as { jobDescription?: string; jobTitle?: string; companyName?: string }
                             const jd = detailData.jobDescription || ''
                             setJobTitle(detailData.jobTitle || '')
                             setCompany(detailData.companyName || '')
