@@ -116,8 +116,7 @@ export function useTailorChat() {
           selectedBulletIds[id] = newTailoredBullets.map(b => b.id)
           finalBullets = [...newTailoredBullets, ...finalBullets]
         } else {
-          selectedExperienceIds.push(id)
-          selectedBulletIds[id] = orig.vaultBullets.map(b => b.id)
+          selectedBulletIds[id] = []
         }
         
         return {
@@ -147,8 +146,7 @@ export function useTailorChat() {
           selectedBulletIds[id] = newTailoredBullets.map(b => b.id)
           finalBullets = [...newTailoredBullets, ...finalBullets]
         } else {
-          selectedProjectIds.push(id)
-          selectedBulletIds[id] = orig.vaultBullets.map(b => b.id)
+          selectedBulletIds[id] = []
         }
         
         return {

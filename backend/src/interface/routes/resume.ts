@@ -136,7 +136,9 @@ export function createResumeRouter(container: Container) {
       }
 
       const filteredExperience = filterExperienceBySelection(experienceToKeep, selectedBulletIds)
+        .filter((e) => e.vaultBullets && e.vaultBullets.length > 0)
       const filteredProjects = filterProjectsBySelection(projectsToKeep, selectedBulletIds)
+        .filter((p) => p.vaultBullets && p.vaultBullets.length > 0)
 
       let educationToKeep = profile.education || []
       if (selectedEducationIds) {
