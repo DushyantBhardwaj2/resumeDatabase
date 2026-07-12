@@ -3,6 +3,7 @@
 import { useEffect, use, useRef, useCallback } from 'react'
 import { api } from '@/config/api-client'
 import { useBuilderStore } from '@/store/useBuilderStore'
+import { useProfileStore } from '@/store/useProfileStore'
 import { GenerateChatWorkspace } from '@/components/generate/GenerateChatWorkspace'
 import { PdfPreviewPanel } from '@/components/generate/PdfPreviewPanel'
 import { Splitter } from '@/components/ui/splitter'
@@ -28,6 +29,13 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
   const setSelections = useBuilderStore((s) => s.setSelections)
   const setCurrentStage = useBuilderStore((s) => s.setCurrentStage)
   const loaded = useRef(false)
+
+  const loadProfile = useProfileStore((s) => s.loadProfile)
+
+  // Load vault profile on mount
+  useEffect(() => {
+    loadProfile()
+  }, [loadProfile])
 
   const [savedWidths, setSavedWidths] = useLocalStorage<number | null>(STORAGE_KEY, null)
 

@@ -1,7 +1,7 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
-import { Sparkle } from '@phosphor-icons/react'
+import { useEffect, useRef, useState } from 'react'
+import { Sparkle, Chat, User, GraduationCap, Briefcase, Folder, Wrench } from '@phosphor-icons/react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { useTailorChat } from './useTailorChat'
 import { JobDetailsForm } from './JobDetailsForm'
@@ -14,6 +14,7 @@ import { SkillsSelectionWidget } from './SkillsSelectionWidget'
 
 export function GenerateChatWorkspace() {
   const scrollRef = useRef<HTMLDivElement>(null)
+  const [activeTab, setActiveTab] = useState<'chat' | 'contact' | 'education' | 'experience' | 'projects' | 'skills'>('chat')
   
   const { entries, generating, handleSubmitJD, addChatEntry } = useTailorChat()
 
@@ -61,124 +62,198 @@ export function GenerateChatWorkspace() {
         </div>
       </div>
 
-      {/* Scrollable message area */}
-      <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-5 scroll-smooth bg-surface/10">
-        {entries.map((entry) => {
-          if (entry.type === 'greeting') {
+      {/* Tabs Bar */}
+      {profile && (
+        <div className="px-5 py-2 border-b border-edge/50 bg-surface/10 flex items-center gap-1.5 overflow-x-auto scrollbar-none shrink-0">
+          {[
+            { id: 'chat', label: 'Chat Flow', icon: <Chat weight={activeTab === 'chat' ? 'fill' : 'regular'} size={14} /> },
+            { id: 'contact', label: 'Contact', icon: <User weight={activeTab === 'contact' ? 'fill' : 'regular'} size={14} /> },
+            { id: 'education', label: 'Education', icon: <GraduationCap weight={activeTab === 'education' ? 'fill' : 'regular'} size={14} /> },
+            { id: 'experience', label: 'Experience', icon: <Briefcase weight={activeTab === 'experience' ? 'fill' : 'regular'} size={14} /> },
+            { id: 'projects', label: 'Projects', icon: <Folder weight={activeTab === 'projects' ? 'fill' : 'regular'} size={14} /> },
+            { id: 'skills', label: 'Skills', icon: <Wrench weight={activeTab === 'skills' ? 'fill' : 'regular'} size={14} /> },
+          ].map((tab) => {
+            const isActive = activeTab === tab.id
             return (
-              <div key={entry.id} className="flex items-start gap-3">
-                <div className="h-8 w-8 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
-                  <Sparkle size={16} className="text-brand" />
-                </div>
-                <div>
-                  <p className="text-sm text-content font-medium">Resume Generator</p>
-                  <p className="text-sm text-content-muted mt-1 leading-relaxed">
-                    Paste the job description and I&rsquo;ll match your strongest Career Vault bullets.
-                  </p>
-                </div>
-              </div>
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id as any)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium border transition-all duration-150 whitespace-nowrap cursor-pointer ${
+                  isActive
+                    ? 'bg-brand/10 border-brand/30 text-brand shadow-sm shadow-brand/5'
+                    : 'bg-transparent border-transparent text-content-muted hover:text-content hover:bg-surface-subtle/50'
+                }`}
+              >
+                {tab.icon}
+                {tab.label}
+              </button>
             )
-          }
+          })}
+        </div>
+      )}
 
-          if (entry.type === 'job-details-form') {
-            return <JobDetailsForm key={entry.id} />
-          }
+      {/* Tab Contents */}
+      {activeTab === 'chat' ? (
+        <>
+          {/* Scrollable message area */}
+          <div ref={scrollRef} className="flex-1 overflow-y-auto px-4 md:px-6 py-6 space-y-5 scroll-smooth bg-surface/10">
+            {entries.map((entry) => {
+              if (entry.type === 'greeting') {
+                return (
+                  <div key={entry.id} className="flex items-start gap-3">
+                    <div className="h-8 w-8 rounded-full bg-brand/10 flex items-center justify-center shrink-0">
+                      <Sparkle size={16} className="text-brand" />
+                    </div>
+                    <div>
+                      <p className="text-sm text-content font-medium">Resume Generator</p>
+                      <p className="text-sm text-content-muted mt-1 leading-relaxed">
+                        Paste the job description and I&rsquo;ll match your strongest Career Vault bullets.
+                      </p>
+                    </div>
+                  </div>
+                )
+              }
 
-          if (entry.type === 'user-jd') {
-            return (
-              <div key={entry.id} className="flex justify-end">
-                <div className="bg-brand/10 border border-brand/20 rounded-[var(--radius-md)] px-3 py-2 max-w-lg">
-                  <p className="text-xs text-content-muted mb-0.5">Job Description submitted</p>
-                  <p className="text-xs text-content leading-relaxed">{entry.content}</p>
-                </div>
-              </div>
-            )
-          }
+              if (entry.type === 'job-details-form') {
+                return <JobDetailsForm key={entry.id} />
+              }
 
-          if (entry.type === 'generating') {
-            return (
-              <div key={entry.id} className="flex items-center gap-3 text-content-muted text-sm ml-11">
-                <span className="w-4 h-4 rounded-full border-2 border-brand border-t-transparent animate-spin" />
-                Matching your Career Vault bullets...
-              </div>
-            )
-          }
+              if (entry.type === 'user-jd') {
+                return (
+                  <div key={entry.id} className="flex justify-end">
+                    <div className="bg-brand/10 border border-brand/20 rounded-[var(--radius-md)] px-3 py-2 max-w-lg">
+                      <p className="text-xs text-content-muted mb-0.5">Job Description submitted</p>
+                      <p className="text-xs text-content leading-relaxed">{entry.content}</p>
+                    </div>
+                  </div>
+                )
+              }
 
-          if (entry.type === 'error') {
-            return (
-              <div key={entry.id} className="flex items-start gap-3 ml-11">
-                <div className="h-6 w-6 rounded-full bg-error/10 flex items-center justify-center shrink-0 mt-0.5">
-                  <span className="text-[10px] text-error font-bold">!</span>
-                </div>
-                <p className="text-xs text-error leading-relaxed">{entry.content}</p>
-              </div>
-            )
-          }
+              if (entry.type === 'generating') {
+                return (
+                  <div key={entry.id} className="flex items-center gap-3 text-content-muted text-sm ml-11">
+                    <span className="w-4 h-4 rounded-full border-2 border-brand border-t-transparent animate-spin" />
+                    Matching your Career Vault bullets...
+                  </div>
+                )
+              }
 
-          if (entry.type === 'contact-selection') {
-            return (
-              <ContactSelectionWidget 
-                key={entry.id} 
-                content={entry.content} 
-                onNext={() => addChatEntry({ role: 'assistant', type: 'education-selection' })} 
+              if (entry.type === 'error') {
+                return (
+                  <div key={entry.id} className="flex items-start gap-3 ml-11">
+                    <div className="h-6 w-6 rounded-full bg-error/10 flex items-center justify-center shrink-0 mt-0.5">
+                      <span className="text-[10px] text-error font-bold">!</span>
+                    </div>
+                    <p className="text-xs text-error leading-relaxed">{entry.content}</p>
+                  </div>
+                )
+              }
+
+              if (entry.type === 'contact-selection') {
+                return (
+                  <ContactSelectionWidget 
+                    key={entry.id} 
+                    content={entry.content} 
+                    onNext={() => addChatEntry({ role: 'assistant', type: 'education-selection' })} 
+                  />
+                )
+              }
+
+              if (entry.type === 'education-selection') {
+                return (
+                  <EducationSelectionWidget 
+                    key={entry.id} 
+                    content={entry.content} 
+                    onNext={() => addChatEntry({ role: 'assistant', type: 'experience-selection' })} 
+                  />
+                )
+              }
+
+              if (entry.type === 'experience-selection') {
+                return (
+                  <ExperienceSelectionWidget 
+                    key={entry.id} 
+                    content={entry.content} 
+                    onNext={() => addChatEntry({ role: 'assistant', type: 'project-selection' })} 
+                  />
+                )
+              }
+
+              if (entry.type === 'project-selection') {
+                return (
+                  <ProjectSelectionWidget 
+                    key={entry.id} 
+                    content={entry.content} 
+                    onNext={() => addChatEntry({ role: 'assistant', type: 'skills-selection' })} 
+                  />
+                )
+              }
+
+              if (entry.type === 'skills-selection') {
+                return (
+                  <SkillsSelectionWidget 
+                    key={entry.id} 
+                    content={entry.content} 
+                    onNext={() => {
+                      setCurrentStage('ready')
+                      addChatEntry({ role: 'assistant', type: 'greeting' })
+                    }}
+                  />
+                )
+              }
+
+              return null
+            })}
+          </div>
+
+          {currentStage === 'ready' ? (
+            <div className="p-5 border-t border-edge/50 bg-surface/30 backdrop-blur-md text-center">
+              <p className="text-sm font-semibold text-fg">Resume tailoring is complete!</p>
+              <p className="text-xs text-content-muted mt-1">You can now download the PDF or make further adjustments directly on the right panel.</p>
+            </div>
+          ) : (
+            <ChatComposer onSubmit={handleSubmitJD} generating={generating} />
+          )}
+        </>
+      ) : (
+        <div className="flex-1 overflow-y-auto px-4 md:px-6 py-6 bg-surface/10 flex flex-col justify-start">
+          <div className="max-w-2xl mx-auto w-full py-4">
+            {activeTab === 'contact' && (
+              <ContactSelectionWidget
+                content="Confirm and customize the contact details to include on this resume:"
+                onNext={() => setActiveTab('education')}
               />
-            )
-          }
-
-          if (entry.type === 'education-selection') {
-            return (
-              <EducationSelectionWidget 
-                key={entry.id} 
-                content={entry.content} 
-                onNext={() => addChatEntry({ role: 'assistant', type: 'experience-selection' })} 
+            )}
+            {activeTab === 'education' && (
+              <EducationSelectionWidget
+                content="Select which education entries to display:"
+                onNext={() => setActiveTab('experience')}
               />
-            )
-          }
-
-          if (entry.type === 'experience-selection') {
-            return (
-              <ExperienceSelectionWidget 
-                key={entry.id} 
-                content={entry.content} 
-                onNext={() => addChatEntry({ role: 'assistant', type: 'project-selection' })} 
+            )}
+            {activeTab === 'experience' && (
+              <ExperienceSelectionWidget
+                content="Verify and select which work experience bullets fit this job description best:"
+                onNext={() => setActiveTab('projects')}
               />
-            )
-          }
-
-          if (entry.type === 'project-selection') {
-            return (
-              <ProjectSelectionWidget 
-                key={entry.id} 
-                content={entry.content} 
-                onNext={() => addChatEntry({ role: 'assistant', type: 'skills-selection' })} 
+            )}
+            {activeTab === 'projects' && (
+              <ProjectSelectionWidget
+                content="Select which project bullets are relevant for this role:"
+                onNext={() => setActiveTab('skills')}
               />
-            )
-          }
-
-          if (entry.type === 'skills-selection') {
-            return (
-              <SkillsSelectionWidget 
-                key={entry.id} 
-                content={entry.content} 
+            )}
+            {activeTab === 'skills' && (
+              <SkillsSelectionWidget
+                content="Confirm your languages, frameworks, and tools. Unselected tags won't appear."
                 onNext={() => {
                   setCurrentStage('ready')
+                  setActiveTab('chat')
                   addChatEntry({ role: 'assistant', type: 'greeting' })
                 }}
               />
-            )
-          }
-
-          return null
-        })}
-      </div>
-
-      {currentStage === 'ready' ? (
-        <div className="p-5 border-t border-edge/50 bg-surface/30 backdrop-blur-md text-center">
-          <p className="text-sm font-semibold text-fg">Resume tailoring is complete!</p>
-          <p className="text-xs text-content-muted mt-1">You can now download the PDF or make further adjustments directly on the right panel.</p>
+            )}
+          </div>
         </div>
-      ) : (
-        <ChatComposer onSubmit={handleSubmitJD} generating={generating} />
       )}
     </div>
   )
