@@ -35,9 +35,28 @@ function esc(s: string): string {
     .replace(/\^/g, "\\textasciicircum{}")
 }
 
+function parseMarkdownToLatex(s: string): string {
+  if (!s) return ""
+  const regex = /(\*\*.*?\*\*|\[.*?\]\(.*?\))/g
+  const parts = s.split(regex)
+  return parts.map(part => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      const boldText = part.slice(2, -2)
+      return `\\textbf{${esc(boldText)}}`
+    }
+    if (part.startsWith('[') && part.includes('](')) {
+      const closeBracket = part.indexOf('](')
+      const label = part.slice(1, closeBracket)
+      const url = part.slice(closeBracket + 2, -1)
+      return `\\href{${url.replace(/%/g, '\\%')}}{${esc(label)}}`
+    }
+    return esc(part)
+  }).join("")
+}
+
 function bulletLine(b: string): string {
   if (!b) return ''
-  return `        \\item ${esc(b)}`
+  return `        \\item ${parseMarkdownToLatex(b)}`
 }
 
 function stripSection(tex: string, sectionName: string): string {
@@ -45,7 +64,15 @@ function stripSection(tex: string, sectionName: string): string {
   if (start === -1) return tex
   const end = tex.indexOf("\\resheading{", start + 1)
   const before = tex.slice(0, start)
-  const after = end === -1 ? "" : tex.slice(end)
+  let after = ""
+  if (end !== -1) {
+    after = tex.slice(end)
+  } else {
+    const docEnd = tex.indexOf("\\end{document}", start)
+    if (docEnd !== -1) {
+      after = tex.slice(docEnd)
+    }
+  }
   return before + after
 }
 
@@ -239,7 +266,7 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
     if (hasExtras) {
       if (safeExtracurriculars.length > 0) {
         const extrasBullets = safeExtracurriculars.map(ec =>
-          `        \\item ${esc(ec.title)}${ec.description ? ` — ${esc(ec.description)}` : ''}${ec.date ? ` (${esc(ec.date)})` : ''}`
+          `        \\item ${parseMarkdownToLatex(ec.title)}${ec.description ? ` — ${parseMarkdownToLatex(ec.description)}` : ''}${ec.date ? ` (${parseMarkdownToLatex(ec.date)})` : ''}`
         ).join('\n')
         tex = tex.replace(
           /\\resheading\{EXTRA-CURRICULAR ACTIVITIES \\& ACHIEVEMENTS\}[\s\S]*?(?=\\resheading\{|\\end\{document\})/,
