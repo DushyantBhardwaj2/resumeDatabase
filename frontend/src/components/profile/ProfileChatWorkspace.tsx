@@ -32,6 +32,7 @@ export function ProfileChatWorkspace() {
   const addMessage = useChatStore((s) => s.addMessage)
   const setMode = useChatStore((s) => s.setMode)
   const sendMessage = useChatStore((s) => s.sendMessage)
+  const loadHistory = useChatStore((s) => s.loadHistory)
   const profile = useProfileStore((s) => s.profile)
   const saveProfile = useProfileStore((s) => s.saveProfile)
   const updateProfile = useProfileStore((s) => s.updateProfile)
@@ -48,31 +49,34 @@ export function ProfileChatWorkspace() {
     initRef.current = true
     setMode('PROFILE')
 
-    if (!useChatStore.getState().messagesByMode['PROFILE']?.length) {
-      const counts = countSectionItems(profile)
-      const overview = [
-        `${counts.contact} contact`,
-        `${counts.education} education`,
-        `${counts.experience} experience entries`,
-        `${counts.projects} projects`,
-        `${counts.skills} skills`,
-        `${counts.certificates} certificates`,
-      ].join(' · ')
+    ;(async () => {
+      await loadHistory('PROFILE')
+      if (!useChatStore.getState().messagesByMode['PROFILE']?.length) {
+        const counts = countSectionItems(profile)
+        const overview = [
+          `${counts.contact} contact`,
+          `${counts.education} education`,
+          `${counts.experience} experience entries`,
+          `${counts.projects} projects`,
+          `${counts.skills} skills`,
+          `${counts.certificates} certificates`,
+        ].join(' · ')
 
-      addMessage({
-        id: 'profile-greeting',
-        role: 'assistant',
-        content: `Here's your Career Vault profile.\n${overview}\n\nTap a section below to edit it, or type what you want to change.`,
-      })
+        addMessage({
+          id: 'profile-greeting',
+          role: 'assistant',
+          content: `Here's your Career Vault profile.\n${overview}\n\nTap a section below to edit it, or type what you want to change.`,
+        })
 
-      addMessage({
-        id: 'profile-sections',
-        role: 'assistant',
-        content: 'Which section would you like to edit?',
-        widget: 'PROFILE_SECTIONS',
-      })
-    }
-  }, [addMessage, profile, setMode])
+        addMessage({
+          id: 'profile-sections',
+          role: 'assistant',
+          content: 'Which section would you like to edit?',
+          widget: 'PROFILE_SECTIONS',
+        })
+      }
+    })()
+  }, [addMessage, profile, setMode, loadHistory])
 
   const handleEditSection = useCallback((section: SectionName) => {
     setEditingSection(section)

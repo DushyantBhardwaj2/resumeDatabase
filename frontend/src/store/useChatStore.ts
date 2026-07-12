@@ -33,6 +33,7 @@ interface ChatStore {
   setMode: (mode: ChatMode) => void
   clearChat: () => void
   sendMessage: (text: string) => Promise<void>
+  loadHistory: (mode: ChatMode) => Promise<void>
 }
 
 const initialModeMessages: Record<ChatMode, ChatMessage[]> = {
@@ -63,6 +64,23 @@ export const useChatStore = create<ChatStore>((set, get) => ({
   setPhase: (phase) => set({ currentPhase: phase }),
 
   setMode: (mode) => set({ mode }),
+  
+  loadHistory: async (mode) => {
+    try {
+      const res = await api.api.protected.chat.history.$get({
+        query: { mode }
+      })
+      if (res.ok) {
+        const messages = await res.json()
+        set((state) => ({
+          messagesByMode: {
+            ...state.messagesByMode,
+            [mode]: messages,
+          },
+        }))
+      }
+    } catch { /* ignore */ }
+  },
 
   clearChat: () =>
     set((state) => ({

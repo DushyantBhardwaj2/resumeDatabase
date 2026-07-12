@@ -12,6 +12,7 @@ export default function OnboardingPage() {
   const router = useRouter()
   const addMessage = useChatStore((s) => s.addMessage)
   const setMode = useChatStore((s) => s.setMode)
+  const loadHistory = useChatStore((s) => s.loadHistory)
   const currentPhase = useChatStore((s) => s.currentPhase)
   const isTyping = useChatStore((s) => s.isTyping)
   const sendMessage = useChatStore((s) => s.sendMessage)
@@ -38,6 +39,7 @@ export default function OnboardingPage() {
       }
 
       setMode('ONBOARDING')
+      await loadHistory('ONBOARDING')
 
       if (!useChatStore.getState().messagesByMode['ONBOARDING']?.length) {
         addMessage({
@@ -57,7 +59,7 @@ export default function OnboardingPage() {
         })
       }
     })()
-  }, [addMessage, setMode, router])
+  }, [addMessage, setMode, router, loadHistory])
 
   useEffect(() => {
     if (currentPhase !== 'COMPLETE' || completing) return
