@@ -41,6 +41,7 @@ interface BuilderStore {
   currentStage: CurrentStage
 
   setProfile: (profile: Profile) => void
+  updateProfile: (profile: Profile) => void
   setJobTitle: (title: string) => void
   setCompany: (company: string) => void
   setJobDescription: (jd: string) => void
@@ -108,6 +109,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
     }
     set({ profile, selectedExperienceIds, selectedProjectIds, selectedEducationIds, selectedBulletIds, contactSelection })
   },
+  updateProfile: (profile) => set({ profile }),
   setJobTitle: (title) => set({ jobTitle: title }),
   setCompany: (company) => set({ company }),
   setJobDescription: (jd) => set({ jobDescription: jd }),

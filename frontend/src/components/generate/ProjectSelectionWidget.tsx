@@ -7,7 +7,7 @@ import { Sparkle, CheckSquare, Square, Plus, MagicWand } from '@phosphor-icons/r
 
 export function ProjectSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
-  const setProfile = useBuilderStore((s) => s.setProfile)
+  const updateProfile = useBuilderStore((s) => s.updateProfile)
   const selectedProjectIds = useBuilderStore((s) => s.selectedProjectIds)
   const toggleProject = useBuilderStore((s) => s.toggleProject)
   
@@ -42,7 +42,7 @@ export function ProjectSelectionWidget({ content, onNext }: { content?: string, 
       }
       return p
     })
-    setProfile({ ...profile, projects: newProj })
+    updateProfile({ ...profile, projects: newProj })
     
     const updatedProj = useBuilderStore.getState().profile?.projects?.find(p => p.id === projId)
     if (updatedProj) {

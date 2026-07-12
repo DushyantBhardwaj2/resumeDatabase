@@ -7,7 +7,7 @@ import { Sparkle, CheckSquare, Square, Plus, MagicWand } from '@phosphor-icons/r
 
 export function ExperienceSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
-  const setProfile = useBuilderStore((s) => s.setProfile)
+  const updateProfile = useBuilderStore((s) => s.updateProfile)
   const selectedExperienceIds = useBuilderStore((s) => s.selectedExperienceIds)
   const toggleExperience = useBuilderStore((s) => s.toggleExperience)
   
@@ -42,7 +42,7 @@ export function ExperienceSelectionWidget({ content, onNext }: { content?: strin
       }
       return e
     })
-    setProfile({ ...profile, experience: newExp })
+    updateProfile({ ...profile, experience: newExp })
     
     const updatedExp = useBuilderStore.getState().profile?.experience?.find(e => e.id === expId)
     if (updatedExp) {

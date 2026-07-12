@@ -126,6 +126,38 @@ describe('setSelections', () => {
   })
 })
 
+// ── updateProfile ────────────────────────────────────────────────────────────
+
+describe('updateProfile', () => {
+  it('updates the profile without resetting other states', () => {
+    const initialProfile = {
+      contact: { name: 'Alice', email: 'alice@example.com', phone: '', linkedin: '', github: '', leetcode: '', portfolio: '', names: [], emails: [], phones: [], linkedins: [], githubs: [], leetcodes: [], portfolios: [] },
+      education: [],
+      experience: [],
+      projects: [],
+      skills: { languages: [], frameworks: [], tools: [] },
+      certificates: [],
+      extracurriculars: [],
+      githubUsername: ''
+    }
+    getStore().setProfile(initialProfile)
+    
+    // Set some custom zoom and stage
+    getStore().setZoom(120)
+    getStore().setCurrentStage('reviewing')
+    
+    const updatedProfile = {
+      ...initialProfile,
+      contact: { ...initialProfile.contact, name: 'Alice Cooper' }
+    }
+    getStore().updateProfile(updatedProfile)
+    
+    expect(getStore().profile).toEqual(updatedProfile)
+    expect(getStore().zoom).toBe(120)
+    expect(getStore().currentStage).toBe('reviewing')
+  })
+})
+
 // ── simple setters ────────────────────────────────────────────────────────────
 
 describe('simple setters', () => {

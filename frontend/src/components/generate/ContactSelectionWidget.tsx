@@ -82,6 +82,7 @@ const combineVaultList = (singular: unknown, array: string[] | undefined): strin
 
 export function ContactSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
+  const updateProfile = useBuilderStore((s) => s.updateProfile)
   const contactSelection = useBuilderStore((s) => s.contactSelection)
   const setContactSelection = useBuilderStore((s) => s.setContactSelection)
 
@@ -116,12 +117,16 @@ export function ContactSelectionWidget({ content, onNext }: { content?: string, 
   const saveToVaultList = (field: string, listField: string, newValue: string) => {
     const currentList = combineVaultList((vault as Record<string, unknown>)[field], (vault as Record<string, unknown>)[listField] as string[] | undefined)
     if (currentList.includes(newValue)) return
-    useProfileStore.getState().updateContact({ ...vault, [listField]: [...currentList, newValue] })
+    const updatedContact = { ...vault, [listField]: [...currentList, newValue] }
+    updateProfile({ ...profile, contact: updatedContact })
+    useProfileStore.getState().updateContact(updatedContact)
   }
 
   const handleNext = () => {
     if (selectedName && selectedName !== vault.name) {
-      useProfileStore.getState().updateContact({ ...vault, name: selectedName })
+      const updatedContact = { ...vault, name: selectedName }
+      updateProfile({ ...profile, contact: updatedContact })
+      useProfileStore.getState().updateContact(updatedContact)
     }
     if (onNext) onNext()
   }

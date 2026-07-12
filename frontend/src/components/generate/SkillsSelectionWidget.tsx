@@ -7,7 +7,7 @@ import { Sparkle, Plus, X } from '@phosphor-icons/react'
 
 export function SkillsSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
-  const setProfile = useBuilderStore((s) => s.setProfile)
+  const updateProfile = useBuilderStore((s) => s.updateProfile)
 
   if (!profile || !profile.skills) return null
 
@@ -17,7 +17,7 @@ export function SkillsSelectionWidget({ content, onNext }: { content?: string, o
       ...profile.skills,
       [category]: current.filter(s => s !== skill)
     }
-    setProfile({
+    updateProfile({
       ...profile,
       skills: updatedSkills
     })
@@ -32,7 +32,7 @@ export function SkillsSelectionWidget({ content, onNext }: { content?: string, o
       ...profile.skills,
       [category]: [...current, skill.trim()]
     }
-    setProfile({
+    updateProfile({
       ...profile,
       skills: updatedSkills
     })
