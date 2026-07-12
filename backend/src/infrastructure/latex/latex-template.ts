@@ -251,6 +251,17 @@ export class LatexTemplateFiller implements ILatexTemplateFiller {
           )
         }
         const ghUrl = String(proj.url ?? "")
+        let linkLatex = ""
+        if (ghUrl) {
+          let label = "Live Link"
+          if (ghUrl.toLowerCase().includes("github.com")) {
+            label = "GitHub"
+          } else if (ghUrl.toLowerCase().includes("youtube.com") || ghUrl.toLowerCase().includes("youtu.be")) {
+            label = "Demo Video"
+          }
+          linkLatex = `\\href{${ghUrl.replace(/%/g, '\\%')}}{\\textbf{[${label}]}}`
+        }
+        tex = tex.replace(new RegExp(`\\{\\{PROJ_LINK_${i}\\}\\}`, "g"), linkLatex)
         tex = tex.replace(new RegExp(`\\{\\{PROJ_GITHUB_URL_${i}\\}\\}`, "g"), ghUrl)
         tex = tex.replace(new RegExp(`\\{\\{PROJ_GITHUB_LABEL_${i}\\}\\}`, "g"), ghUrl ? "GitHub" : "")
       } else {
