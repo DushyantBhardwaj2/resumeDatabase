@@ -10,7 +10,7 @@ COPY package.json package-lock.json* ./
 COPY prisma/ ./prisma/
 
 # Install all deps (including devDeps: tsc, tsx, @types/*)
-RUN npm ci
+RUN npm install
 
 # Generate Prisma client (required before tsc so @prisma/client types resolve)
 RUN npx prisma generate
@@ -41,7 +41,7 @@ WORKDIR /app
 # Copy only production node_modules from the builder (no devDeps)
 COPY package.json package-lock.json* ./
 COPY prisma/ ./prisma/
-RUN npm ci --omit=dev && npx prisma generate
+RUN npm install --omit=dev && npx prisma generate
 
 # Copy compiled output from the builder stage
 COPY --from=builder /app/dist ./dist
