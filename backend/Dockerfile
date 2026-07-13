@@ -43,6 +43,9 @@ COPY package.json package-lock.json* ./
 COPY prisma/ ./prisma/
 RUN npm install --omit=dev && npx prisma generate
 
+# Copy tsconfig.json so tsconfig-paths can resolve @/* at runtime
+COPY tsconfig.json ./
+
 # Copy compiled output from the builder stage
 COPY --from=builder /app/dist ./dist
 
@@ -51,4 +54,4 @@ EXPOSE 8080
 # Run the pre-compiled JS — NOT tsx.
 # tsx is a dev-only transpiler; using it in production compiles TypeScript on
 # every module load, adding latency and shipping compiler overhead unnecessarily.
-CMD ["node", "dist/index.js"]
+CMD ["node", "-r", "tsconfig-paths/register", "dist/index.js"]
