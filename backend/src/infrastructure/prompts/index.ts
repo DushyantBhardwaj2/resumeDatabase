@@ -1,4 +1,4 @@
-import { logger } from '@/infrastructure/logger'
+import { logger } from '../logger'
 
 export const GENERATE_BULLETS: Record<string, string> = {
   experience: `You are a resume writing expert. Given raw notes about a person's work experience, generate 3-5 polished, achievement-oriented vault bullet points.

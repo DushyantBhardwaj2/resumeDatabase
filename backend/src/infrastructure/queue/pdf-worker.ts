@@ -1,5 +1,5 @@
 import { Worker } from 'bullmq'
-import { logger } from '@/infrastructure/logger'
+import { logger } from '../logger'
 import { bullmqConnectionOpts, redisClient } from './redis'
 import type { PdfJobData } from './pdf-queue'
 import { LatexCompiler } from '../latex/latex-compiler'

@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
 import { zValidator } from '@hono/zod-validator'
-import { logger } from '@/infrastructure/logger'
+import { logger } from '../../infrastructure/logger'
 import { container as defaultContainer } from '../../di/container'
 import { compileLiveSchema } from '../schemas/compile-live'
 import { filterExperienceBySelection, filterProjectsBySelection } from '../../core/application/services/bullet-filter'

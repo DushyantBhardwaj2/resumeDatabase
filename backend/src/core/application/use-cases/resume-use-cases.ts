@@ -1,4 +1,4 @@
-import { logger } from '@/infrastructure/logger'
+import { logger } from '../../../infrastructure/logger'
 import type { Profile, TailoredOutput, Experience, Project, VaultBullet } from "../../domain/entities"
 import type { IProfileRepository, ITailoredResumeRepository } from "../../domain/repositories"
 import type { IAIService, ISchema } from "../ports/ai-service"

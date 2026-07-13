@@ -1,5 +1,5 @@
 import { Context, Next } from 'hono'
-import { logger } from '@/infrastructure/logger'
+import { logger } from './logger'
 import { redisClient } from './queue/redis'
 
 export interface RateLimiterOptions {

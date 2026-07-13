@@ -1,7 +1,7 @@
 import { Hono } from 'hono'
 import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
-import { logger } from '@/infrastructure/logger'
+import { logger } from '../../infrastructure/logger'
 import { container as defaultContainer } from '../../di/container'
 import type { Variables } from '../types'
 import type { Container } from '../../di/container'

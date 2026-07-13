@@ -1,5 +1,5 @@
 import { Hono } from 'hono'
-import { logger } from '@/infrastructure/logger'
+import { logger } from '../../infrastructure/logger'
 import { container as defaultContainer } from '../../di/container'
 import { computeCompleteness } from '../../infrastructure/profile-utils'
 import type { Variables } from '../types'

@@ -13,7 +13,7 @@ import { aiRouter } from './interface/routes/ai'
 import { chatRouter } from './interface/routes/chat'
 import { historyRouter } from './interface/routes/history'
 
-import { logger } from '@/infrastructure/logger'
+import { logger } from './infrastructure/logger'
 import { startPdfWorker, stopPdfWorker } from './infrastructure/queue/pdf-worker'
 
 const app = new Hono<{ Variables: Variables }>()

@@ -1,4 +1,4 @@
-import { logger } from '@/infrastructure/logger'
+import { logger } from '../logger'
 import type { IAIService, ISchema } from "../../core/application/ports/ai-service"
 
 export class OpenCodeZenAIService implements IAIService {

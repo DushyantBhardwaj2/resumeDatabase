@@ -1,4 +1,4 @@
-import { logger } from '@/infrastructure/logger'
+import { logger } from '../logger'
 import IORedis from 'ioredis'
 
 const rawUrl = process.env.REDIS_URL ?? 'redis://localhost:6379'
