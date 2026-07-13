@@ -97,7 +97,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     const modeMessages = messagesByMode[mode] || []
 
     const userMsg: ChatMessage = {
-      id: Date.now(),
+      id: crypto.randomUUID(),
       role: 'user',
       content: text,
     }
@@ -126,7 +126,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       const data = await res.json()
 
       const assistantMsg: ChatMessage = {
-        id: Date.now() + 1,
+        id: crypto.randomUUID(),
         role: 'assistant',
         content: data.reply,
         widget: data.targetWidget,
@@ -150,16 +150,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       }))
 
       // Persist both messages to chat history
-      fetch('/api/protected/chat/save', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ role: 'user', content: text, mode }),
+      api.api.protected.chat.save.$post({
+        json: { role: 'user', content: text, mode },
       }).catch(() => {})
       if (data.reply) {
-        fetch('/api/protected/chat/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ role: 'assistant', content: data.reply, widget: data.targetWidget, mode }),
+        api.api.protected.chat.save.$post({
+          json: { role: 'assistant', content: data.reply, widget: data.targetWidget, mode },
         }).catch(() => {})
       }
     } catch {
@@ -167,9 +163,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         messagesByMode: {
           ...state.messagesByMode,
           [mode]: [...(state.messagesByMode[mode] || []), {
-            id: Date.now() + 1,
-            role: 'assistant',
-            content: "Sorry, I couldn't process that. Please try again.",
+          id: crypto.randomUUID(),
+          role: 'assistant',
+          content: "Sorry, I couldn't process that. Please try again.",
             widget: null,
           }],
         },

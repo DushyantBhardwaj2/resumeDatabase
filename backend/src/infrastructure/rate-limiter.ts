@@ -1,4 +1,5 @@
 import { Context, Next } from 'hono'
+import { logger } from '@/infrastructure/logger'
 import { redisClient } from './queue/redis'
 
 export interface RateLimiterOptions {
@@ -34,7 +35,7 @@ export function rateLimiter(options: RateLimiterOptions) {
           if (count === 1 || pttl === -1) {
             // Background expire setup
             redisClient.pexpire(key, options.windowMs).catch((err) => {
-              console.error('[RateLimiter] Failed to set expiry:', err)
+              logger.error({ err, tag: 'RateLimiter' }, 'Failed to set expiry')
             })
           }
 
@@ -52,7 +53,7 @@ export function rateLimiter(options: RateLimiterOptions) {
     } catch (err) {
       // If Redis is unavailable, log the error but allow the request to pass through
       // to maintain system availability.
-      console.error('[RateLimiter] Redis error, bypassing rate limit:', err)
+      logger.error({ err, tag: 'RateLimiter' }, 'Redis error, bypassing rate limit')
     }
 
     await next()

@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Sparkle, CheckSquare, Square, Plus, MagicWand } from '@phosphor-icons/react'
 
-export function ExperienceSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
+export const ExperienceSelectionWidget = memo(function ExperienceSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
   const updateProfile = useBuilderStore((s) => s.updateProfile)
   const selectedExperienceIds = useBuilderStore((s) => s.selectedExperienceIds)
@@ -92,7 +92,7 @@ export function ExperienceSelectionWidget({ content, onNext }: { content?: strin
       </div>
     </div>
   )
-}
+})
 
 function ExperienceGroup({ exp, isSelected, onToggleExp, selectedBulletIds, onToggleBullet, onAddCustomBullet }: any) {
   const [isAdding, setIsAdding] = useState(false)

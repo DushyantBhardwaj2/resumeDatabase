@@ -4,11 +4,24 @@ import { create } from 'zustand'
 import { toast } from 'sonner'
 import type { Profile, Experience, Project, Education, Certificate, Skills, Contact } from '@resumint/shared'
 import { normalizeProfile, getEmptyProfile } from '@/lib/normalize-profile'
+import isEqual from 'fast-deep-equal'
 import { api } from '@/config/api-client'
 
 export const DRAFT_KEY = 'profile-draft'
 
 type SaveState = 'idle' | 'saving' | 'saved' | 'error'
+
+// Debounce timer for auto-save — shared across store methods
+let saveTimer: ReturnType<typeof setTimeout> | null = null
+const SAVE_DEBOUNCE_MS = 500
+
+function scheduleSave(fn: () => void) {
+  if (saveTimer) clearTimeout(saveTimer)
+  saveTimer = setTimeout(() => {
+    saveTimer = null
+    fn()
+  }, SAVE_DEBOUNCE_MS)
+}
 
 interface ProfileStore {
   profile: Profile
@@ -60,7 +73,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
   saveProfile: async () => {
     const { profile, originalProfile } = get()
     if (!originalProfile) return
-    if (JSON.stringify(profile) === JSON.stringify(originalProfile)) return
+    if (isEqual(profile, originalProfile)) return
     set({ saving: 'saving' })
     try {
       const res = await api.api.protected.profile.$patch({
@@ -84,40 +97,41 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
     try {
       localStorage.setItem(DRAFT_KEY, JSON.stringify(updated))
     } catch { /* ignore */ }
+    scheduleSave(() => get().saveProfile())
   },
 
   isDirty: () => {
     const { profile, originalProfile } = get()
     if (!originalProfile) return false
-    return JSON.stringify(profile) !== JSON.stringify(originalProfile)
+    return !isEqual(profile, originalProfile)
   },
 
   addProject: (item) => {
     const { profile } = get()
     const updated = { ...profile, projects: [...profile.projects, item] }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   addExperience: (item) => {
     const { profile } = get()
     const updated = { ...profile, experience: [...profile.experience, item] }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   addEducation: (item) => {
     const { profile } = get()
     const updated = { ...profile, education: [...profile.education, item] }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   addCertificate: (item) => {
     const { profile } = get()
     const updated = { ...profile, certificates: [...profile.certificates, item] }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   updateExperience: (id, item) => {
@@ -127,7 +141,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       experience: profile.experience.map(e => e.id === id ? item : e)
     }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   deleteExperience: (id) => {
@@ -137,7 +151,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       experience: profile.experience.filter(e => e.id !== id)
     }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   updateProject: (id, item) => {
@@ -147,7 +161,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       projects: profile.projects.map(p => p.id === id ? item : p)
     }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   deleteProject: (id) => {
@@ -157,21 +171,21 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       projects: profile.projects.filter(p => p.id !== id)
     }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   updateContact: (contact) => {
     const { profile } = get()
     const updated = { ...profile, contact }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   updateSkills: (skills) => {
     const { profile } = get()
     const updated = { ...profile, skills }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   updateCertificate: (id, item) => {
@@ -181,7 +195,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       certificates: profile.certificates.map(c => c.id === id ? item : c)
     }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   deleteCertificate: (id) => {
@@ -191,7 +205,7 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       certificates: profile.certificates.filter(c => c.id !== id)
     }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 
   updateExtracurricular: (id, item) => {
@@ -201,6 +215,6 @@ export const useProfileStore = create<ProfileStore>((set, get) => ({
       extracurriculars: (profile.extracurriculars || []).map((e: any) => e.id === id ? item : e)
     }
     set({ profile: updated })
-    get().saveProfile()
+    scheduleSave(() => get().saveProfile())
   },
 }))

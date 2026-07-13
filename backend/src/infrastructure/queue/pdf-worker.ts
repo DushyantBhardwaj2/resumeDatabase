@@ -1,54 +1,65 @@
 import { Worker } from 'bullmq'
+import { logger } from '@/infrastructure/logger'
 import { bullmqConnectionOpts, redisClient } from './redis'
 import type { PdfJobData } from './pdf-queue'
 import { LatexCompiler } from '../latex/latex-compiler'
 
 /** How long (seconds) the compiled PDF blob is kept in Redis after completion */
-const PDF_RESULT_TTL_SECONDS = 300 // 5 minutes
+const PDF_RESULT_TTL_SECONDS = parseInt(process.env.PDF_RESULT_TTL || '300')
 
 const latexCompiler = new LatexCompiler()
 
-// ── Worker ────────────────────────────────────────────────────────────────────
-// Runs in-process alongside the Hono HTTP server.
-// concurrency=2 means up to 2 pdflatex processes can run in parallel.
-// execFileAsync is genuinely async — neither compile blocks the event loop.
-export const pdfWorker = new Worker<PdfJobData>(
-  'pdf-compile',
-  async (job) => {
-    const { latexSource, templateId } = job.data
+let pdfWorker: Worker<PdfJobData> | null = null
 
-    try {
-      const pdfBytes = await latexCompiler.compile(latexSource, templateId, job.id || 'unknown')
+export function startPdfWorker(): Worker<PdfJobData> {
+  if (pdfWorker) return pdfWorker
 
-      // ── Store result in Redis with TTL ────────────────────────────────────
-      // ioredis SETEX requires a string value; encode the binary as base64.
-      await redisClient.setex(
-        `pdf:result:${job.id}`,
-        PDF_RESULT_TTL_SECONDS,
-        pdfBytes.toString('base64'),
-      )
+  pdfWorker = new Worker<PdfJobData>(
+    'pdf-compile',
+    async (job) => {
+      const { latexSource, templateId } = job.data
 
-      console.log(`[PDF Worker] job ${job.id} → ${pdfBytes.length} bytes, TTL=${PDF_RESULT_TTL_SECONDS}s`)
-      return { bytes: pdfBytes.length }
-    } catch (err: any) {
-      console.error(`[PDF Worker] job ${job.id} failed:`, err.message)
-      throw err
-    }
-  },
-  {
-    connection: bullmqConnectionOpts,
-    concurrency: 2,
-  },
-)
+      try {
+        const pdfBytes = await latexCompiler.compile(latexSource, templateId, job.id || 'unknown')
 
-pdfWorker.on('completed', (job) => {
-  console.log(`[PDF Worker] completed job ${job.id}`)
-})
+        await redisClient.setex(
+          `pdf:result:${job.id}`,
+          PDF_RESULT_TTL_SECONDS,
+          pdfBytes.toString('base64'),
+        )
 
-pdfWorker.on('failed', (job, err) => {
-  console.error(`[PDF Worker] failed job ${job?.id}:`, err.message)
-})
+        logger.info({ jobId: job.id, bytes: pdfBytes.length, ttlSeconds: PDF_RESULT_TTL_SECONDS, tag: 'PDF Worker' }, 'job completed with bytes')
+        return { bytes: pdfBytes.length }
+      } catch (err: any) {
+        logger.error({ jobId: job.id, err: err.message, tag: 'PDF Worker' }, 'job failed')
+        throw err
+      }
+    },
+    {
+      connection: bullmqConnectionOpts,
+      concurrency: 2,
+    },
+  )
 
-pdfWorker.on('error', (err) => {
-  console.error('[PDF Worker] worker error:', err.message)
-})
+  pdfWorker.on('completed', (job) => {
+    logger.info({ jobId: job.id, tag: 'PDF Worker' }, 'completed job')
+  })
+
+  pdfWorker.on('failed', (job, err) => {
+    logger.error({ jobId: job?.id, err: err.message, tag: 'PDF Worker' }, 'failed job')
+  })
+
+  pdfWorker.on('error', (err) => {
+    logger.error({ err: err.message, tag: 'PDF Worker' }, 'worker error')
+  })
+
+  logger.info({ tag: 'PDF Worker' }, 'started (concurrency=2)')
+  return pdfWorker
+}
+
+export async function stopPdfWorker(): Promise<void> {
+  if (!pdfWorker) return
+  logger.info({ tag: 'PDF Worker' }, 'shutting down')
+  await pdfWorker.close()
+  pdfWorker = null
+}

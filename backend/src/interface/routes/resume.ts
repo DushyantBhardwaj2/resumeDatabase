@@ -1,69 +1,13 @@
 import { Hono } from 'hono'
-import { z } from 'zod'
 import { zValidator } from '@hono/zod-validator'
+import { logger } from '@/infrastructure/logger'
 import { container as defaultContainer } from '../../di/container'
+import { compileLiveSchema } from '../schemas/compile-live'
 import { filterExperienceBySelection, filterProjectsBySelection } from '../../core/application/services/bullet-filter'
 import { addPdfJob, pdfQueue } from '../../infrastructure/queue/pdf-queue'
 import { redisClient } from '../../infrastructure/queue/redis'
 import type { Variables } from '../types'
 import type { Container } from '../../di/container'
-
-const vaultBulletSchema = z.object({
-  id: z.string().max(100),
-  text: z.string().max(5000),
-  category: z.enum(['FRONTEND', 'BACKEND', 'DEVOPS', 'LEADERSHIP', 'GENERAL']).optional(),
-  keywords: z.array(z.string().max(100)).max(50).default([]),
-  isAIGenerated: z.boolean().default(false),
-})
-
-const compileLiveSchema = z.object({
-  templateId: z.enum(['nsut-canonical', 'ats-clean', 'modern', 'compact']),
-  selectedBulletIds: z.record(z.string().max(100), z.array(z.string().max(100)).max(200)).optional().default({}),
-  selectedExperienceIds: z.array(z.string().max(100)).max(50).optional(),
-  selectedProjectIds: z.array(z.string().max(100)).max(50).optional(),
-  selectedEducationIds: z.array(z.string().max(200)).max(20).optional(),
-  contactSelection: z.object({
-    name: z.string().max(1000).optional(),
-    email: z.union([z.string().max(500), z.array(z.string().max(500))]).optional(),
-    phone: z.union([z.string().max(100), z.array(z.string().max(100))]).optional(),
-    linkedin: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
-    github: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
-    portfolio: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
-    leetcode: z.union([z.string().max(1000), z.array(z.string().max(1000))]).optional(),
-    enabledSocials: z.array(z.string().max(50)).max(10).optional(),
-  }).optional(),
-  profile: z.object({
-    contact: z.record(z.string(), z.union([z.string(), z.array(z.string())]).nullable()).optional().nullable(),
-    education: z.array(z.record(z.string(), z.unknown())).max(10).optional().nullable(),
-    experience: z.array(z.object({
-      id: z.string().max(100).optional(),
-      company: z.string().max(500),
-      role: z.string().max(500),
-      startDate: z.string().max(100).nullable().optional(),
-      endDate: z.string().max(100).nullable().optional(),
-      current: z.boolean().optional(),
-      vaultBullets: z.array(vaultBulletSchema).max(200).optional().default([]),
-    })).max(20).optional().nullable(),
-    projects: z.array(z.object({
-      id: z.string().max(100).optional(),
-      title: z.string().max(500),
-      url: z.string().max(2000).nullable().optional(),
-      techStack: z.array(z.string().max(200)).max(50).optional().default([]),
-      vaultBullets: z.array(vaultBulletSchema).max(200).optional().default([]),
-    })).max(20).optional().nullable(),
-    skills: z.object({
-      languages: z.array(z.string().max(200)).max(100).optional().default([]),
-      frameworks: z.array(z.string().max(200)).max(100).optional().default([]),
-      tools: z.array(z.string().max(200)).max(100).optional().default([]),
-    }).optional().nullable(),
-    extracurriculars: z.array(z.object({
-      id: z.string().max(100).default(() => crypto.randomUUID()),
-      title: z.string().max(500),
-      description: z.string().max(5000),
-      date: z.string().max(100).nullable().optional(),
-    })).max(20).optional().nullable(),
-  }),
-})
 
 export function createResumeRouter(container: Container) {
   return new Hono<{ Variables: Variables }>()
@@ -73,7 +17,7 @@ export function createResumeRouter(container: Container) {
       const { title, company, description, templateId } = body
       const startTime = Date.now()
       try {
-        console.log(`[TAILOR] start userId=${session.user.id} title="${title || body.jobTitle}" company="${company || body.company}"`)
+        logger.info({ userId: session.user.id, title: title || body.jobTitle, company: company || body.company, tag: 'TAILOR' }, 'start')
         const result = await container.resumeUseCases.tailorResume(
           session.user.id,
           {
@@ -84,11 +28,11 @@ export function createResumeRouter(container: Container) {
           templateId || 'nsut-canonical'
         )
         const elapsed = Date.now() - startTime
-        console.log(`[TAILOR] success userId=${session.user.id} elapsed=${elapsed}ms`)
+        logger.info({ userId: session.user.id, elapsedMs: elapsed, tag: 'TAILOR' }, 'success')
         return c.json(result)
       } catch (err: any) {
         const elapsed = Date.now() - startTime
-        console.error(`[TAILOR] error userId=${session.user.id} elapsed=${elapsed}ms error=${err.message}`)
+        logger.error({ userId: session.user.id, elapsedMs: elapsed, err: err.message, tag: 'TAILOR' }, 'error')
         return c.json({ error: err.message }, 500)
       }
     })
@@ -143,7 +87,7 @@ export function createResumeRouter(container: Container) {
       let educationToKeep = profile.education || []
       if (selectedEducationIds) {
         educationToKeep = educationToKeep.filter((e) =>
-          selectedEducationIds.includes(`${(e as Record<string, unknown>).school || ''}|${(e as Record<string, unknown>).degree || ''}`)
+          selectedEducationIds.includes(((e as Record<string, unknown>).id as string) || '')
         )
       }
 
@@ -171,7 +115,7 @@ export function createResumeRouter(container: Container) {
         const jobId = await addPdfJob({ latexSource, templateId: safeTemplateId })
         return c.json({ jobId })
       } catch (err: any) {
-        console.error('[compile-live] Failed to enqueue job:', err.message)
+        logger.error({ err: err.message, tag: 'compile-live' }, 'Failed to enqueue job')
         return c.json({ error: 'Failed to queue PDF compilation', details: err.message }, 500)
       }
     })

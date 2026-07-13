@@ -86,6 +86,7 @@ var contactSchema = import_zod.z.object({
   portfolios: import_zod.z.array(import_zod.z.string()).default([]).optional()
 });
 var educationSchema = import_zod.z.object({
+  id: import_zod.z.string().default(() => crypto.randomUUID()),
   school: import_zod.z.string(),
   degree: import_zod.z.string(),
   gpa: import_zod.z.string().nullable(),

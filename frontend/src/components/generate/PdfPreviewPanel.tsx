@@ -1,5 +1,6 @@
 'use client'
 
+import { useEffect } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { Plus, Minus, Download } from '@phosphor-icons/react'
 
@@ -9,6 +10,12 @@ export function PdfPreviewPanel() {
   const status = useBuilderStore((s) => s.status)
   const zoom = useBuilderStore((s) => s.zoom)
   const setZoom = useBuilderStore((s) => s.setZoom)
+  const revokePdfUrl = useBuilderStore((s) => s.revokePdfUrl)
+
+  // Clean up blob URL on unmount
+  useEffect(() => {
+    return () => revokePdfUrl()
+  }, [revokePdfUrl])
 
   const handleDownload = () => {
     if (!pdfUrl) return
@@ -66,6 +73,13 @@ export function PdfPreviewPanel() {
         )}
       </div>
 
+      {/* Screen reader announcements */}
+      <div aria-live="polite" className="sr-only">
+        {isCompiling && 'Updating PDF preview'}
+        {status === 'ready' && 'PDF preview ready'}
+        {status === 'error' && 'PDF compilation error'}
+      </div>
+
       {/* PDF display area */}
       <div className="flex-1 flex items-start justify-center p-6 pt-24 overflow-auto relative">
         {isCompiling && (
@@ -75,7 +89,7 @@ export function PdfPreviewPanel() {
           </div>
         )}
         {status === 'error' && (
-          <div className="flex flex-col items-center mt-12 text-center z-10">
+          <div className="flex flex-col items-center mt-12 text-center z-10" role="alert">
             <p className="text-sm font-medium text-red-500">Compilation Error</p>
             <p className="text-xs text-content-muted mt-1">Check your LaTeX template for errors.</p>
           </div>

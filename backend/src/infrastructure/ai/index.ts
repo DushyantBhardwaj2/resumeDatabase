@@ -1,3 +1,4 @@
+import { logger } from '@/infrastructure/logger'
 import type { IAIService, ISchema } from "../../core/application/ports/ai-service"
 
 export class OpenCodeZenAIService implements IAIService {
@@ -42,7 +43,7 @@ export class OpenCodeZenAIService implements IAIService {
 
       const data = await response.json()
       if (!data.choices?.[0]?.message?.content) {
-        console.error("Unexpected AI response format:", data)
+        logger.error({ data }, 'Unexpected AI response format')
         throw new Error("Invalid response format from AI service.")
       }
 
@@ -52,7 +53,7 @@ export class OpenCodeZenAIService implements IAIService {
         const parsed = JSON.parse(jsonStr)
         return schema.parse(parsed)
       } catch (e) {
-        console.error("Failed to parse AI JSON:", { text, jsonStr, error: e })
+        logger.error({ text, jsonStr, err: e }, 'Failed to parse AI JSON')
         throw new Error("AI returned invalid data format. Please try again.")
       }
     } catch (err: unknown) {

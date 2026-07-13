@@ -63,6 +63,7 @@ export type Contact = z.infer<typeof contactSchema>;
 // ── Education Schema ──────────────────────────────────────────────────────────
 
 export const educationSchema = z.object({
+  id: z.string().default(() => crypto.randomUUID()),
   school: z.string(),
   degree: z.string(),
   gpa: z.string().nullable(),

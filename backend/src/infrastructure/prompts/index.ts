@@ -1,3 +1,5 @@
+import { logger } from '@/infrastructure/logger'
+
 export const GENERATE_BULLETS: Record<string, string> = {
   experience: `You are a resume writing expert. Given raw notes about a person's work experience, generate 3-5 polished, achievement-oriented vault bullet points.
 
@@ -309,7 +311,7 @@ Return ONLY valid JSON matching this schema, with no text outside it:
 export function getBulletSelectorPrompt(templateId: string): string {
   const config = TEMPLATE_SELECTION_CONFIGS[templateId]
   if (!config) {
-    console.warn(`[getBulletSelectorPrompt] Unknown template "${templateId}", falling back to ats-clean`)
+    logger.warn({ templateId, tag: 'getBulletSelectorPrompt' }, 'Unknown template, falling back to ats-clean')
     return buildPrompt(TEMPLATE_SELECTION_CONFIGS['ats-clean'])
   }
   return buildPrompt(config)

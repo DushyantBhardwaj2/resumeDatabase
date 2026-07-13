@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Sparkle, Plus, X } from '@phosphor-icons/react'
 
-export function SkillsSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
+export const SkillsSelectionWidget = memo(function SkillsSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
   const updateProfile = useBuilderStore((s) => s.updateProfile)
 
@@ -87,7 +87,7 @@ export function SkillsSelectionWidget({ content, onNext }: { content?: string, o
       </div>
     </div>
   )
-}
+})
 
 function SkillCategory({ title, items, onRemove, onAdd }: { title: string, items: string[], onRemove: (s:string)=>void, onAdd: (s:string)=>void }) {
   const [isAdding, setIsAdding] = useState(false)

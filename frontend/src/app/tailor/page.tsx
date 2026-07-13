@@ -11,6 +11,7 @@ import { useLocalStorage } from '@/lib/use-local-storage'
 import { clamp } from '@/lib/utils'
 import { normalizeProfile } from '@/lib/normalize-profile'
 import { toast } from 'sonner'
+import type { HistoryItemResponse } from '@/types/history'
 
 const MIN_CENTER_PX = 360
 const MIN_PREVIEW_PX = 320
@@ -106,8 +107,7 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
       try {
         const res = await api.api.protected.history[':id'].$get({ param: { id: id as string } })
         if (!res.ok) return
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const data = (await res.json()) as any
+        const data: HistoryItemResponse = await res.json()
         const td = data.tailoredData
 
         setJobTitle(td.jobTitle || '')
@@ -151,7 +151,7 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
 
       {/* Splitter — hidden on mobile */}
       <div className="hidden lg:block w-2 cursor-col-resize hover:bg-brand/20 transition-colors rounded-full" style={{ alignSelf: 'stretch' }}>
-        <Splitter onResize={handleSplitter} />
+        <Splitter onResize={handleSplitter} value={savedWidths ?? 55} min={20} max={80} />
       </div>
 
       {/* Preview panel — hidden on mobile */}

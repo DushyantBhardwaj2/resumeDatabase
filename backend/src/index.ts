@@ -13,17 +13,23 @@ import { aiRouter } from './interface/routes/ai'
 import { chatRouter } from './interface/routes/chat'
 import { historyRouter } from './interface/routes/history'
 
-// Importing this module starts the in-process BullMQ PDF worker as a side-effect
-import './infrastructure/queue/pdf-worker'
+import { logger } from '@/infrastructure/logger'
+import { startPdfWorker, stopPdfWorker } from './infrastructure/queue/pdf-worker'
 
 const app = new Hono<{ Variables: Variables }>()
 
 const frontendUrl = process.env.VERCEL_FRONTEND_URL || 'http://localhost:3000'
 
+const allowedOrigins = [
+  frontendUrl,
+  'http://localhost:3000',
+  'http://localhost:8080',
+]
+
 app.use('*', cors({
   origin: (origin) => {
     if (!origin) return frontendUrl;
-    if (origin === frontendUrl || origin.includes('localhost') || origin.endsWith('.vercel.app')) {
+    if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
       return origin;
     }
     return frontendUrl;
@@ -110,10 +116,22 @@ export type AppType = typeof routes
 
 // ── Server Start ──────────────────────────────────────────────────────────────
 
-serve({
+const server = serve({
   fetch: app.fetch,
   port: parseInt(process.env.PORT || '8080')
 }, (info) => {
-  console.log(`Listening on http://localhost:${info.port}`)
-  console.log('[PDF Worker] in-process worker active (concurrency=2)')
+  logger.info({ port: info.port }, 'listening')
+  startPdfWorker()
 })
+
+// ── Graceful Shutdown ─────────────────────────────────────────────────────────
+const shutdown = async (signal: string) => {
+  logger.info({ signal }, 'received signal, shutting down gracefully')
+  await stopPdfWorker()
+  server.close()
+  logger.info({ tag: 'Server' }, 'goodbye')
+  process.exit(0)
+}
+
+process.on('SIGTERM', () => shutdown('SIGTERM'))
+process.on('SIGINT', () => shutdown('SIGINT'))

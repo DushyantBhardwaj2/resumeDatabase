@@ -88,7 +88,7 @@ function VaultBulletEditor({
     if (!bullet.text.trim()) return
     try {
       const res = await api.api.protected.ai['expand-vault'].$post({
-        json: { content: bullet.text, count: 8 }
+        json: { type: 'EXPERIENCE', title: bullet.text.slice(0, 100), rawDescription: bullet.text }
       })
       if (!res.ok) return
       const data = await res.json()
@@ -288,7 +288,7 @@ function EducationEditor({ data, onChange }: { data: Profile; onChange: (d: Prof
   const updateItem = (idx: number, patch: Partial<Profile['education'][0]>) =>
     setItems(items.map((e, i) => (i === idx ? { ...e, ...patch } : e)))
   const addItem = () =>
-    setItems([...items, { school: '', degree: '', gpa: null, startYear: null, endYear: null }])
+    setItems([...items, { id: crypto.randomUUID(), school: '', degree: '', gpa: null, startYear: null, endYear: null }])
   const removeItem = (idx: number) => setItems(items.filter((_, i) => i !== idx))
 
   if (items.length === 0) {

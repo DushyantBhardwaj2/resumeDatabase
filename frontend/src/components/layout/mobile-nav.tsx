@@ -1,9 +1,10 @@
 'use client'
 
-import { useState, useEffect, startTransition } from 'react'
+import { useState, useEffect, useRef, useCallback, startTransition } from 'react'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { usePathname } from 'next/navigation'
+import { useIsActive } from '@/hooks/use-is-active'
 import { Avatar } from '@/components/ui/avatar'
 import {
   List,
@@ -37,20 +38,82 @@ const navItems: NavItemDef[] = [
   { icon: Lightbulb, label: 'Tips', href: '/tips' },
 ]
 
+function focusableSelector(): string {
+  return 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+}
+
+function getFocusableElements(container: HTMLElement): HTMLElement[] {
+  return Array.from(container.querySelectorAll<HTMLElement>(focusableSelector()))
+}
+
 export function MobileNav({ user }: MobileNavProps) {
   const pathname = usePathname()
+  const isActive = useIsActive()
   const [open, setOpen] = useState(false)
+  const drawerRef = useRef<HTMLDivElement>(null)
+  const toggleRef = useRef<HTMLButtonElement>(null)
+  const previousFocusRef = useRef<HTMLElement | null>(null)
 
+  const close = useCallback(() => setOpen(false), [])
+
+  // Close drawer on route change
   useEffect(() => {
-    startTransition(() => {
-      setOpen(false)
-    })
-  }, [pathname])
+    startTransition(() => close())
+  }, [pathname, close])
 
-  function isActive(href: string): boolean {
-    if (href === '/tailor' && pathname.startsWith('/tailor')) return true
-    return pathname.startsWith(href) && href !== '/tailor'
-  }
+  // Body scroll lock
+  useEffect(() => {
+    if (open) {
+      const prev = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => { document.body.style.overflow = prev }
+    }
+  }, [open])
+
+  // Focus management: save on open, restore on close
+  useEffect(() => {
+    if (open) {
+      previousFocusRef.current = document.activeElement as HTMLElement
+      // Focus first focusable element inside drawer on next frame (after render)
+      requestAnimationFrame(() => {
+        if (drawerRef.current) {
+          const els = getFocusableElements(drawerRef.current)
+          els[0]?.focus()
+        }
+      })
+    } else {
+      previousFocusRef.current?.focus()
+      previousFocusRef.current = null
+    }
+  }, [open])
+
+  // Focus trap: cycle Tab within drawer
+  const handleKeyDown = useCallback((e: React.KeyboardEvent) => {
+    if (e.key === 'Escape') {
+      close()
+      return
+    }
+
+    if (e.key !== 'Tab' || !drawerRef.current) return
+
+    const els = getFocusableElements(drawerRef.current)
+    if (els.length === 0) return
+
+    const first = els[0]
+    const last = els[els.length - 1]
+
+    if (e.shiftKey) {
+      if (document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      }
+    } else {
+      if (document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+  }, [close])
 
   async function handleSignOut() {
     await fetch('/api/auth/sign-out', { method: 'POST' })
@@ -61,9 +124,11 @@ export function MobileNav({ user }: MobileNavProps) {
     <div className="lg:hidden">
       <header className="fixed top-0 left-0 right-0 z-40 h-14 bg-card border-b border-edge flex items-center px-4 gap-3">
         <button
+          ref={toggleRef}
           onClick={() => setOpen(true)}
           className="flex items-center justify-center h-8 w-8 rounded-[var(--radius-md)] text-content-muted hover:text-content hover:bg-surface transition-colors"
           aria-label="Open navigation menu"
+          aria-expanded={open}
         >
           <List size={20} aria-hidden="true" />
         </button>
@@ -76,18 +141,27 @@ export function MobileNav({ user }: MobileNavProps) {
       </header>
 
       {open && (
-        <>
+        <div
+          className="fixed inset-0 z-50"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Mobile navigation"
+        >
           <div
-            className="fixed inset-0 z-50 bg-black/40"
-            onClick={() => setOpen(false)}
+            className="fixed inset-0 bg-black/40 animate-fade-in"
+            onClick={close}
             aria-hidden="true"
           />
 
-          <div className="fixed top-0 left-0 h-full w-72 bg-card z-50 flex flex-col shadow-[var(--shadow-xl)] animate-slide-left">
+          <div
+            ref={drawerRef}
+            onKeyDown={handleKeyDown}
+            className="fixed top-0 left-0 h-full w-72 bg-card z-50 flex flex-col shadow-[var(--shadow-xl)] animate-slide-left"
+          >
             <div className="flex items-center justify-between px-5 py-5 shrink-0">
               <Link
                 href="/tailor"
-                onClick={() => setOpen(false)}
+                onClick={close}
                 className="font-display font-bold text-lg text-content inline-flex items-center"
               >
                 resumint
@@ -95,7 +169,7 @@ export function MobileNav({ user }: MobileNavProps) {
               </Link>
 
               <button
-                onClick={() => setOpen(false)}
+                onClick={close}
                 className="flex items-center justify-center h-8 w-8 rounded-[var(--radius-md)] text-content-muted hover:text-content hover:bg-surface transition-colors"
                 aria-label="Close navigation menu"
               >
@@ -107,7 +181,7 @@ export function MobileNav({ user }: MobileNavProps) {
               Your words, sharpened. Never made up.
             </p>
 
-            <nav className="flex-1 overflow-y-auto px-3" aria-label="Mobile navigation">
+            <nav className="flex-1 overflow-y-auto px-3" aria-label="Main navigation">
               {navItems.map((item) => {
                 const active = isActive(item.href)
                 const Icon = item.icon
@@ -115,7 +189,7 @@ export function MobileNav({ user }: MobileNavProps) {
                   <Link
                     key={item.href}
                     href={item.href}
-                    onClick={() => setOpen(false)}
+                    onClick={close}
                     className={[
                       'flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm transition-colors duration-150 mb-0.5',
                       active
@@ -138,7 +212,7 @@ export function MobileNav({ user }: MobileNavProps) {
                 return (
                   <Link
                     href={settingsHref}
-                    onClick={() => setOpen(false)}
+                    onClick={close}
                     className={[
                       'flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm transition-colors duration-150 mb-0.5',
                       active
@@ -170,6 +244,7 @@ export function MobileNav({ user }: MobileNavProps) {
 
               <button
                 onClick={handleSignOut}
+                type="button"
                 className="flex items-center gap-3 px-3 py-2 rounded-[var(--radius-md)] text-sm text-content-muted hover:bg-red-50 dark:hover:bg-red-950/20 hover:text-red-500 transition-colors cursor-pointer w-full text-left"
               >
                 <SignOut size={18} aria-hidden="true" />
@@ -177,7 +252,7 @@ export function MobileNav({ user }: MobileNavProps) {
               </button>
             </div>
           </div>
-        </>
+        </div>
       )}
     </div>
   )

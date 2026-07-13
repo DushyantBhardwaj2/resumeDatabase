@@ -1,10 +1,11 @@
 'use client'
 
+import { memo } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Sparkle, CheckSquare, Square, GraduationCap } from '@phosphor-icons/react'
 
-export function EducationSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
+export const EducationSelectionWidget = memo(function EducationSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
   const selectedEducationIds = useBuilderStore((s) => s.selectedEducationIds)
   const toggleEducation = useBuilderStore((s) => s.toggleEducation)
@@ -83,4 +84,4 @@ export function EducationSelectionWidget({ content, onNext }: { content?: string
       </div>
     </div>
   )
-}
+})

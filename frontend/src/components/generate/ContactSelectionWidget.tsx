@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Sparkle, EnvelopeSimple, Phone, LinkedinLogo, GithubLogo, Globe, User, Code, CheckSquare, Square, Plus } from '@phosphor-icons/react'
@@ -50,10 +50,10 @@ function ContactFieldSelect({ label, icon, values, selected, onSelect, onSaveToV
           />
           <button onClick={handleSave} className="px-3 py-2 bg-brand text-brand-fg text-xs rounded-md font-medium whitespace-nowrap">Save to Vault</button>
           <button onClick={() => setIsAdding(false)} className="px-2 py-2 text-xs text-content-muted">Cancel</button>
-        </div>
       </div>
-    )
-  }
+    </div>
+  )
+}
 
   return (
     <div className="flex flex-col gap-2">
@@ -80,7 +80,7 @@ const combineVaultList = (singular: unknown, array: string[] | undefined): strin
   return [...fromSingular, ...fromArray].filter(v => { if (seen.has(v)) return false; seen.add(v); return true })
 }
 
-export function ContactSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
+export const ContactSelectionWidget = memo(function ContactSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
   const updateProfile = useBuilderStore((s) => s.updateProfile)
   const contactSelection = useBuilderStore((s) => s.contactSelection)
@@ -227,4 +227,4 @@ export function ContactSelectionWidget({ content, onNext }: { content?: string, 
       </div>
     </div>
   )
-}
+})

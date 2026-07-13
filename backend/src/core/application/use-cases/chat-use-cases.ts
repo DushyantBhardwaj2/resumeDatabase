@@ -1,3 +1,4 @@
+import { logger } from '@/infrastructure/logger'
 import type { IAIService, ISchema } from "../ports/ai-service"
 import type { Profile, VaultBullet } from "../../domain/entities"
 import type {
@@ -93,7 +94,7 @@ export class ChatUseCases {
               messagesForAI += `\n\n[System Context: The user provided a URL (${url}). Here is its scraped content for you to analyze and generate points from:\n${truncated}]`;
             }
           } catch (error) {
-             console.error(`Failed to fetch URL context for ${url}:`, error);
+             logger.error({ url, err: error }, 'Failed to fetch URL context');
           }
         }
       }

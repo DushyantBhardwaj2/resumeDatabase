@@ -88,7 +88,7 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
   setProfile: (profile) => {
     const selectedExperienceIds = profile.experience?.map(e => e.id!) || []
     const selectedProjectIds = profile.projects?.map(p => p.id!) || []
-    const selectedEducationIds = profile.education?.map((e) => e.school + '|' + e.degree) || []
+    const selectedEducationIds = profile.education?.map((e) => e.id!) || []
     const selectedBulletIds: BuilderSelections = {}
     profile.experience?.forEach(e => {
       if (e.id) selectedBulletIds[e.id] = e.vaultBullets.map(b => b.id)
@@ -161,8 +161,8 @@ export const useBuilderStore = create<BuilderStore>((set, get) => ({
       const originalOrder = state.profile?.education || []
       const newList = [...state.selectedEducationIds, id]
       newList.sort((a, b) => {
-        const ai = originalOrder.findIndex(e => (e.school + '|' + e.degree) === a)
-        const bi = originalOrder.findIndex(e => (e.school + '|' + e.degree) === b)
+        const ai = originalOrder.findIndex(e => e.id === a)
+        const bi = originalOrder.findIndex(e => e.id === b)
         return ai - bi
       })
       return { selectedEducationIds: newList }

@@ -39,7 +39,12 @@ export function ChatContainer({ mode, renderWidget, renderInput }: ChatContainer
         ref={scrollRef}
         className="flex-1 overflow-y-auto p-4 md:p-6 space-y-4 scroll-smooth"
       >
-        {messages.length === 0 && (
+        <div aria-live="polite" role="log" aria-label="Chat messages" className="sr-only">
+        {messages.length > 0 && `${messages.length} messages`}
+        {isTyping && 'AI is typing'}
+      </div>
+
+      {messages.length === 0 && (
           <div className="flex items-center justify-center h-full text-content-muted text-sm">
             Start a conversation to build your resume...
           </div>
@@ -48,7 +53,7 @@ export function ChatContainer({ mode, renderWidget, renderInput }: ChatContainer
           <MessageBubble key={msg.id} message={msg} renderWidget={renderWidget} />
         ))}
         {isTyping && (
-          <div className="flex items-center gap-1.5 text-content-muted text-sm px-1">
+          <div className="flex items-center gap-1.5 text-content-muted text-sm px-1" role="status" aria-label="AI is typing">
             <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: '0ms' }} />
             <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: '150ms' }} />
             <span className="w-1.5 h-1.5 rounded-full bg-brand animate-bounce" style={{ animationDelay: '300ms' }} />

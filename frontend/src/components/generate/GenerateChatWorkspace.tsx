@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, useCallback } from 'react'
 import { Sparkle, Chat, User, GraduationCap, Briefcase, Folder, Wrench } from '@phosphor-icons/react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { useTailorChat } from './useTailorChat'
@@ -172,17 +172,17 @@ export function GenerateChatWorkspace() {
                   <ContactSelectionWidget 
                     key={entry.id} 
                     content={entry.content} 
-                    onNext={() => addChatEntry({ role: 'assistant', type: 'education-selection' })} 
+onNext={useCallback(() => addChatEntry({ role: 'assistant', type: 'education-selection' }), [])}
                   />
                 )
               }
 
               if (entry.type === 'education-selection') {
                 return (
-                  <EducationSelectionWidget 
-                    key={entry.id} 
-                    content={entry.content} 
-                    onNext={() => addChatEntry({ role: 'assistant', type: 'experience-selection' })} 
+                  <EducationSelectionWidget
+                    key={entry.id}
+                    content={entry.content}
+                    onNext={useCallback(() => addChatEntry({ role: 'assistant', type: 'experience-selection' }), [])}
                   />
                 )
               }
@@ -192,17 +192,17 @@ export function GenerateChatWorkspace() {
                   <ExperienceSelectionWidget 
                     key={entry.id} 
                     content={entry.content} 
-                    onNext={() => addChatEntry({ role: 'assistant', type: 'project-selection' })} 
+onNext={useCallback(() => addChatEntry({ role: 'assistant', type: 'project-selection' }), [])}
                   />
                 )
               }
 
               if (entry.type === 'project-selection') {
                 return (
-                  <ProjectSelectionWidget 
-                    key={entry.id} 
-                    content={entry.content} 
-                    onNext={() => addChatEntry({ role: 'assistant', type: 'skills-selection' })} 
+                  <ProjectSelectionWidget
+                    key={entry.id}
+                    content={entry.content}
+                    onNext={useCallback(() => addChatEntry({ role: 'assistant', type: 'skills-selection' }), [])}
                   />
                 )
               }
@@ -212,10 +212,10 @@ export function GenerateChatWorkspace() {
                   <SkillsSelectionWidget 
                     key={entry.id} 
                     content={entry.content} 
-                    onNext={() => {
+                    onNext={useCallback(() => {
                       setCurrentStage('ready')
                       addChatEntry({ role: 'assistant', type: 'greeting' })
-                    }}
+                    }, [])}
                   />
                 )
               }
@@ -280,35 +280,35 @@ export function GenerateChatWorkspace() {
             {activeTab === 'contact' && (
               <ContactSelectionWidget
                 content="Confirm and customize the contact details to include on this resume:"
-                onNext={() => setActiveTab('education')}
+                onNext={useCallback(() => setActiveTab('education'), [])}
               />
             )}
             {activeTab === 'education' && (
               <EducationSelectionWidget
                 content="Select which education entries to display:"
-                onNext={() => setActiveTab('experience')}
+                onNext={useCallback(() => setActiveTab('experience'), [])}
               />
             )}
             {activeTab === 'experience' && (
               <ExperienceSelectionWidget
                 content="Verify and select which work experience bullets fit this job description best:"
-                onNext={() => setActiveTab('projects')}
+                onNext={useCallback(() => setActiveTab('projects'), [])}
               />
             )}
             {activeTab === 'projects' && (
               <ProjectSelectionWidget
                 content="Select which project bullets are relevant for this role:"
-                onNext={() => setActiveTab('skills')}
+                onNext={useCallback(() => setActiveTab('skills'), [])}
               />
             )}
             {activeTab === 'skills' && (
               <SkillsSelectionWidget
                 content="Confirm your languages, frameworks, and tools. Unselected tags won't appear."
-                onNext={() => {
-                  setCurrentStage('ready')
-                  setActiveTab('chat')
-                  addChatEntry({ role: 'assistant', type: 'greeting' })
-                }}
+onNext={useCallback(() => {
+                    setCurrentStage('ready')
+                    setActiveTab('chat')
+                    addChatEntry({ role: 'assistant', type: 'greeting' })
+                  }, [])}
               />
             )}
           </div>

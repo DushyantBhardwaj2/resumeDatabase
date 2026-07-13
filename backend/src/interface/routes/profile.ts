@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { logger } from '@/infrastructure/logger'
 import { container as defaultContainer } from '../../di/container'
 import { computeCompleteness } from '../../infrastructure/profile-utils'
 import type { Variables } from '../types'
@@ -29,7 +30,7 @@ export function createProfileRouter(container: Container) {
         const profile = await container.profileUseCases.updateProfile(session.user.id, body)
         return c.json(profile)
       } catch (err: any) {
-        console.error('Profile update error:', err)
+        logger.error({ err }, 'Profile update error')
         return c.json({ error: err.message }, 500)
       }
     })

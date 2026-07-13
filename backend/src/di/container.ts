@@ -10,6 +10,7 @@ import { ChatUseCases } from "../core/application/use-cases/chat-use-cases"
 import { ProfileRepository } from "../infrastructure/persistence/profile-repository"
 import { TailoredResumeRepository } from "../infrastructure/persistence/tailored-resume-repository"
 import { GitHubRepoRepository } from "../infrastructure/persistence/github-repo-repository"
+import { ChatRepository } from "../infrastructure/persistence/chat-repository"
 import { OpenCodeZenAIService } from "../infrastructure/ai"
 import { PDFParser } from "../infrastructure/pdf"
 import { LatexTemplateFiller } from "../infrastructure/latex/latex-template"
@@ -21,6 +22,7 @@ class Container {
   private _profileRepo?: IProfileRepository
   private _tailoredRepo?: ITailoredResumeRepository
   private _githubRepo?: IGitHubRepoRepository
+  private _chatRepo?: ChatRepository
   private _aiService?: IAIService
   private _pdfParser?: IPDFParser
   private _latexTemplate?: ILatexTemplateFiller
@@ -100,6 +102,11 @@ class Container {
   private get githubRepo(): IGitHubRepoRepository {
     if (!this._githubRepo) this._githubRepo = new GitHubRepoRepository()
     return this._githubRepo
+  }
+
+  get chatRepository(): ChatRepository {
+    if (!this._chatRepo) this._chatRepo = new ChatRepository()
+    return this._chatRepo
   }
 
   private get aiService(): IAIService {

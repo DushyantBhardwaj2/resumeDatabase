@@ -1,3 +1,4 @@
+import { logger } from '@/infrastructure/logger'
 import type { Profile, TailoredOutput, Experience, Project, VaultBullet } from "../../domain/entities"
 import type { IProfileRepository, ITailoredResumeRepository } from "../../domain/repositories"
 import type { IAIService, ISchema } from "../ports/ai-service"
@@ -160,7 +161,7 @@ export class ResumeUseCases {
       JSON.stringify({ jobDescription: input.jobDescription, profile: compactProfile }),
       { parse: (data: unknown) => data as { summary: string } }
     ).then((r) => (r as { summary?: string }).summary).catch((err) => {
-      console.error("[tailorResume] Summary AI failed:", err)
+      logger.error({ err, tag: 'tailorResume' }, 'Summary AI failed')
       return null
     })
 

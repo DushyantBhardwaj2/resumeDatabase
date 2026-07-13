@@ -74,12 +74,14 @@ declare const contactSchema: z.ZodObject<{
 }>;
 type Contact = z.infer<typeof contactSchema>;
 declare const educationSchema: z.ZodObject<{
+    id: z.ZodDefault<z.ZodString>;
     school: z.ZodString;
     degree: z.ZodString;
     gpa: z.ZodNullable<z.ZodString>;
     startYear: z.ZodNullable<z.ZodNumber>;
     endYear: z.ZodNullable<z.ZodNumber>;
 }, "strip", z.ZodTypeAny, {
+    id: string;
     school: string;
     degree: string;
     gpa: string | null;
@@ -91,6 +93,7 @@ declare const educationSchema: z.ZodObject<{
     gpa: string | null;
     startYear: number | null;
     endYear: number | null;
+    id?: string | undefined;
 }>;
 type Education = z.infer<typeof educationSchema>;
 declare const extracurricularItemSchema: z.ZodObject<{
@@ -459,12 +462,14 @@ declare const profileSchema: z.ZodObject<{
         portfolios?: string[] | undefined;
     }>;
     education: z.ZodArray<z.ZodObject<{
+        id: z.ZodDefault<z.ZodString>;
         school: z.ZodString;
         degree: z.ZodString;
         gpa: z.ZodNullable<z.ZodString>;
         startYear: z.ZodNullable<z.ZodNumber>;
         endYear: z.ZodNullable<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
+        id: string;
         school: string;
         degree: string;
         gpa: string | null;
@@ -476,6 +481,7 @@ declare const profileSchema: z.ZodObject<{
         gpa: string | null;
         startYear: number | null;
         endYear: number | null;
+        id?: string | undefined;
     }>, "many">;
     experience: z.ZodArray<z.ZodObject<{
         id: z.ZodDefault<z.ZodString>;
@@ -648,6 +654,7 @@ declare const profileSchema: z.ZodObject<{
         portfolios?: string[] | undefined;
     };
     education: {
+        id: string;
         school: string;
         degree: string;
         gpa: string | null;
@@ -724,6 +731,7 @@ declare const profileSchema: z.ZodObject<{
         gpa: string | null;
         startYear: number | null;
         endYear: number | null;
+        id?: string | undefined;
     }[];
     experience: {
         company: string;
@@ -894,12 +902,14 @@ declare const parsedResumeSchema: z.ZodObject<{
         portfolios?: string[] | undefined;
     }>;
     education: z.ZodArray<z.ZodObject<{
+        id: z.ZodDefault<z.ZodString>;
         school: z.ZodString;
         degree: z.ZodString;
         gpa: z.ZodNullable<z.ZodString>;
         startYear: z.ZodNullable<z.ZodNumber>;
         endYear: z.ZodNullable<z.ZodNumber>;
     }, "strip", z.ZodTypeAny, {
+        id: string;
         school: string;
         degree: string;
         gpa: string | null;
@@ -911,6 +921,7 @@ declare const parsedResumeSchema: z.ZodObject<{
         gpa: string | null;
         startYear: number | null;
         endYear: number | null;
+        id?: string | undefined;
     }>, "many">;
     experience: z.ZodArray<z.ZodEffects<z.ZodObject<{
         company: z.ZodString;
@@ -1104,6 +1115,7 @@ declare const parsedResumeSchema: z.ZodObject<{
         portfolios?: string[] | undefined;
     };
     education: {
+        id: string;
         school: string;
         degree: string;
         gpa: string | null;
@@ -1175,6 +1187,7 @@ declare const parsedResumeSchema: z.ZodObject<{
         gpa: string | null;
         startYear: number | null;
         endYear: number | null;
+        id?: string | undefined;
     }[];
     experience: {
         company: string;

@@ -42,6 +42,7 @@ var contactSchema = z.object({
   portfolios: z.array(z.string()).default([]).optional()
 });
 var educationSchema = z.object({
+  id: z.string().default(() => crypto.randomUUID()),
   school: z.string(),
   degree: z.string(),
   gpa: z.string().nullable(),

@@ -1,11 +1,11 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, memo } from 'react'
 import { useBuilderStore } from '@/store/useBuilderStore'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Sparkle, CheckSquare, Square, Plus, MagicWand } from '@phosphor-icons/react'
 
-export function ProjectSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
+export const ProjectSelectionWidget = memo(function ProjectSelectionWidget({ content, onNext }: { content?: string, onNext?: () => void }) {
   const profile = useBuilderStore((s) => s.profile)
   const updateProfile = useBuilderStore((s) => s.updateProfile)
   const selectedProjectIds = useBuilderStore((s) => s.selectedProjectIds)
@@ -109,7 +109,7 @@ export function ProjectSelectionWidget({ content, onNext }: { content?: string, 
       </div>
     </div>
   )
-}
+})
 
 function ProjectGroup({ proj, isSelected, onToggleProj, selectedBulletIds, onToggleBullet, onAddCustomBullet, onSaveProjectLink }: any) {
   const [isAdding, setIsAdding] = useState(false)

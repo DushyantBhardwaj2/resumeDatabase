@@ -3,8 +3,8 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { api } from '@/config/api-client'
-import { usePathname } from 'next/navigation'
 import { ThemeToggle } from '@/components/theme-toggle'
+import { useIsActive } from '@/hooks/use-is-active'
 import { Avatar } from '@/components/ui/avatar'
 import {
   Sparkle,
@@ -88,7 +88,7 @@ function NavLink({
 }
 
 export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarProps) {
-  const pathname = usePathname()
+  const isActive = useIsActive()
   const [historyItems, setHistoryItems] = useState<HistoryItem[]>([])
   const [historyLoading, setHistoryLoading] = useState(true)
 
@@ -104,12 +104,6 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
       setHistoryLoading(false)
     })()
   }, [])
-
-  function isActive(href: string): boolean {
-    if (href === '/dashboard' && pathname === '/dashboard') return true
-    if (href !== '/dashboard' && pathname.startsWith(href)) return true
-    return false
-  }
 
   async function handleSignOut() {
     await fetch('/api/auth/sign-out', { method: 'POST' })

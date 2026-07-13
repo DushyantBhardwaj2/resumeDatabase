@@ -141,7 +141,7 @@ describe('countSectionItems', () => {
   it('counts all sections correctly', () => {
     const data = getEmptyProfile()
     data.contact.name = 'John'
-    data.education.push({ school: 'MIT', degree: 'BS', gpa: null, startYear: null, endYear: null })
+    data.education.push({ id: crypto.randomUUID(), school: 'MIT', degree: 'BS', gpa: null, startYear: null, endYear: null })
     data.experience.push({ id: '1', company: 'Acme', role: 'Eng', startDate: '', endDate: '', current: false, vaultBullets: [] })
     data.projects.push({ id: '1', title: 'P', url: '', techStack: [], vaultBullets: [] })
     data.skills.languages = ['TS', 'Python']

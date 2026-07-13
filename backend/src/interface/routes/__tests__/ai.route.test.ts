@@ -18,6 +18,11 @@ const PROFILE: Profile = {
   githubUsername: null,
 }
 
+function expectZodError(body: Record<string, unknown>) {
+  expect(body).toHaveProperty('error')
+  expect((body.error as Record<string, unknown>).name).toBe('ZodError')
+}
+
 function buildApp(overrides: Record<string, unknown> = {}) {
   const mockContainer: any = {
     aiUseCases: {
@@ -65,7 +70,7 @@ describe('POST /generate-bullets', () => {
     })
     expect(res.status).toBe(400)
     const body = await res.json()
-    expect(body).toHaveProperty('error', 'Missing required fields')
+    expectZodError(body)
   })
 
   it('returns 400 when rawInput is missing', async () => {
@@ -85,7 +90,7 @@ describe('POST /generate-bullets', () => {
     const res = await app.request('/generate-bullets', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ section: 'xyz', rawInput: 'some input' }),
+      body: JSON.stringify({ section: 'experience', rawInput: 'some input' }),
     })
     expect(res.status).toBe(500)
   })
@@ -105,7 +110,7 @@ describe('POST /expand-vault', () => {
     const res = await app.request('/expand-vault', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'experience', title: 'SWE', rawDescription: 'Built stuff' }),
+      body: JSON.stringify({ type: 'EXPERIENCE', title: 'SWE', rawDescription: 'Built stuff' }),
     })
     expect(res.status).toBe(200)
     const body = await res.json()
@@ -122,7 +127,7 @@ describe('POST /expand-vault', () => {
     const res = await app.request('/expand-vault', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type: 'experience', title: 'x', rawDescription: 'y' }),
+      body: JSON.stringify({ type: 'EXPERIENCE', title: 'x', rawDescription: 'y' }),
     })
     expect(res.status).toBe(500)
   })

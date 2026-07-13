@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import {
   vaultBulletSchema,
+  educationSchema,
   experienceEntrySchema,
   projectEntrySchema,
   parsedResumeSchema,
@@ -9,6 +10,27 @@ import {
   bulletsSchema,
   summarySchema,
 } from '../index'
+
+// ── educationSchema ───────────────────────────────────────────────────────────
+
+describe('educationSchema', () => {
+  it('generates a unique id when omitted', () => {
+    const result = educationSchema.parse({ school: 'NSUT', degree: 'B.Tech', gpa: null, startYear: null, endYear: null })
+    expect(result.id).toBeTruthy()
+    expect(typeof result.id).toBe('string')
+  })
+
+  it('preserves a provided id', () => {
+    const result = educationSchema.parse({ id: 'edu-123', school: 'NSUT', degree: 'B.Tech', gpa: null, startYear: null, endYear: null })
+    expect(result.id).toBe('edu-123')
+  })
+
+  it('generates unique ids across multiple entries', () => {
+    const a = educationSchema.parse({ school: 'A', degree: 'B', gpa: null, startYear: null, endYear: null })
+    const b = educationSchema.parse({ school: 'C', degree: 'D', gpa: null, startYear: null, endYear: null })
+    expect(a.id).not.toBe(b.id)
+  })
+})
 
 // ── vaultBulletSchema ─────────────────────────────────────────────────────────
 
@@ -249,6 +271,8 @@ describe('tailorOutputSchema', () => {
 describe('bulletSelectionSchema', () => {
   it('parses valid selection with rationale', () => {
     const input = {
+      selectedExperienceIds: ['exp-1'],
+      selectedProjectIds: ['proj-1'],
       selections: { 'exp-1': ['b1', 'b2'], 'proj-1': [] },
       rationale: 'These bullets match the JD well.',
     }
@@ -258,11 +282,11 @@ describe('bulletSelectionSchema', () => {
   })
 
   it('fails when rationale is missing', () => {
-    expect(() => bulletSelectionSchema.parse({ selections: {} })).toThrow()
+    expect(() => bulletSelectionSchema.parse({ selectedExperienceIds: [], selectedProjectIds: [], selections: {} })).toThrow()
   })
 
   it('accepts empty selections record', () => {
-    const result = bulletSelectionSchema.parse({ selections: {}, rationale: 'No matches.' })
+    const result = bulletSelectionSchema.parse({ selectedExperienceIds: [], selectedProjectIds: [], selections: {}, rationale: 'No matches.' })
     expect(result.selections).toEqual({})
   })
 })

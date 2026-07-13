@@ -72,6 +72,7 @@ export function ProfileGenerationCard({ data, onAskEdit }: ProfileGenerationCard
         }
         case 'EDUCATION': {
           const edu: Education = {
+            id: crypto.randomUUID(),
             school: data.school,
             degree: data.degree,
             gpa: data.gpa || null,

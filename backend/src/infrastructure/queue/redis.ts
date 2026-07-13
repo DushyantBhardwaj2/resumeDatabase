@@ -1,3 +1,4 @@
+import { logger } from '@/infrastructure/logger'
 import IORedis from 'ioredis'
 
 const rawUrl = process.env.REDIS_URL ?? 'redis://localhost:6379'
@@ -40,10 +41,10 @@ export const redisClient = new IORedis(rawUrl, {
 })
 
 redisClient.on('error', (err: Error) => {
-  console.error('[Redis] connection error:', err.message)
+  logger.error({ err: err.message, tag: 'Redis' }, 'connection error')
 })
 
 redisClient.on('connect', () => {
   const safeUrl = rawUrl.replace(/:\/\/[^@]+@/, '://***@')
-  console.log('[Redis] connected to', safeUrl)
+  logger.info({ url: safeUrl, tag: 'Redis' }, 'connected')
 })

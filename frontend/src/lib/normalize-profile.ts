@@ -79,6 +79,7 @@ function normalizeEducation(edu: unknown): Profile['education'] {
   if (!edu) return []
   if (Array.isArray(edu)) {
     return edu.map((e) => ({
+      id: typeof e.id === 'string' ? e.id : crypto.randomUUID(),
       school: typeof e.school === 'string' ? e.school : '',
       degree: typeof e.degree === 'string' ? e.degree : '',
       gpa: typeof e.gpa === 'string' ? e.gpa : null,
@@ -89,6 +90,7 @@ function normalizeEducation(edu: unknown): Profile['education'] {
   if (typeof edu === 'object' && edu !== null) {
     const e = edu as Record<string, unknown>
     return [{
+      id: typeof e.id === 'string' ? e.id : crypto.randomUUID(),
       school: typeof e.school === 'string' ? e.school : typeof e.university === 'string' ? e.university : '',
       degree: typeof e.degree === 'string' ? e.degree : '',
       gpa: typeof e.gpa === 'string' ? e.gpa : typeof e.grade === 'string' ? e.grade : null,

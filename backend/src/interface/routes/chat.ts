@@ -1,12 +1,19 @@
 import { Hono } from 'hono'
+import { z } from 'zod'
+import { zValidator } from '@hono/zod-validator'
+import { logger } from '@/infrastructure/logger'
 import { container as defaultContainer } from '../../di/container'
-import { ChatRepository } from '../../infrastructure/persistence/chat-repository'
 import type { Variables } from '../types'
 import type { Container } from '../../di/container'
 
-export function createChatRouter(container: Container) {
-  const chatRepo = new ChatRepository()
+const saveMessageSchema = z.object({
+  role: z.enum(['user', 'assistant', 'system']),
+  content: z.string().min(1),
+  widget: z.string().nullable().optional(),
+  mode: z.enum(['ONBOARDING', 'BUILDER', 'DASHBOARD', 'TAILOR', 'PROFILE']),
+})
 
+export function createChatRouter(container: Container) {
   return new Hono<{ Variables: Variables }>()
     .post('/interact', async (c) => {
       const session = c.get('session')
@@ -16,30 +23,29 @@ export function createChatRouter(container: Container) {
         const result = await container.chatUseCases.parseIntent(body)
         return c.json(result)
       } catch (err: any) {
-        console.error('Chat intent error:', err)
+        logger.error({ err }, 'Chat intent error')
         return c.json({ error: err.message }, 500)
       }
     })
-    .post('/save', async (c) => {
+    .post('/save', zValidator('json', saveMessageSchema), async (c) => {
       const session = c.get('session')
       if (!session) return c.json({ error: 'Unauthorized' }, 401)
-      const { role, content, widget, mode } = await c.req.json() as { role: string; content: string; widget?: string; mode: string }
-      if (!role || !content || !mode) return c.json({ error: 'Missing required fields: role, content, mode' }, 400)
-      const msg = await chatRepo.save(session.user.id, role, content, widget || null, mode)
+      const { role, content, widget, mode } = c.req.valid('json')
+      const msg = await container.chatRepository.save(session.user.id, role, content, widget || null, mode)
       return c.json(msg)
     })
     .get('/history', async (c) => {
       const session = c.get('session')
       if (!session) return c.json({ error: 'Unauthorized' }, 401)
       const mode = c.req.query('mode') || undefined
-      const messages = await chatRepo.findByUserId(session.user.id, mode)
+      const messages = await container.chatRepository.findByUserId(session.user.id, mode)
       return c.json(messages)
     })
     .delete('/clear', async (c) => {
       const session = c.get('session')
       if (!session) return c.json({ error: 'Unauthorized' }, 401)
       const mode = c.req.query('mode') || undefined
-      await chatRepo.clearByUserId(session.user.id, mode)
+      await container.chatRepository.clearByUserId(session.user.id, mode)
       return c.json({ success: true })
     })
 }

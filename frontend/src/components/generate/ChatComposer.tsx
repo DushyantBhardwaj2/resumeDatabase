@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, memo } from 'react'
 import { PaperPlaneRight } from '@phosphor-icons/react'
 
-export function ChatComposer({
+export const ChatComposer = memo(function ChatComposer({
   onSubmit,
   generating,
 }: {
@@ -60,4 +60,4 @@ export function ChatComposer({
       </div>
     </div>
   )
-}
+})
