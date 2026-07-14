@@ -12,6 +12,11 @@ import { resumeRouter } from './interface/routes/resume'
 import { aiRouter } from './interface/routes/ai'
 import { chatRouter } from './interface/routes/chat'
 import { historyRouter } from './interface/routes/history'
+import { memoryRouter } from './interface/routes/memory'
+import { draftsRouter } from './interface/routes/drafts'
+import { githubRouter } from './interface/routes/github'
+import { parseRouter } from './interface/routes/parse'
+import { kbRouter } from './interface/routes/kb'
 
 import { logger } from './infrastructure/logger'
 import { startPdfWorker, stopPdfWorker } from './infrastructure/queue/pdf-worker'
@@ -92,9 +97,9 @@ const generalRateLimiter = rateLimiter({
 
 // Apply rate limiters
 app.use('/api/protected/ai/*', aiRateLimiter)
-app.use('/api/protected/resume/tailor', aiRateLimiter)
-app.use('/api/protected/resume/parse', aiRateLimiter)
 app.use('/api/protected/chat/*', aiRateLimiter)
+app.use('/api/protected/parse', aiRateLimiter)
+app.use('/api/protected/github/analyze', aiRateLimiter)
 
 app.use('/api/protected/resume/compile-live', compileRateLimiter)
 
@@ -102,6 +107,11 @@ app.use('/api/protected/profile/*', generalRateLimiter)
 app.use('/api/protected/profile', generalRateLimiter)
 app.use('/api/protected/history/*', generalRateLimiter)
 app.use('/api/protected/history', generalRateLimiter)
+app.use('/api/protected/memory/*', generalRateLimiter)
+app.use('/api/protected/drafts/*', generalRateLimiter)
+app.use('/api/protected/drafts', generalRateLimiter)
+app.use('/api/protected/github/import', generalRateLimiter)
+app.use('/api/protected/kb/*', generalRateLimiter)
 
 // ── Mount Sub-Routers ─────────────────────────────────────────────────────────
 
@@ -111,6 +121,11 @@ const routes = app
   .route('/api/protected/ai', aiRouter)
   .route('/api/protected/chat', chatRouter)
   .route('/api/protected/history', historyRouter)
+  .route('/api/protected/memory', memoryRouter)
+  .route('/api/protected/drafts', draftsRouter)
+  .route('/api/protected/github', githubRouter)
+  .route('/api/protected/parse', parseRouter)
+  .route('/api/protected/kb', kbRouter)
 
 export type AppType = typeof routes
 
