@@ -30,6 +30,15 @@ export type TargetWidget =
 
 export type ChatIntent = "PROVIDE_DATA" | "NAVIGATE" | "GENERAL_CHAT" | "GENERATE_PROFILE_DATA"
 
+// Phase 6: Revised intent classification
+export type ChatIntentV2 =
+  | "CREATE_MEMORY"
+  | "UPDATE_MEMORY"
+  | "DELETE_MEMORY"
+  | "CREATE_RESUME"
+  | "SEARCH_MEMORY"
+  | "GENERAL_CHAT"
+
 export type ChatInteractRequest = {
   messages: ChatMessage[]
   currentState?: {
@@ -43,6 +52,43 @@ export type ChatInteractResponse = {
   intent: ChatIntent
   targetWidget: TargetWidget
   extractedData?: Record<string, unknown>
+}
+
+// Phase 6: Revised response with MemoryAction support
+import type { EntrySummary, MergeAction } from "../../../shared"
+import type { DomainMemoryAction } from "../../domain/entities"
+
+export type ChatInteractResponseV2 = {
+  reply: string
+  type: "text" | "proposal-cards" | "selection" | "search-results" | "merge-suggestion"
+  intent: ChatIntentV2
+  actions?: DomainMemoryAction[]
+  selections?: SelectionV2[]
+  searchResults?: EntrySummary[]
+  mergeSuggestion?: MergeAction
+}
+
+export interface SelectionV2 {
+  entryId: string
+  entryType: "experience" | "project" | "education"
+  confidence: number
+  rank: number
+  rationale: string
+  selectedBulletIds: string[]
+}
+
+export interface Selection {
+  entryId: string
+  entryType: "experience" | "project" | "education"
+  confidence: number
+  rank: number
+  rationale: string
+  selectedBulletIds: string[]
+}
+
+export interface ChatInteractRequestV2 {
+  message: string
+  activeDraftId?: string
 }
 
 // ── Vault Expansion Types ─────────────────────────────────────────────────────

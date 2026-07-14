@@ -6,6 +6,8 @@ datasource db {
   provider = "postgresql"
 }
 
+// ── Auth Models (BetterAuth managed) ───────────────────────────────────────────
+
 model User {
   id            String   @id @default(cuid())
   email         String   @unique
@@ -15,13 +17,25 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
+  // BetterAuth managed relations
+  sessions Session[]
+  accounts Account[]
+
+  // Legacy relations
   profile         Profile?
   githubRepos     GitHubRepo[]
   tailoredResumes TailoredResume[]
+  chatMessages    ChatMessage[]
 
-  sessions    Session[]
-  accounts    Account[]
-  chatMessages ChatMessage[]
+  // Phase 6: Career Memory relations
+  experiences  Experience[]
+  projects     Project[]
+  educations   Education[]
+  skills       Skill[]
+  certificates Certificate[]
+  achievements Achievement[]
+  resumeDrafts ResumeDraft[]
+  rawMemories  RawMemory[]
 }
 
 model Session {
@@ -37,20 +51,20 @@ model Session {
 }
 
 model Account {
-  id           String   @id @default(cuid())
-  userId       String
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  accountId    String
-  providerId   String
-  accessToken  String?
-  refreshToken String?
-  idToken      String?
-  scope        String?
-  password     String?
-  accessTokenExpiresAt DateTime?
+  id                    String    @id @default(cuid())
+  userId                String
+  user                  User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  accountId             String
+  providerId            String
+  accessToken           String?
+  refreshToken          String?
+  idToken               String?
+  scope                 String?
+  password              String?
+  accessTokenExpiresAt  DateTime?
   refreshTokenExpiresAt DateTime?
-  createdAt    DateTime @default(now())
-  updatedAt    DateTime @updatedAt
+  createdAt             DateTime  @default(now())
+  updatedAt             DateTime  @updatedAt
 }
 
 model Verification {
@@ -62,23 +76,25 @@ model Verification {
   updatedAt  DateTime @updatedAt
 }
 
+// ── Legacy Models (KEEP temporarily — removed in Phase 3) ──────────────────────
+
 model Profile {
-  id            String   @id @default(cuid())
-  userId        String   @unique
-  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  githubUsername String?
-  rawResumeText String?
-  contact       Json?
-  education     Json?
-  experience    Json?
-  projects      Json?
-  skills        Json?
-  leadership    Json?
-  certificates Json?
-  achievements  Json?
+  id               String   @id @default(cuid())
+  userId           String   @unique
+  user             User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  githubUsername   String?
+  rawResumeText    String?
+  contact          Json?
+  education        Json?
+  experience       Json?
+  projects         Json?
+  skills           Json?
+  leadership       Json?
+  certificates     Json?
+  achievements     Json?
   extracurriculars Json?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
 }
 
 model GitHubRepo {
@@ -94,6 +110,18 @@ model GitHubRepo {
   @@unique([userId, repoUrl])
 }
 
+model TailoredResume {
+  id             String   @id @default(cuid())
+  userId         String
+  user           User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  companyName    String
+  jobTitle       String
+  jobDescription String
+  tailoredData   Json
+  styleConfig    Json?
+  createdAt      DateTime @default(now())
+}
+
 model ChatMessage {
   id        String   @id @default(cuid())
   userId    String
@@ -103,16 +131,162 @@ model ChatMessage {
   widget    String?
   mode      String
   createdAt DateTime @default(now())
+
+  @@index([userId, createdAt])
 }
 
-model TailoredResume {
-  id                String   @id @default(cuid())
-  userId            String
-  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  companyName       String
-  jobTitle          String
-  jobDescription    String
-  tailoredData      Json
-  styleConfig       Json?
-  createdAt         DateTime @default(now())
+// ── Phase 6: Career Memory Models ──────────────────────────────────────────────
+
+model Experience {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  company   String
+  role      String
+  startDate String
+  endDate   String?
+  current   Boolean  @default(false)
+  location  String?
+  tags      String[]
+  source    Json
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Project {
+  id           String   @id @default(cuid())
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title        String
+  url          String?
+  githubUrl    String?
+  readme       String?
+  languages    String[]
+  topics       String[]
+  commitCount  Int?
+  dependencies String[]
+  techStack    String[]
+  tags         String[]
+  source       Json
+  pinned       Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Education {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  school    String
+  degree    String
+  field     String?
+  gpa       String?
+  courses   String[]
+  startYear Int
+  endYear   Int?
+  tags      String[]
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Skill {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name        String
+  category    String // "LANGUAGE" | "FRAMEWORK" | "TOOL" | "PLATFORM" | "CONCEPT"
+  proficiency String? // "BEGINNER" | "INTERMEDIATE" | "EXPERT"
+  tags        String[]
+  pinned      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([userId, name])
+  @@index([userId])
+}
+
+model Certificate {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  issuer    String
+  url       String?
+  date      String?
+  tags      String[]
+  pinned    Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Achievement {
+  id          String   @id @default(cuid())
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title       String
+  description String
+  date        String?
+  url         String?
+  type        String // "AWARD" | "HACKATHON" | "PUBLICATION" | "VOLUNTEER" | "LEADERSHIP"
+  tags        String[]
+  pinned      Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([userId])
+}
+
+model Bullet {
+  id            String   @id @default(cuid())
+  text          String
+  order         Int
+  isAIGenerated Boolean  @default(false)
+  parentType    String // "experience" | "project"
+  parentId      String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([parentType, parentId])
+}
+
+model ResumeDraft {
+  id             String    @id @default(cuid())
+  userId         String
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title          String
+  jobDescription String
+  jdAnalysis     Json?
+  templateId     String
+  resumeSpec     Json
+  selections     Json // ResumeSelection[]
+  kbVersion      String
+  compileStatus  String    @default("draft") // "draft" | "queued" | "compiling" | "ready" | "error"
+  pdfCacheKey    String?
+  lastCompiledAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  @@index([userId])
+}
+
+model RawMemory {
+  id        String   @id @default(cuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  source    String // "GITHUB_README" | "PDF_UPLOAD" | "CONVERSATION" | "LINKEDIN"
+  content   String
+  metadata  Json
+  createdAt DateTime @default(now())
+
+  @@index([userId])
 }

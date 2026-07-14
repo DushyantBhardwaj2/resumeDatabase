@@ -30,22 +30,20 @@ export function createChatRouter(container: Container) {
     .post('/save', zValidator('json', saveMessageSchema), async (c) => {
       const session = c.get('session')
       if (!session) return c.json({ error: 'Unauthorized' }, 401)
-      const { role, content, widget, mode } = c.req.valid('json')
-      const msg = await container.chatRepository.save(session.user.id, role, content, widget || null, mode)
+      const { role, content } = c.req.valid('json')
+      const msg = await container.chatRepository.save({ userId: session.user.id, role, content })
       return c.json(msg)
     })
     .get('/history', async (c) => {
       const session = c.get('session')
       if (!session) return c.json({ error: 'Unauthorized' }, 401)
-      const mode = c.req.query('mode') || undefined
-      const messages = await container.chatRepository.findByUserId(session.user.id, mode)
+      const messages = await container.chatRepository.findByUserId(session.user.id)
       return c.json(messages)
     })
     .delete('/clear', async (c) => {
       const session = c.get('session')
       if (!session) return c.json({ error: 'Unauthorized' }, 401)
-      const mode = c.req.query('mode') || undefined
-      await container.chatRepository.clearByUserId(session.user.id, mode)
+      await container.chatRepository.clearByUserId(session.user.id)
       return c.json({ success: true })
     })
 }

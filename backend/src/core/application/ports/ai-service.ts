@@ -3,5 +3,15 @@ export interface ISchema<T> {
 }
 
 export interface IAIService {
-  generateStructuredData<T>(systemPrompt: string, userContent: string, schema: ISchema<T>): Promise<T>
+  generate(prompt: string, options?: {
+    temperature?: number
+    maxTokens?: number
+  }): Promise<string>
+
+  generateStructuredData<T>(
+    systemPrompt: string,
+    userContent: string,
+    schema: ISchema<T>,
+    options?: { maxRetries?: number }
+  ): Promise<T>
 }

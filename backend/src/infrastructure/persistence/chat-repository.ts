@@ -1,41 +1,24 @@
 import { prisma } from "../../config/prisma"
+import type { IChatRepository } from "../../core/domain/repositories"
 
-export interface ChatMessageRecord {
-  id: string
-  userId: string
-  role: string
-  content: string
-  widget: string | null
-  mode: string
-  createdAt: Date
-}
-
-export class ChatRepository {
-  async save(userId: string, role: string, content: string, widget: string | null, mode: string): Promise<ChatMessageRecord> {
+export class ChatRepository implements IChatRepository {
+  async save(message: { userId: string; role: string; content: string }): Promise<{ id: string; userId: string; role: string; content: string; createdAt: Date }> {
     const row = await prisma.chatMessage.create({
-      data: { userId, role, content, widget, mode },
+      data: { userId: message.userId, role: message.role, content: message.content, mode: "GLOBAL" },
     })
-    return row as ChatMessageRecord
+    return row
   }
 
-  async findByUserId(userId: string, mode?: string, limit = 100): Promise<ChatMessageRecord[]> {
-    const where: Record<string, unknown> = { userId }
-    if (mode) where.mode = mode
+  async findByUserId(userId: string, limit = 100): Promise<Array<{ id: string; userId: string; role: string; content: string; createdAt: Date }>> {
     const rows = await prisma.chatMessage.findMany({
-      where: where as any,
-      orderBy: { createdAt: 'desc' },
+      where: { userId },
+      orderBy: { createdAt: "desc" },
       take: limit,
     })
-    return rows as ChatMessageRecord[]
+    return rows
   }
 
-  async deleteById(id: string, userId: string): Promise<void> {
-    await prisma.chatMessage.deleteMany({ where: { id, userId } })
-  }
-
-  async clearByUserId(userId: string, mode?: string): Promise<void> {
-    const where: Record<string, unknown> = { userId }
-    if (mode) where.mode = mode
-    await prisma.chatMessage.deleteMany({ where: where as any })
+  async clearByUserId(userId: string): Promise<void> {
+    await prisma.chatMessage.deleteMany({ where: { userId } })
   }
 }

@@ -30,6 +30,8 @@ export const vaultBulletSchema = z.object({
   category: BulletCategoryEnum.optional(),
   keywords: z.array(z.string()).default([]),
   isAIGenerated: z.boolean().default(false),
+  parentType: z.enum(["experience", "project"]).optional(),
+  parentId: z.string().optional(),
 });
 
 export type VaultBullet = z.infer<typeof vaultBulletSchema>;
@@ -290,3 +292,89 @@ export interface AiGeneratedExperience {
 }
 
 export type SectionType = "experience" | "projects" | "skills" | "summary" | "project" | "experience_entry"
+
+// ── Phase 6: New Domain Types (re-exported from core/domain for compatibility) ──
+
+export type MemoryType = "experience" | "project" | "education" | "skill" | "certificate" | "achievement"
+
+export interface JDAnalysis {
+  role: string
+  company?: string
+  requiredSkills: string[]
+  preferredSkills: string[]
+  experienceLevel: string
+  responsibilities: string[]
+  keywords: string[]
+}
+
+export interface ResumeSpec {
+  sections: {
+    experience: { min: number; max: number; maxBullets: number }
+    projects: { max: number; maxBullets: number; githubRequired?: boolean }
+    education: { max: number; required: boolean }
+    skills: { priority: string[]; maxPerGroup: number; max: number }
+    certificates: { max: number }
+  }
+  sectionOrder: string[]
+  pageLimit: 1 | 2
+}
+
+export interface ResumeSelection {
+  entryType: "experience" | "project" | "education"
+  entryId: string
+  confidence: number
+  rank: number
+  rationale?: string
+  selectedBulletIds: string[]
+}
+
+export interface ResumeDraft {
+  id: string
+  userId: string
+  title: string
+  jobDescription: string
+  jdAnalysis?: JDAnalysis
+  templateId: string
+  resumeSpec: ResumeSpec
+  selections: ResumeSelection[]
+  kbVersion: string
+  compileStatus: "draft" | "queued" | "compiling" | "ready" | "error"
+  pdfCacheKey?: string
+  lastCompiledAt?: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface EntrySummary {
+  id: string
+  type: MemoryType
+  title: string
+  keywords: string[]
+  bulletSummary: string
+  score: number
+  recencyDays: number
+}
+
+export interface MergeAction {
+  sourceContent: { title: string; description: string; techStack: string[] }
+  targetEntry: { id: string; title: string; type: MemoryType } | null
+  matchScore: number
+  shouldSuggest: boolean
+}
+
+export interface ConfidenceAttribution {
+  field: string
+  value: string
+  confidence: number
+  source: string
+}
+
+export interface ResumeFitScore {
+  overall: number
+  matched: { skill: string; source: string }[]
+  missing: { skill: string }[]
+  breakdown: {
+    required: { matched: number; total: number; percentage: number }
+    preferred: { matched: number; total: number; percentage: number }
+  }
+}

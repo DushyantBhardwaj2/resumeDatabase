@@ -2,6 +2,46 @@ import { logger } from '../logger'
 import type { IAIService, ISchema } from "../../core/application/ports/ai-service"
 
 export class OpenCodeZenAIService implements IAIService {
+  async generate(prompt: string, options?: { temperature?: number; maxTokens?: number }): Promise<string> {
+    const apiKey = process.env.OPENCODE_API_KEY
+    if (!apiKey) throw new Error("Missing OPENCODE_API_KEY environment variable. AI features are unavailable.")
+
+    const controller = new AbortController()
+    const timeout = setTimeout(() => controller.abort(), 90_000)
+
+    try {
+      const response = await fetch("https://opencode.ai/zen/v1/chat/completions", {
+        signal: controller.signal,
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Authorization": `Bearer ${apiKey}` },
+        body: JSON.stringify({
+          model: "deepseek-v4-flash-free",
+          messages: [{ role: "user", content: prompt }],
+          temperature: options?.temperature ?? 0,
+          max_tokens: options?.maxTokens,
+        }),
+      })
+
+      if (!response.ok) {
+        const errorText = await response.text()
+        throw new Error(`AI API error: ${response.status} - ${errorText}`)
+      }
+
+      const data = await response.json()
+      if (!data.choices?.[0]?.message?.content) {
+        throw new Error("Invalid response format from AI service.")
+      }
+
+      return data.choices[0].message.content
+    } catch (err: unknown) {
+      const isAbort = err instanceof DOMException ? err.name === 'AbortError' : (err as Error)?.name === 'AbortError'
+      if (isAbort) throw new Error("AI request timed out after 90 seconds.")
+      throw err
+    } finally {
+      clearTimeout(timeout)
+    }
+  }
+
   async generateStructuredData<T>(systemPrompt: string, userContent: string, schema: ISchema<T>): Promise<T> {
     const apiKey = process.env.OPENCODE_API_KEY
     if (!apiKey) {
