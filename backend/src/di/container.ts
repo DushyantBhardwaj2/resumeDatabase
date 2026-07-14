@@ -32,6 +32,17 @@ import { PDFParser } from "../infrastructure/pdf"
 import { LatexTemplateFiller } from "../infrastructure/latex/latex-template"
 import { GENERATE_BULLETS, CHAT_INTENT_PARSER, PARSE_RESUME, MEMORY_EXTRACT } from "../infrastructure/prompts"
 import { SECTION_SCHEMAS } from "../shared"
+import { ExperienceRepository } from "../infrastructure/persistence/experience-repository"
+import { ProjectRepository } from "../infrastructure/persistence/project-repository"
+import { EducationRepository } from "../infrastructure/persistence/education-repository"
+import { SkillRepository } from "../infrastructure/persistence/skill-repository"
+import { CertificateRepository } from "../infrastructure/persistence/certificate-repository"
+import { AchievementRepository } from "../infrastructure/persistence/achievement-repository"
+import { BulletRepository } from "../infrastructure/persistence/bullet-repository"
+import { DraftRepository } from "../infrastructure/persistence/draft-repository"
+import { MemoryRepository } from "../infrastructure/persistence/memory-repository"
+import { KnowledgeBaseService } from "../infrastructure/knowledge-base"
+import { GitHubAnalyzer } from "../infrastructure/github/github-analyzer"
 
 class Container {
   private _profileRepo?: IProfileRepository
@@ -47,6 +58,14 @@ class Container {
   private _kb?: IKnowledgeBaseService
   private _ghAnalyzer?: IGitHubAnalyzer
   private _draftRepo?: IResumeDraftRepository
+  private _experienceRepo?: ExperienceRepository
+  private _projectRepo?: ProjectRepository
+  private _educationRepo?: EducationRepository
+  private _skillRepo?: SkillRepository
+  private _certificateRepo?: CertificateRepository
+  private _achievementRepo?: AchievementRepository
+  private _bulletRepo?: BulletRepository
+  private _memoryRepo?: MemoryRepository
 
   private _profileUseCases?: ProfileUseCases
   private _resumeUseCases?: ResumeUseCases
@@ -216,20 +235,22 @@ class Container {
 
   private get kb(): IKnowledgeBaseService {
     if (!this._kb) {
-      throw new Error("KnowledgeBaseService not implemented yet")
+      this._kb = new KnowledgeBaseService()
     }
     return this._kb
   }
 
   private get ghAnalyzer(): IGitHubAnalyzer {
     if (!this._ghAnalyzer) {
-      throw new Error("GitHubAnalyzer not implemented yet")
+      this._ghAnalyzer = new GitHubAnalyzer()
     }
     return this._ghAnalyzer
   }
 
   private get draftRepo(): IResumeDraftRepository {
-    if (!this._draftRepo) throw new Error("IResumeDraftRepository not implemented yet")
+    if (!this._draftRepo) {
+      this._draftRepo = new DraftRepository()
+    }
     return this._draftRepo
   }
 
@@ -265,38 +286,44 @@ class Container {
     return this._latexTemplate
   }
 
-  // ── New Repository Getters (stubs — replace with real implementations) ────
-
-  private get experienceRepo(): any {
-    throw new Error("IExperienceRepository not implemented yet")
+  private get experienceRepo(): ExperienceRepository {
+    if (!this._experienceRepo) this._experienceRepo = new ExperienceRepository()
+    return this._experienceRepo
   }
 
-  private get projectRepo(): any {
-    throw new Error("IProjectRepository not implemented yet")
+  private get projectRepo(): ProjectRepository {
+    if (!this._projectRepo) this._projectRepo = new ProjectRepository()
+    return this._projectRepo
   }
 
-  private get educationRepo(): any {
-    throw new Error("IEducationRepository not implemented yet")
+  private get educationRepo(): EducationRepository {
+    if (!this._educationRepo) this._educationRepo = new EducationRepository()
+    return this._educationRepo
   }
 
-  private get skillRepo(): any {
-    throw new Error("ISkillRepository not implemented yet")
+  private get skillRepo(): SkillRepository {
+    if (!this._skillRepo) this._skillRepo = new SkillRepository()
+    return this._skillRepo
   }
 
-  private get certificateRepo(): any {
-    throw new Error("ICertificateRepository not implemented yet")
+  private get certificateRepo(): CertificateRepository {
+    if (!this._certificateRepo) this._certificateRepo = new CertificateRepository()
+    return this._certificateRepo
   }
 
-  private get achievementRepo(): any {
-    throw new Error("IAchievementRepository not implemented yet")
+  private get achievementRepo(): AchievementRepository {
+    if (!this._achievementRepo) this._achievementRepo = new AchievementRepository()
+    return this._achievementRepo
   }
 
-  private get bulletRepo(): any {
-    throw new Error("IBulletRepository not implemented yet")
+  private get bulletRepo(): BulletRepository {
+    if (!this._bulletRepo) this._bulletRepo = new BulletRepository()
+    return this._bulletRepo
   }
 
-  private get memoryRepo(): any {
-    throw new Error("IMemoryRepository not implemented yet")
+  private get memoryRepo(): MemoryRepository {
+    if (!this._memoryRepo) this._memoryRepo = new MemoryRepository()
+    return this._memoryRepo
   }
 }
 

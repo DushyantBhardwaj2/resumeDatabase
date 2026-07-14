@@ -31,6 +31,27 @@ export function createAiRouter(container: Container) {
         return c.json({ error: err.message }, 500)
       }
     })
+    .post('/select-bullets', zValidator('json', z.object({
+      jobDescription: z.string().min(1),
+      profile: z.any(),
+      templateId: z.string().optional().default('ats-clean'),
+    })), async (c) => {
+      const session = c.get('session')
+      if (!session) return c.json({ error: 'Unauthorized' }, 401)
+      const { jobDescription, profile, templateId } = c.req.valid('json')
+      try {
+        const selectionPrompt = container.resumeUseCases.bulletSelectorPrompt(templateId)
+        const result = await container.aiService.generateStructuredData(
+          selectionPrompt,
+          JSON.stringify({ jobDescription, profile }),
+          container.resumeUseCases.bulletSelectorSchema
+        )
+        return c.json(result)
+      } catch (err: any) {
+        logger.error({ err }, 'Select bullets error')
+        return c.json({ error: err.message }, 500)
+      }
+    })
 }
 
 export const aiRouter = createAiRouter(defaultContainer)

@@ -108,8 +108,8 @@ export class ResumeUseCases {
     private latexTemplate: ILatexTemplateFiller,
     private parsePrompt: string,
     private parseSchema: ISchema<unknown>,
-    private bulletSelectorPrompt: (templateId: string) => string,
-    private bulletSelectorSchema: ISchema<unknown>
+    public bulletSelectorPrompt: (templateId: string) => string,
+    public bulletSelectorSchema: ISchema<unknown>
   ) {}
 
   async parseResume(buffer: Buffer): Promise<{ rawText: string; parsed: Profile }> {

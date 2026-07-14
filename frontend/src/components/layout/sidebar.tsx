@@ -97,8 +97,18 @@ export function Sidebar({ user, collapsed = false, onToggleCollapse }: SidebarPr
       try {
         const res = await api.api.protected.history.$get()
         if (res.ok) {
-          const data: HistoryItem[] = await res.json()
-          setHistoryItems(data.slice(0, 5))
+          const data: any[] = await res.json()
+          const mapped = data.map((d) => {
+            const parts = d.title.split(' — ')
+            const companyName = parts[0] || 'Unknown'
+            const jobTitle = parts[1] || 'Resume'
+            return {
+              ...d,
+              companyName,
+              jobTitle,
+            }
+          })
+          setHistoryItems(mapped.slice(0, 5))
         }
       } catch { /* ignore */ }
       setHistoryLoading(false)

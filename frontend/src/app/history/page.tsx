@@ -190,7 +190,17 @@ export default function HistoryPage() {
         const res = await api.api.protected.history.$get();
         if (!res.ok) throw new Error();
         const data = await res.json();
-        setItems(data);
+        const mapped = data.map((d: any) => {
+          const parts = d.title.split(' — ');
+          const companyName = parts[0] || 'Unknown';
+          const jobTitle = parts[1] || 'Resume';
+          return {
+            ...d,
+            companyName,
+            jobTitle,
+          };
+        });
+        setItems(mapped);
       } catch {
         toast.error('Failed to load history');
       } finally {

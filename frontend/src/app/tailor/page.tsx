@@ -107,31 +107,26 @@ export default function GeneratePage({ searchParams }: { searchParams: Promise<R
       try {
         const res = await api.api.protected.history[':id'].$get({ param: { id: id as string } })
         if (!res.ok) return
-        const data: HistoryItemResponse = await res.json()
-        const td = data.tailoredData
+        const data: any = await res.json()
+        const parts = (data.title || '').split(' — ')
+        const company = parts[0] || ''
+        const jobTitle = parts[1] || ''
 
-        setJobTitle(td.jobTitle || '')
-        setCompany(td.company || '')
+        setJobTitle(jobTitle)
+        setCompany(company)
         setJobDescription(data.jobDescription || '')
 
-        const original = td.original
-        setProfile(normalizeProfile(original))
+        const profRes = await api.api.protected.profile.$get()
+        if (!profRes.ok) return
+        const profileData = await profRes.json()
+        setProfile(normalizeProfile(profileData))
 
-        const selections: Record<string, string[]> = {}
-        const selectedExperienceIds: string[] = []
-        const selectedProjectIds: string[] = []
-        
-        for (const exp of (td.tailored?.experience || [])) {
-          const eid = (exp.id as string) || crypto.randomUUID()
-          selections[eid] = ((exp.vaultBullets || []) as Array<{ id: string }>).map((b) => b.id)
-          selectedExperienceIds.push(eid)
-        }
-        for (const proj of (td.tailored?.projects || [])) {
-          const pid = (proj.id as string) || crypto.randomUUID()
-          selections[pid] = ((proj.vaultBullets || []) as Array<{ id: string }>).map((b) => b.id)
-          selectedProjectIds.push(pid)
-        }
-        setSelections(selections)
+        const selectionsObj = data.selections || {}
+        const bulletSelections = selectionsObj.selectedBulletIds || {}
+        const selectedExperienceIds = selectionsObj.selectedExperienceIds || []
+        const selectedProjectIds = selectionsObj.selectedProjectIds || []
+
+        setSelections(bulletSelections)
         useBuilderStore.setState({ selectedExperienceIds, selectedProjectIds })
         setCurrentStage('reviewing')
       } catch {

@@ -19,7 +19,7 @@ export function ResumeUploadWidget() {
     }
     setParsing(true)
     try {
-      const res = await api.api.protected.resume.parse.$post({ form: { file } })
+      const res = await api.api.protected.parse.$post({ form: { file } })
       const result = (await res.json()) as Record<string, unknown>
       if (!res.ok) throw new Error((result.error as string) || 'Failed to parse resume')
       useChatStore.setState({ extractedData: result.parsed as Record<string, unknown> })

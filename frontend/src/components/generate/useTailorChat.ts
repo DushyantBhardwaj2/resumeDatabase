@@ -78,42 +78,85 @@ export function useTailorChat() {
     setJobDescription(trimmed)
 
     try {
-      const res = await api.api.protected.resume.tailor.$post({
+      const profRes = await api.api.protected.profile.$get()
+      if (!profRes.ok) throw new Error('Failed to fetch career profile')
+      const profileData: any = await profRes.json()
+      if (!profileData) throw new Error('Career profile not found')
+
+      const compactProfile = {
+        experience: (profileData.experience || []).map((e: any) => ({
+          id: e.id,
+          role: e.role,
+          company: e.company,
+          vaultBullets: (e.vaultBullets || []).map((b: any) => ({ id: b.id, text: b.text, keywords: b.keywords })),
+        })),
+        projects: (profileData.projects || []).map((p: any) => ({
+          id: p.id,
+          title: p.title,
+          vaultBullets: (p.vaultBullets || []).map((b: any) => ({ id: b.id, text: b.text, keywords: b.keywords })),
+        })),
+        skills: profileData.skills || { languages: [], frameworks: [], tools: [] },
+      }
+
+      const selRes = await api.api.protected.ai['select-bullets'].$post({
         json: {
-          jobTitle: title,
-          company: comp,
           jobDescription: trimmed,
+          profile: compactProfile,
           templateId: templateValue,
         }
       })
-      if (!res.ok) {
-        const err = (await res.json().catch(() => ({}))) as Record<string, string>
+      if (!selRes.ok) {
+        const err = (await selRes.json().catch(() => ({}))) as Record<string, string>
         throw new Error(err.error || 'Generation failed')
       }
-      const data: TailorResponse = (await res.json()) as unknown as TailorResponse
+      const selectionResult = await selRes.json() as any
+
+      const data: any = {
+        jobTitle: title,
+        company: comp,
+        original: profileData,
+        tailored: {
+          summary: selectionResult.rationale || null,
+          experience: (profileData.experience || []).map((exp: any) => {
+            const selectedIds = selectionResult.selections[exp.id] || []
+            return {
+              ...exp,
+              vaultBullets: (exp.vaultBullets || []).filter((b: any) => selectedIds.includes(b.id)),
+            }
+          }),
+          projects: (profileData.projects || []).map((proj: any) => {
+            const selectedIds = selectionResult.selections[proj.id] || []
+            return {
+              ...proj,
+              vaultBullets: (proj.vaultBullets || []).filter((b: any) => selectedIds.includes(b.id)),
+            }
+          }),
+          skills: selectionResult.skills || profileData.skills,
+        }
+      }
 
       // Map tailored items for quick lookup
-      const tailoredExpMap = new Map(data.tailored.experience.map((e) => [e.company + '|' + e.role, e]))
-      const tailoredProjMap = new Map(data.tailored.projects.map((p) => [p.title, p]))
+      const tailoredExpMap = new Map<string, any>(data.tailored.experience.map((e: any) => [e.company + '|' + e.role, e]))
+      const tailoredProjMap = new Map<string, any>(data.tailored.projects.map((p: any) => [p.title, p]))
 
       const selectedBulletIds: Record<string, string[]> = {}
       const selectedExperienceIds: string[] = []
       const selectedProjectIds: string[] = []
 
       // Keep ALL original experiences, but inject tailored bullets at the top if AI selected them
-      const mergedExperience = data.original.experience.map((orig) => {
+      const mergedExperience = data.original.experience.map((orig: any) => {
         const id = orig.id || crypto.randomUUID()
         const tailored = tailoredExpMap.get(orig.company + '|' + orig.role)
         
-        let finalBullets = orig.vaultBullets.map(b => ({ ...b, isAIGenerated: false }))
+        let finalBullets = (orig.vaultBullets || []).map((b: any) => ({ ...b, isAIGenerated: false }))
         
         if (tailored) {
           selectedExperienceIds.push(id)
-          const newTailoredBullets = tailored.vaultBullets.map(b => {
+          const newTailoredBullets = (tailored.vaultBullets || []).map((b: any) => {
             const bId = b.id || crypto.randomUUID()
             return { id: bId, text: b.text, keywords: b.keywords || [], isAIGenerated: true }
           })
-          selectedBulletIds[id] = newTailoredBullets.map(b => b.id)
+          selectedBulletIds[id] = newTailoredBullets.map((b: any) => b.id)
           finalBullets = [...newTailoredBullets, ...finalBullets]
         } else {
           selectedBulletIds[id] = []
@@ -131,19 +174,19 @@ export function useTailorChat() {
       })
 
       // Keep ALL original projects
-      const mergedProjects = data.original.projects.map((orig) => {
+      const mergedProjects = data.original.projects.map((orig: any) => {
         const id = orig.id || crypto.randomUUID()
         const tailored = tailoredProjMap.get(orig.title)
         
-        let finalBullets = orig.vaultBullets.map(b => ({ ...b, isAIGenerated: false }))
+        let finalBullets = (orig.vaultBullets || []).map((b: any) => ({ ...b, isAIGenerated: false }))
         
         if (tailored) {
           selectedProjectIds.push(id)
-          const newTailoredBullets = tailored.vaultBullets.map(b => {
+          const newTailoredBullets = (tailored.vaultBullets || []).map((b: any) => {
             const bId = b.id || crypto.randomUUID()
             return { id: bId, text: b.text, keywords: b.keywords || [], isAIGenerated: true }
           })
-          selectedBulletIds[id] = newTailoredBullets.map(b => b.id)
+          selectedBulletIds[id] = newTailoredBullets.map((b: any) => b.id)
           finalBullets = [...newTailoredBullets, ...finalBullets]
         } else {
           selectedBulletIds[id] = []

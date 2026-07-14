@@ -40,8 +40,18 @@ export function GenerateChatWorkspace() {
       try {
         const res = await api.api.protected.history.$get()
         if (res.ok) {
-          const data = await res.json()
-          setHistoryItems(data)
+          const data: any[] = await res.json()
+          const mapped = data.map((d) => {
+            const parts = d.title.split(' — ')
+            const companyName = parts[0] || 'Unknown'
+            const jobTitle = parts[1] || 'Resume'
+            return {
+              ...d,
+              companyName,
+              jobTitle,
+            }
+          })
+          setHistoryItems(mapped)
         }
       } catch { /* ignore */ }
     })()
@@ -241,14 +251,17 @@ onNext={useCallback(() => addChatEntry({ role: 'assistant', type: 'project-selec
                       const selectedItem = historyItems.find(item => item.id === val)
                       if (selectedItem) {
                         try {
-                          const detailRes = await api.api.protected.history[':id'].$get({
+                           const detailRes = await api.api.protected.history[':id'].$get({
                             param: { id: selectedItem.id }
                           })
                           if (detailRes.ok) {
-                            const detailData = await detailRes.json() as { jobDescription?: string; jobTitle?: string; companyName?: string }
+                            const detailData = await detailRes.json() as any
+                            const parts = (detailData.title || '').split(' — ')
+                            const companyName = parts[0] || ''
+                            const jobTitle = parts[1] || ''
                             const jd = detailData.jobDescription || ''
-                            setJobTitle(detailData.jobTitle || '')
-                            setCompany(detailData.companyName || '')
+                            setJobTitle(jobTitle)
+                            setCompany(companyName)
                             useBuilderStore.setState({ jobDescription: jd })
                             window.dispatchEvent(new CustomEvent('autofill-composer', { detail: jd }))
                             toast.success('Loaded from history')

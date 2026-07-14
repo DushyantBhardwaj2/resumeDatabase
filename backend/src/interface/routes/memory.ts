@@ -62,6 +62,18 @@ export function createMemoryRouter(container: Container) {
       const results = await container.memoryUseCases.search(session.user.id)
       return c.json({ entries: results })
     })
+    .post('/apply', zValidator('json', z.object({ actions: z.array(z.any()) })), async (c) => {
+      const session = c.get('session')
+      if (!session) return c.json({ error: 'Unauthorized' }, 401)
+      const { actions } = c.req.valid('json')
+      try {
+        const results = await container.memoryUseCases.applyActions(session.user.id, actions)
+        return c.json({ success: true, results })
+      } catch (err: any) {
+        logger.error({ err, tag: 'memory-apply' }, 'Apply actions error')
+        return c.json({ error: err.message }, 500)
+      }
+    })
 }
 
 export const memoryRouter = createMemoryRouter(defaultContainer)

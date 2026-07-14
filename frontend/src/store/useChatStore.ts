@@ -1,9 +1,15 @@
 import { create } from 'zustand'
 import { api } from '@/config/api-client'
+
 export type ChatMessage = {
   id: string | number
   role: 'user' | 'assistant' | 'system'
   content: string
+  type?: 'text' | 'proposal-cards' | 'selection' | 'search-results' | 'merge-suggestion'
+  actions?: any[]
+  selections?: any[]
+  searchResults?: any[]
+  mergeSuggestion?: any
   widget?: string | null
   meta?: Record<string, unknown>
 }
@@ -112,12 +118,7 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     try {
       const res = await api.api.protected.chat.interact.$post({
         json: {
-          messages: [...modeMessages, userMsg].map((m) => ({
-            role: m.role,
-            content: m.content,
-          })),
-          currentState: { phase: currentPhase },
-          mode,
+          message: text,
         },
       })
 
@@ -129,10 +130,12 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         id: crypto.randomUUID(),
         role: 'assistant',
         content: data.reply,
-        widget: data.targetWidget,
-        meta: data.extractedData && typeof data.extractedData === 'object' && Object.keys(data.extractedData).length > 0
-          ? { generatedData: data.extractedData }
-          : undefined,
+        type: data.type,
+        actions: data.actions,
+        selections: data.selections,
+        searchResults: data.searchResults,
+        mergeSuggestion: data.mergeSuggestion,
+        widget: data.type !== 'text' ? data.type : null,
       }
 
       set((state) => ({
@@ -141,21 +144,18 @@ export const useChatStore = create<ChatStore>((set, get) => ({
           [mode]: [...(state.messagesByMode[mode] || []), assistantMsg],
         },
         isTyping: false,
-        extractedData: data.extractedData
-          ? { ...state.extractedData, ...data.extractedData }
-          : state.extractedData,
-        currentPhase: data.intent === 'NAVIGATE' && data.targetWidget
-          ? mapWidgetToPhase(data.targetWidget)
+        currentPhase: data.intent === 'CREATE_RESUME' && data.type === 'selection'
+          ? 'COMPLETE'
           : state.currentPhase,
       }))
 
       // Persist both messages to chat history
       api.api.protected.chat.save.$post({
-        json: { role: 'user', content: text, mode },
+        json: { role: 'user', content: text },
       }).catch(() => {})
       if (data.reply) {
         api.api.protected.chat.save.$post({
-          json: { role: 'assistant', content: data.reply, widget: data.targetWidget, mode },
+          json: { role: 'assistant', content: data.reply },
         }).catch(() => {})
       }
     } catch {
@@ -163,9 +163,9 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         messagesByMode: {
           ...state.messagesByMode,
           [mode]: [...(state.messagesByMode[mode] || []), {
-          id: crypto.randomUUID(),
-          role: 'assistant',
-          content: "Sorry, I couldn't process that. Please try again.",
+            id: crypto.randomUUID(),
+            role: 'assistant',
+            content: "Sorry, I couldn't process that. Please try again.",
             widget: null,
           }],
         },
@@ -174,16 +174,3 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     }
   },
 }))
-
-function mapWidgetToPhase(widget: string): OnboardingPhase {
-  const map: Record<string, OnboardingPhase> = {
-    CONTACT: 'REVIEW_CONTACT_AND_CERTS',
-    EXPERIENCE: 'REVIEW_EXPERIENCE',
-    PROJECTS: 'REVIEW_PROJECTS',
-    SKILLS: 'REVIEW_SKILLS',
-    CERTIFICATES: 'REVIEW_CONTACT_AND_CERTS',
-    REVIEW: 'COMPLETE',
-    UPLOAD_DROPZONE: 'AWAITING_RESUME_OR_TEXT',
-  }
-  return map[widget] || 'GREETING'
-}

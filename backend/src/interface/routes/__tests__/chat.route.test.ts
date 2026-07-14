@@ -7,24 +7,25 @@ const SESSION = {
   session: { id: 'sess-1', expiresAt: new Date() },
 }
 
-function buildApp(parseIntentFn?: ReturnType<typeof vi.fn>) {
+function buildApp(interactFn?: ReturnType<typeof vi.fn>) {
   const mockContainer: any = {
     chatUseCases: {
-      parseIntent: parseIntentFn ?? vi.fn().mockResolvedValue({
+      interact: interactFn ?? vi.fn().mockResolvedValue({
         reply: 'Hello!',
+        type: 'text',
         intent: 'GENERAL_CHAT',
-        targetWidget: null,
-        extractedData: {},
       }),
     },
+    chatRepository: {
+      save: vi.fn().mockResolvedValue({ id: 'msg-1', content: 'saved' }),
+      findByUserId: vi.fn().mockResolvedValue([]),
+    }
   }
   const app = new Hono<{ Variables: any }>()
   app.use('*', async (c, next) => { c.set('session', SESSION); await next() })
   app.route('/', createChatRouter(mockContainer))
   return { app, container: mockContainer }
 }
-
-// ── POST /interact ────────────────────────────────────────────────────────────
 
 describe('POST /interact (chat)', () => {
   it('returns AI response on success', async () => {
@@ -33,8 +34,7 @@ describe('POST /interact (chat)', () => {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        messages: [{ role: 'user', content: 'Hi' }],
-        currentState: { phase: 'GREETING' },
+        message: 'Hello',
       }),
     })
     expect(res.status).toBe(200)
@@ -43,27 +43,26 @@ describe('POST /interact (chat)', () => {
     expect(body.intent).toBe('GENERAL_CHAT')
   })
 
-  it('passes full request body to chatUseCases.parseIntent', async () => {
+  it('passes request fields to chatUseCases.interact', async () => {
     const { app, container } = buildApp()
     const reqBody = {
-      messages: [{ role: 'user', content: 'My name is Bob' }],
-      currentState: { phase: 'REVIEW_EXPERIENCE' },
-      mode: 'ONBOARDING',
+      message: 'My name is Bob',
+      activeDraftId: 'draft-abc'
     }
     await app.request('/interact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(reqBody),
     })
-    expect(container.chatUseCases.parseIntent).toHaveBeenCalledWith(reqBody)
+    expect(container.chatUseCases.interact).toHaveBeenCalledWith(reqBody, 'user-1')
   })
 
-  it('returns 500 when parseIntent throws', async () => {
+  it('returns 500 when interact throws', async () => {
     const { app } = buildApp(vi.fn().mockRejectedValue(new Error('AI failure')))
     const res = await app.request('/interact', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ messages: [] }),
+      body: JSON.stringify({ message: 'Hi' }),
     })
     expect(res.status).toBe(500)
     const body = await res.json()

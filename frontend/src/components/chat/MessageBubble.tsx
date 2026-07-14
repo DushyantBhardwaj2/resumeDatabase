@@ -9,6 +9,10 @@ import { DashboardWelcomeWidget } from './widgets/DashboardWelcomeWidget'
 import { DashboardStatsWidget } from './widgets/DashboardStatsWidget'
 import { DashboardCompletenessWidget } from './widgets/DashboardCompletenessWidget'
 import { DashboardQuickActionsWidget } from './widgets/DashboardQuickActionsWidget'
+import { ProposalCardsWidget } from './widgets/ProposalCardsWidget'
+import { MergeSuggestionWidget } from './widgets/MergeSuggestionWidget'
+import { SearchResultsWidget } from './widgets/SearchResultsWidget'
+import { SelectionV2Widget } from './widgets/SelectionV2Widget'
 
 interface MessageBubbleProps {
   message: ChatMessage
@@ -66,6 +70,19 @@ export function MessageBubble({ message, renderWidget }: MessageBubbleProps) {
               <DashboardCompletenessWidget percent={(message.meta?.completeness as number) ?? 0} />
             )}
             {message.widget === 'DASHBOARD_QUICK_ACTIONS' && <DashboardQuickActionsWidget />}
+
+            {message.type === 'proposal-cards' && message.actions && (
+              <ProposalCardsWidget actions={message.actions} />
+            )}
+            {message.type === 'merge-suggestion' && message.mergeSuggestion && (
+              <MergeSuggestionWidget mergeSuggestion={message.mergeSuggestion} />
+            )}
+            {message.type === 'search-results' && message.searchResults && (
+              <SearchResultsWidget results={message.searchResults} />
+            )}
+            {message.type === 'selection' && message.selections && (
+              <SelectionV2Widget selections={message.selections} />
+            )}
           </div>
         </BorderGlow>
       )}

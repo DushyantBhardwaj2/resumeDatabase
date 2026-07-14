@@ -36,13 +36,6 @@ const SESSION = {
 
 function buildApp(overrides: Record<string, unknown> = {}) {
   const mockContainer: any = {
-    resumeUseCases: {
-      tailorResume: vi.fn().mockResolvedValue({ tailored: true }),
-      parseResume: vi.fn().mockResolvedValue({ parsed: true }),
-    },
-    profileUseCases: {
-      getProfile: vi.fn().mockResolvedValue(null),
-    },
     latexTemplate: {
       fill: vi.fn().mockReturnValue('latex-source'),
     },
@@ -56,91 +49,10 @@ function buildApp(overrides: Record<string, unknown> = {}) {
 
 // ── Tests ─────────────────────────────────────────────────────────────────────
 
-describe('POST /tailor', () => {
-  it('calls resumeUseCases.tailorResume and returns result', async () => {
-    const { app, container } = buildApp()
-    const res = await app.request('/tailor', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title: 'SWE', company: 'Google', description: 'JD' }),
-    })
-    expect(res.status).toBe(200)
-    const body = await res.json()
-    expect(body).toHaveProperty('tailored', true)
-    expect(container.resumeUseCases.tailorResume).toHaveBeenCalledWith(
-      'user-1',
-      { jobTitle: 'SWE', company: 'Google', jobDescription: 'JD' },
-      'nsut-canonical'
-    )
-  })
-})
-
-describe('POST /parse', () => {
-  it('returns existing profile if found (fromDb: true)', async () => {
-    const existing = { contact: { name: 'Bob' } }
-    const { app } = buildApp({ profileUseCases: { getProfile: vi.fn().mockResolvedValue(existing) } })
-    const res = await app.request('/parse', { method: 'POST' })
-    expect(res.status).toBe(200)
-    const body = await res.json()
-    expect(body.fromDb).toBe(true)
-    expect(body.parsed.contact.name).toBe('Bob')
-  })
-
-  it('rejects if no file uploaded', async () => {
-    const { app } = buildApp()
-    const formData = new FormData()
-    const res = await app.request('/parse', {
-      method: 'POST',
-      body: formData,
-    })
-    expect(res.status).toBe(400)
-    expect(await res.json()).toHaveProperty('error', 'No file uploaded')
-  })
-
-  it('rejects if file is not pdf', async () => {
-    const { app } = buildApp()
-    const formData = new FormData()
-    formData.append('file', new File(['test'], 'test.txt', { type: 'text/plain' }))
-    const res = await app.request('/parse', {
-      method: 'POST',
-      body: formData,
-    })
-    expect(res.status).toBe(400)
-    expect(await res.json()).toHaveProperty('error', 'Only PDF files are accepted')
-  })
-
-  it('rejects if file is too large', async () => {
-    const { app } = buildApp()
-    const formData = new FormData()
-    const largeContent = new Uint8Array(6 * 1024 * 1024)
-    formData.append('file', new File([largeContent], 'test.pdf', { type: 'application/pdf' }))
-    const res = await app.request('/parse', {
-      method: 'POST',
-      body: formData,
-    })
-    expect(res.status).toBe(400)
-    expect(await res.json()).toHaveProperty('error', 'File size exceeds 5MB limit')
-  })
-
-  it('calls resumeUseCases.parseResume and returns result', async () => {
-    const { app, container } = buildApp()
-    const formData = new FormData()
-    formData.append('file', new File(['%PDF...'], 'test.pdf', { type: 'application/pdf' }))
-    const res = await app.request('/parse', {
-      method: 'POST',
-      body: formData,
-    })
-    expect(res.status).toBe(200)
-    const body = await res.json()
-    expect(body).toHaveProperty('parsed', true)
-    expect(container.resumeUseCases.parseResume).toHaveBeenCalledOnce()
-  })
-})
-
 describe('POST /compile-live', () => {
   it('enqueues job and returns jobId', async () => {
     const { app } = buildApp()
-    const payload = { templateId: 'ats-clean', profile: {}, selectedBulletIds: {} }
+    const payload = { templateId: 'ats-clean', profile: { experience: [], projects: [], education: [], skills: { languages: [], frameworks: [], tools: [] } }, selectedBulletIds: {} }
     const res = await app.request('/compile-live', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
