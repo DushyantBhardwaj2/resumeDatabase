@@ -15,29 +15,14 @@ export function createHistoryRouter(container: Container) {
     .get('/:id', async (c) => {
       const session = c.get('session')
       const id = c.req.param('id')
-      const item = await container.historyUseCases.get(id, session.user.id)
+      const item = await container.historyUseCases.get(id)
       if (!item) return c.json({ error: 'Not found' }, 404)
       return c.json(item)
     })
     .delete('/:id', async (c) => {
       const session = c.get('session')
       const id = c.req.param('id')
-      await container.historyUseCases.delete(id, session.user.id)
-      return c.json({ success: true })
-    })
-    .patch('/:id', zValidator('json', z.any()), async (c) => {
-      const session = c.get('session')
-      const id = c.req.param('id')
-      const body = await c.req.json()
-      // Implementation for saving tailored changes manually
-      await container.historyUseCases.updateStyling(id, session.user.id, body)
-      return c.json({ success: true })
-    })
-    .put('/:id/styling', zValidator('json', z.any()), async (c) => {
-      const session = c.get('session')
-      const id = c.req.param('id')
-      const styling = await c.req.json()
-      await container.historyUseCases.updateStyling(id, session.user.id, styling)
+      await container.historyUseCases.delete(id)
       return c.json({ success: true })
     })
 }

@@ -1,154 +1,153 @@
-import { logger } from '../../../infrastructure/logger'
 import type { IAIService, ISchema } from "../ports/ai-service"
-import type { Profile, VaultBullet } from "../../domain/entities"
-import type {
-  ChatInteractRequest,
-  ChatInteractResponse,
-  ChatMessage,
-  VaultExpansionRequest,
-  VaultExpansionResponse,
-  BulletSelectionRequest,
-  BulletSelectionResponse,
-  ChatIntent,
-  TargetWidget,
-} from "../ports/chat-types"
-
-// ── Zod schemas for AI response validation ───────────────────────────────────
-
-import { z } from "zod"
-
-const chatInteractAISchema = z.object({
-  intent: z.enum(["PROVIDE_DATA", "NAVIGATE", "GENERAL_CHAT", "GENERATE_PROFILE_DATA"]),
-  targetWidget: z.enum([
-    "CONTACT", "EXPERIENCE", "PROJECTS", "SKILLS", "CERTIFICATES", "REVIEW", "UPLOAD_DROPZONE", "PROFILE_GENERATOR",
-  ]).nullable().default(null),
-  reply: z.string(),
-  extractedData: z.record(z.string(), z.unknown()).optional().default({}),
-})
-
-const vaultExpandAISchema = z.object({
-  vaultBullets: z.array(z.object({
-    id: z.string(),
-    text: z.string(),
-    category: z.enum(["FRONTEND", "BACKEND", "DEVOPS", "LEADERSHIP", "GENERAL"]).optional(),
-    keywords: z.array(z.string()).default([]),
-    isAIGenerated: z.boolean().default(true),
-  })),
-})
-
-const bulletSelectAISchema = z.object({
-  selectedExperienceIds: z.array(z.string()),
-  selectedProjectIds: z.array(z.string()),
-  selections: z.record(z.string(), z.array(z.string())),
-  skills: z.object({
-    languages: z.array(z.string()),
-    frameworks: z.array(z.string()),
-    tools: z.array(z.string()),
-  }).optional(),
-  rationale: z.string(),
-})
-
-// ── Schema wrappers implementing ISchema ──────────────────────────────────────
+import type { IRetrieverService } from "../ports/retriever"
+import type { IKnowledgeBaseService } from "../ports/knowledge-base"
+import type { IConfidenceService } from "../ports/system-confidence"
+import type { IChatRepository } from "../../domain/repositories"
+import type { ChatMessage, ChatIntentV2, ChatInteractRequestV2, ChatInteractResponseV2 } from "../ports/chat-types"
+import type { DomainMemoryAction } from "../../domain/entities"
+import { intentClassifySchema, memoryExtractSchema } from "./schemas"
 
 function makeSchema<T>(schema: z.ZodType<T>): ISchema<T> {
   return { parse: (data: unknown) => schema.parse(data) }
 }
 
-// ── Use Case ──────────────────────────────────────────────────────────────────
+import { z } from "zod"
 
 export class ChatUseCases {
   constructor(
     private aiService: IAIService,
-    private chatIntentPrompt: string,
-    private vaultExpanderPrompt: string,
-    private bulletSelectorPrompt: string
+    private retriever: IRetrieverService,
+    private kb: IKnowledgeBaseService,
+    private confidence: IConfidenceService,
+    private chatRepo: IChatRepository,
+    private intentPrompt: string,
+    private memoryExtractPrompt: string,
   ) {}
 
-  async parseIntent(
-    request: ChatInteractRequest
-  ): Promise<ChatInteractResponse> {
-    const systemPrompt = `${this.chatIntentPrompt}\n\nThe user is currently in phase: ${request.currentState?.phase ?? "GREETING"}.`
-    let messagesForAI = request.messages
-      .filter((m) => m.role !== "system")
-      .map((m) => `${m.role === "assistant" ? "Assistant" : "User"}: ${m.content}`)
-      .join("\n")
+  async interact(request: ChatInteractRequestV2, userId: string): Promise<ChatInteractResponseV2> {
+    await this.chatRepo.save({ userId, role: "user", content: request.message })
 
-    // --- NEW LOGIC: URL Interception and Scanning ---
-    const lastUserMsg = request.messages.filter((m) => m.role === 'user').pop();
-    if (lastUserMsg) {
-      const urlRegex = /(https?:\/\/[^\s]+)/g;
-      const urls = lastUserMsg.content.match(urlRegex);
+    const intent = await this._classifyIntent(request.message)
+    const kbContext = this.kb.getContext(intent.intent as any)
 
-      if (urls && urls.length > 0) {
-        for (const url of urls) {
-          try {
-            const jinaRes = await fetch(`https://r.jina.ai/${url}`, {
-              headers: { 
-                "Accept": "text/plain",
-                "X-No-Cache": "true" 
-              }
-            });
-            if (jinaRes.ok) {
-              const content = await jinaRes.text();
-              const truncated = content.slice(0, 30000); 
-              messagesForAI += `\n\n[System Context: The user provided a URL (${url}). Here is its scraped content for you to analyze and generate points from:\n${truncated}]`;
-            }
-          } catch (error) {
-             logger.error({ url, err: error }, 'Failed to fetch URL context');
-          }
+    switch (intent.intent) {
+      case "GENERAL_CHAT":
+        return this._handleGeneralChat(request.message, userId, kbContext)
+
+      case "CREATE_MEMORY":
+        return this._handleCreateMemory(request.message, userId, kbContext)
+
+      case "SEARCH_MEMORY":
+        return this._handleSearchMemory(request.message, userId)
+
+      case "CREATE_RESUME":
+        return {
+          reply: "I'll analyze this job description and prepare your resume. Let me work on that...",
+          type: "text",
+          intent: "CREATE_RESUME",
         }
-      }
+
+      case "UPDATE_MEMORY":
+        return {
+          reply: "Which entry would you like to update? Please specify the name and the changes.",
+          type: "text",
+          intent: "UPDATE_MEMORY",
+        }
+
+      case "DELETE_MEMORY":
+        return {
+          reply: "Which entry would you like to delete? Please specify the name.",
+          type: "text",
+          intent: "DELETE_MEMORY",
+        }
+
+      default:
+        return {
+          reply: "How can I help you with your resume?",
+          type: "text",
+          intent: "GENERAL_CHAT",
+        }
     }
-    // --- END NEW LOGIC ---
+  }
+
+  private async _classifyIntent(message: string): Promise<{ intent: ChatIntentV2; confidence: number; contextHint?: string }> {
+    try {
+      const result = await this.aiService.generateStructuredData(
+        this.intentPrompt,
+        message,
+        makeSchema(intentClassifySchema)
+      )
+      return { intent: result.intent, confidence: result.confidence, contextHint: result.contextHint }
+    } catch {
+      return { intent: "GENERAL_CHAT", confidence: 0.5 }
+    }
+  }
+
+  private async _handleGeneralChat(message: string, userId: string, kbContext: any): Promise<ChatInteractResponseV2> {
+    const systemCtx = kbContext?.files?.map((f: any) => f.content).join("\n") ?? ""
+    const reply = await this.aiService.generate(
+      `${systemCtx}\n\nBe concise and helpful. The user said: ${message}`,
+      { temperature: 0.7, maxTokens: 500 }
+    )
+    return { reply, type: "text", intent: "GENERAL_CHAT" }
+  }
+
+  private async _handleCreateMemory(message: string, userId: string, kbContext: any): Promise<ChatInteractResponseV2> {
+    const systemCtx = kbContext?.files?.map((f: any) => f.content).join("\n") ?? ""
 
     try {
       const result = await this.aiService.generateStructuredData(
-        systemPrompt,
-        messagesForAI,
-        makeSchema(chatInteractAISchema)
+        `${systemCtx}\n\nExtract memory entries from the user's message.`,
+        message,
+        makeSchema(memoryExtractSchema)
       )
+
+      const actions = (result.actions ?? []) as DomainMemoryAction[]
+
+      if (actions.length === 0) {
+        return {
+          reply: "I couldn't find any details to save. Could you share more about your experience?",
+          type: "text",
+          intent: "CREATE_MEMORY",
+        }
+      }
+
       return {
-        reply: result.reply,
-        intent: result.intent as ChatIntent,
-        targetWidget: result.targetWidget as TargetWidget,
-        extractedData: result.extractedData,
+        reply: `I found ${actions.length} entr${actions.length === 1 ? "y" : "ies"} to save. Please review and confirm.`,
+        type: "proposal-cards",
+        intent: "CREATE_MEMORY",
+        actions,
       }
     } catch {
       return {
-        reply: "I didn't quite catch that. Can you rephrase?",
-        intent: "GENERAL_CHAT",
-        targetWidget: null,
-        extractedData: {},
+        reply: "I'd love to save that. Could you share more details like the company, role, and what you worked on?",
+        type: "text",
+        intent: "CREATE_MEMORY",
       }
     }
   }
 
-  async expandVault(request: VaultExpansionRequest): Promise<VaultExpansionResponse> {
-    const userContent = `Type: ${request.type}\nTitle: ${request.title}\nDescription: ${request.rawDescription}`
-    const result = await this.aiService.generateStructuredData(
-      this.vaultExpanderPrompt,
-      userContent,
-      makeSchema(vaultExpandAISchema)
-    )
-    return { vaultBullets: result.vaultBullets }
-  }
-
-  async selectBullets(request: BulletSelectionRequest): Promise<BulletSelectionResponse> {
-    const userContent = JSON.stringify({
-      jobDescription: request.jobDescription,
-      profile: request.profile,
+  private async _handleSearchMemory(query: string, userId: string): Promise<ChatInteractResponseV2> {
+    const results = await this.retriever.search({
+      userId,
+      query,
+      maxResults: 20,
     })
-    const result = await this.aiService.generateStructuredData(
-      this.bulletSelectorPrompt,
-      userContent,
-      makeSchema(bulletSelectAISchema)
-    )
+
+    if (results.length === 0) {
+      return {
+        reply: "I couldn't find any matching entries in your career memory.",
+        type: "text",
+        intent: "SEARCH_MEMORY",
+        searchResults: [],
+      }
+    }
+
     return {
-      selectedExperienceIds: result.selectedExperienceIds ?? [],
-      selectedProjectIds: result.selectedProjectIds ?? [],
-      selections: result.selections,
-      skills: result.skills,
-      rationale: result.rationale,
+      reply: `Found ${results.length} matching entr${results.length === 1 ? "y" : "ies"}:`,
+      type: "search-results",
+      intent: "SEARCH_MEMORY",
+      searchResults: results,
     }
   }
 }

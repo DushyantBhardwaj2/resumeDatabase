@@ -1,58 +1,59 @@
-import type { IGitHubRepoRepository, IProfileRepository } from "../../domain/repositories"
-import type { IAIService, ISchema } from "../ports/ai-service"
-import type { Profile, VaultBullet } from "../../domain/entities"
-
-function bulletsToVault(bullets: string[], isAIGenerated = true): VaultBullet[] {
-  return bullets.map((b) => ({
-    id: crypto.randomUUID(),
-    text: b,
-    keywords: [],
-    isAIGenerated,
-  }))
-}
+import type { IGitHubAnalyzer } from "../ports/github-analyzer"
+import type { IProjectRepository } from "../../domain/repositories"
+import type { DomainMemoryAction, DomainBullet } from "../../domain/entities"
 
 export class GithubUseCases {
   constructor(
-    private githubRepo: IGitHubRepoRepository,
-    private profileRepo: IProfileRepository,
-    private aiService: IAIService,
-    private readmeBulletPrompt: string,
-    private arraySchema: ISchema<string[]>
+    private githubAnalyzer: IGitHubAnalyzer,
+    private projectRepo: IProjectRepository,
   ) {}
 
-  async importRepos(
-    userId: string,
-    repos: Array<{ name: string; url: string; language: string | null }>
-  ): Promise<{ imported: number; projects: Profile["projects"] }> {
-    const importedProjects: Profile["projects"] = []
+  async analyze(url: string) {
+    return this.githubAnalyzer.analyze(url)
+  }
 
-    for (const repo of repos) {
-      let bullets: string[] = []
-      try {
-        const readmeRes = await fetch(
-          `https://api.github.com/repos/${encodeURIComponent(repo.url.replace("https://github.com/", ""))}/readme`,
-          { headers: { Accept: "application/vnd.github.v3.raw", "User-Agent": "resumint-app/1.0" } }
-        )
-        const readmeContent = readmeRes.ok ? (await readmeRes.text()).slice(0, 3000) : ""
-        const content = `Repo: ${repo.name}\nLanguage: ${repo.language ?? "N/A"}\n\nREADME:\n${readmeContent}`
-        bullets = await this.aiService.generateStructuredData(this.readmeBulletPrompt, content, this.arraySchema)
-      } catch {
-        bullets = [`Built and maintained ${repo.name} using ${repo.language ?? "various technologies"}.`]
-      }
+  async importRepo(url: string, userId: string): Promise<{ actions: DomainMemoryAction[] }> {
+    const analysis = await this.githubAnalyzer.analyze(url)
 
-      const vaultBullets = bulletsToVault(bullets)
-      await this.githubRepo.upsertRepos(userId, [
-        { repoName: repo.name, repoUrl: repo.url, techStack: repo.language ? [repo.language] : [], bulletsGenerated: bullets },
-      ])
+    const techStack = [
+      ...Object.keys(analysis.languages),
+      ...analysis.techStack.map((t) => t.name),
+      ...analysis.frameworks.map((f) => f.name),
+    ]
 
-      importedProjects.push({ id: crypto.randomUUID(), title: repo.name, techStack: repo.language ? [repo.language] : [], vaultBullets, url: repo.url })
+    const bullets = [
+      ...analysis.recentCommits.map((c) => c.message),
+      ...(analysis.readme ? [analysis.readme.slice(0, 200)] : []),
+    ].slice(0, 10)
+
+    const action: DomainMemoryAction = {
+      type: "CREATE_PROJECT" as const,
+      project: {
+        userId,
+        title: analysis.name,
+        url: analysis.fullName ? `https://github.com/${analysis.fullName}` : undefined,
+        githubUrl: `https://github.com/${analysis.fullName}`,
+        readme: analysis.readme?.slice(0, 3000),
+        languages: Object.keys(analysis.languages),
+        topics: analysis.topics,
+        commitCount: analysis.commitCount,
+        dependencies: [analysis.packageJson ? JSON.stringify(Object.keys((analysis.packageJson as any)?.dependencies ?? {})) : "", analysis.goMod ?? "", analysis.requirementsTxt ?? ""].filter(Boolean),
+        techStack,
+        tags: [...analysis.topics, ...Object.keys(analysis.languages), ...analysis.techStack.map((t) => t.name)],
+        source: { type: "GITHUB", importedAt: new Date().toISOString() },
+        bullets: bullets.map((text, i) => ({
+          id: crypto.randomUUID(),
+          text,
+          order: i,
+          isAIGenerated: true,
+          parentType: "project" as const,
+          parentId: "",
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        })),
+      },
     }
 
-    const profile = await this.profileRepo.findByUserId(userId)
-    const existingUrls = new Set(profile?.projects?.map((p) => p.url) ?? [])
-    const mergedProjects = [...importedProjects.filter((p) => !existingUrls.has(p.url)), ...(profile?.projects ?? [])]
-    await this.profileRepo.upsert(userId, { projects: mergedProjects })
-
-    return { imported: importedProjects.length, projects: mergedProjects }
+    return { actions: [action] }
   }
 }

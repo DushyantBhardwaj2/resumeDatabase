@@ -10,7 +10,6 @@ const saveMessageSchema = z.object({
   role: z.enum(['user', 'assistant', 'system']),
   content: z.string().min(1),
   widget: z.string().nullable().optional(),
-  mode: z.enum(['ONBOARDING', 'BUILDER', 'DASHBOARD', 'TAILOR', 'PROFILE']),
 })
 
 export function createChatRouter(container: Container) {
@@ -20,7 +19,7 @@ export function createChatRouter(container: Container) {
       if (!session) return c.json({ error: 'Unauthorized' }, 401)
       const body = await c.req.json()
       try {
-        const result = await container.chatUseCases.parseIntent(body)
+        const result = await container.chatUseCases.interact(body, session.user.id)
         return c.json(result)
       } catch (err: any) {
         logger.error({ err }, 'Chat intent error')

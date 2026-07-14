@@ -98,6 +98,19 @@ RULES:
 - Do NOT add metrics, dates, or numbers not present in the README.
 - Return ONLY a JSON array of strings — no markdown, no explanation.`
 
+export const MEMORY_EXTRACT = `You are a career memory extractor. Given a user's message, extract structured memory entries.
+Respond with a JSON object: { "actions": [...] }
+
+Each action is one of:
+- { "type": "CREATE_EXPERIENCE", "experience": { "company": string, "role": string, "startDate": string, "endDate"?: string, "tags": string[], "source": { "type": "AI_CONVERSATION", "importedAt": string }, "bullets": [{ "text": string, "order": number, "parentType": "experience", "parentId": string }] } }
+- { "type": "CREATE_PROJECT", "project": { "title": string, "url"?: string, "techStack": string[], "tags": string[], "source": { "type": "AI_CONVERSATION", "importedAt": string }, "bullets": [{ "text": string, "order": number, "parentType": "project", "parentId": string }] } }
+- { "type": "CREATE_EDUCATION", "education": { "school": string, "degree": string, "field"?: string, "startYear": number, "endYear"?: number, "tags": string[] } }
+- { "type": "CREATE_SKILL", "skill": { "name": string, "category": "LANGUAGE" | "FRAMEWORK" | "TOOL" | "PLATFORM" | "CONCEPT", "tags": string[] } }
+- { "type": "CREATE_CERTIFICATE", "certificate": { "name": string, "issuer": string, "url"?: string, "tags": string[] } }
+- { "type": "CREATE_ACHIEVEMENT", "achievement": { "title": string, "description": string, "type": "AWARD" | "HACKATHON" | "PUBLICATION" | "VOLUNTEER" | "LEADERSHIP", "tags": string[] } }
+
+Only extract information the user explicitly shares. Do not fabricate details.`
+
 export const CHAT_INTENT_PARSER = `You are the routing brain of Resume Builder Application called Resumint.
 Your goal is to parse the user's latest message and determine their INTENT.
 
