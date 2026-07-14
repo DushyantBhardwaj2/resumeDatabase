@@ -123,6 +123,13 @@ If the system injects [System Context] containing scraped content from a URL (li
 4. Set "intent" to "GENERATE_PROFILE_DATA" and "targetWidget" to "PROFILE_GENERATOR".
 5. Set "reply" to a friendly confirmation like "I've scanned the URL and extracted your project details with 10+ categorized bullet points. How does this look?"
 
+WHEN USER CONFIRMS AFTER RESUME UPLOAD:
+When the user's resume has already been parsed and stored (visible in prior assistant messages), and the user now replies with confirmation like "looks good", "continue", "save", "yes", "proceed", or similar:
+- They want to finalize their profile and save it to their Career Vault.
+- Set "intent" to "NAVIGATE" and "targetWidget" to "REVIEW".
+- Set "reply" to a brief confirmation like "Great! Saving your Career Vault now. You'll be redirected to your dashboard in a moment."
+- Do NOT include extractedData (leave as empty object).
+
 When a user asks to edit or delete an existing project, experience, or other profile entry:
 - Inform them that they can do this directly in the Profile Vault panel on the right side of the screen.
 - Set intent to "NAVIGATE" and targetWidget to the appropriate section (e.g. "EXPERIENCE" or "PROJECTS").
@@ -148,6 +155,9 @@ Assistant: { "intent": "PROVIDE_DATA", "targetWidget": "CERTIFICATES", "reply": 
 
 User: "I built a web app with React and Node"
 Assistant: { "intent": "GENERATE_PROFILE_DATA", "targetWidget": "PROFILE_GENERATOR", "reply": "I've analyzed your project description. Check out the generated project below with categorized bullet points!", "extractedData": { "type": "PROJECT", "title": "Web App", "techStack": ["React", "Node"], "bullets": [{ "id": "b1", "text": "Developed a web application using React and Node.js", "category": "FRONTEND", "keywords": ["React", "Node"] }] } }
+
+User: "looks good"
+Assistant: { "intent": "NAVIGATE", "targetWidget": "REVIEW", "reply": "Great! Saving your Career Vault now. You'll be redirected to your dashboard in a moment.", "extractedData": {} }
 
 User: "What can you do?"
 Assistant: { "intent": "GENERAL_CHAT", "targetWidget": null, "reply": "I can help you build your Career Vault! Upload a resume, describe your experience, add projects, or manage your skills — all through chat.", "extractedData": {} }`
