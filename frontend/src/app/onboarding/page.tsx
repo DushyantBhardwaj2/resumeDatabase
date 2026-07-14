@@ -7,6 +7,7 @@ import { api } from '@/config/api-client'
 import { ChatContainer } from '@/components/chat/ChatContainer'
 import { ChatInput } from '@/components/chat/ChatInput'
 import { useChatStore } from '@/store/useChatStore'
+import { OnboardingPreviewPanel } from '@/components/chat/widgets/OnboardingPreviewPanel'
 
 export default function OnboardingPage() {
   const router = useRouter()
@@ -83,7 +84,7 @@ export default function OnboardingPage() {
   }, [currentPhase, completing, extractedData, router])
 
   return (
-    <div className="min-h-dvh bg-surface flex flex-col overflow-hidden relative">
+    <div className="h-dvh bg-surface flex flex-col overflow-hidden relative">
       <div className="pointer-events-none fixed inset-0 overflow-hidden -z-0" aria-hidden>
         <div className="absolute -top-24 -right-24 w-96 h-96 rounded-full bg-brand/5 blur-3xl animate-fade-in" />
         <div className="absolute -bottom-32 -left-32 w-[30rem] h-[30rem] rounded-full bg-brand/5 blur-3xl animate-fade-in delay-150" />
@@ -91,7 +92,7 @@ export default function OnboardingPage() {
       </div>
 
       <header className="relative z-10 shrink-0 border-b border-edge/50 glass animate-fade-up">
-        <div className="max-w-3xl mx-auto h-14 flex items-center justify-between px-4">
+        <div className="max-w-7xl mx-auto h-14 flex items-center justify-between px-6">
           <div className="flex items-center gap-2">
             <span className="font-display text-lg font-bold text-content tracking-tight">
               Resumint
@@ -107,17 +108,22 @@ export default function OnboardingPage() {
         </div>
       </header>
 
-      <main className="flex-1 flex items-start justify-center p-4 sm:p-6 lg:p-8 relative z-10 overflow-hidden">
-        <div className="w-full max-w-3xl h-full flex flex-col glass rounded-[var(--radius-2xl)] shadow-xl animate-fade-up delay-75 overflow-hidden">
-          <ChatContainer mode="ONBOARDING" renderInput={false} />
+      <main className="flex-1 flex flex-col lg:flex-row p-6 gap-6 relative z-10 overflow-hidden">
+        {/* Left pane: Assistant Chat */}
+        <div className="w-full lg:w-[40%] flex flex-col glass rounded-[var(--radius-2xl)] shadow-xl overflow-hidden min-w-[360px] h-full animate-fade-up delay-75">
+          <div className="flex-1 overflow-hidden">
+            <ChatContainer mode="ONBOARDING" renderInput={false} />
+          </div>
+          <div className="p-4 bg-card/60 border-t border-edge/50 shrink-0">
+            <ChatInput onSend={sendMessage} disabled={isTyping} placeholder="Type a message or drop your resume above..." />
+          </div>
+        </div>
+
+        {/* Right pane: Real-time Profile Preview */}
+        <div className="w-full lg:w-[60%] flex flex-col glass rounded-[var(--radius-2xl)] shadow-xl overflow-y-auto p-6 h-full animate-fade-up delay-150">
+          <OnboardingPreviewPanel />
         </div>
       </main>
-
-      <div className="relative z-10 shrink-0 glass border-t border-edge/50 animate-fade-up delay-150">
-        <div className="max-w-3xl mx-auto px-4 py-3">
-          <ChatInput onSend={sendMessage} disabled={isTyping} placeholder="Type a message or drop your resume above..." />
-        </div>
-      </div>
     </div>
   )
 }
