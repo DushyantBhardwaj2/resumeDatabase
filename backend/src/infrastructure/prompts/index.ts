@@ -80,7 +80,7 @@ RULES:
 
 Expected JSON structure:
 {
-  "contact": { "phone": string | null, "linkedin": string | null, "github": string | null, "portfolio": string | null },
+  "contact": { "name": string | null, "email": string | null, "phone": string | null, "linkedin": string | null, "github": string | null, "portfolio": string | null },
   "education": [{ "school": string, "degree": string, "gpa": string | null, "startYear": number | null, "endYear": number | null }],
   "experience": [{ "company": string, "role": string, "startDate": string | null, "endDate": string | null, "bullets": string[] }],
   "projects": [{ "title": string, "techStack": string[], "bullets": string[], "url": string | null }],
