@@ -4,15 +4,13 @@ import { useState, useRef } from 'react'
 import { UploadSimple } from '@phosphor-icons/react'
 import { toast } from 'sonner'
 import { api } from '@/config/api-client'
+import { useChatStore } from '@/store/useChatStore'
 
-interface ResumeUploadWidgetProps {
-  onParsed?: (data: unknown) => void
-}
-
-export function ResumeUploadWidget({ onParsed }: ResumeUploadWidgetProps) {
+export function ResumeUploadWidget() {
   const [dragging, setDragging] = useState(false)
   const [parsing, setParsing] = useState(false)
   const fileRef = useRef<HTMLInputElement>(null)
+  const addMessage = useChatStore((s) => s.addMessage)
 
   const parseFile = async (file: File) => {
     if (!file.type.includes('pdf')) {
@@ -24,7 +22,18 @@ export function ResumeUploadWidget({ onParsed }: ResumeUploadWidgetProps) {
       const res = await api.api.protected.resume.parse.$post({ form: { file } })
       const result = (await res.json()) as Record<string, unknown>
       if (!res.ok) throw new Error((result.error as string) || 'Failed to parse resume')
-      onParsed?.(result.parsed)
+      useChatStore.setState({ extractedData: result.parsed as Record<string, unknown> })
+      addMessage({
+        id: 'parsed-done',
+        role: 'assistant',
+        content: [
+          'Great! Resume parsed successfully.',
+          '',
+          'Take a look at the extracted information above. You can edit anything before we save it to your Career Vault.',
+          '',
+          'Reply **looks good** to continue, or let me know what needs fixing.',
+        ].join('\n'),
+      })
       toast.success(result.fromDb ? 'Profile loaded from your data!' : 'Resume parsed successfully!')
     } catch (e) {
       toast.error(e instanceof Error ? e.message : 'Something went wrong')
