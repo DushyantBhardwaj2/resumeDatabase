@@ -17,6 +17,7 @@ import { draftsRouter } from './interface/routes/drafts'
 import { githubRouter } from './interface/routes/github'
 import { parseRouter } from './interface/routes/parse'
 import { kbRouter } from './interface/routes/kb'
+import { authRouter } from './interface/routes/auth'
 
 import { logger } from './infrastructure/logger'
 import { startPdfWorker, stopPdfWorker } from './infrastructure/queue/pdf-worker'
@@ -56,6 +57,11 @@ app.use('/api/auth/*', rateLimiter({
   keyGenerator: (c) => `auth:${c.req.header('x-forwarded-for') || c.req.header('x-real-ip') || 'unknown'}`,
   message: 'Too many authentication attempts. Please try again in a minute.'
 }))
+
+// Block email/password sign-up — only Google can create accounts
+app.post('/api/auth/sign-up/email', (c) => {
+  return c.json({ error: "Sign-up with email/password is not allowed. Please use Google." }, 403)
+})
 
 // BetterAuth handler
 app.all('/api/auth/*', (c) => {
@@ -136,6 +142,7 @@ const routes = app
   .route('/api/protected/github', githubRouter)
   .route('/api/protected/parse', parseRouter)
   .route('/api/protected/kb', kbRouter)
+  .route('/api/protected/auth', authRouter)
 
 export type AppType = typeof routes
 

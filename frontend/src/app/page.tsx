@@ -39,8 +39,14 @@ export default function LandingPage() {
         </p>
 
         {/* Call to Action */}
-        <div className="mb-10 animate-fade-up-d2">
+        <div className="mb-6 animate-fade-up-d2 flex flex-col items-center gap-3">
           <SignInButton />
+          <Link
+            href="/auth/login"
+            className="text-xs text-content-muted hover:text-content underline underline-offset-2 transition-colors"
+          >
+            Sign in with email instead
+          </Link>
         </div>
 
         {/* Navigation Cards */}

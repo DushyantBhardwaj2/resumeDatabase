@@ -1,4 +1,4 @@
-import { getServerSession, serverApi } from "@/config/api-client-server"
+import { getServerSession, fetchWithSession } from "@/config/api-client-server"
 import { redirect } from "next/navigation"
 
 export default async function AuthRedirectPage(props: {
@@ -22,7 +22,7 @@ export default async function AuthRedirectPage(props: {
 
   let profile = null
   try {
-    const res = await serverApi.api.protected.profile.$get()
+    const res = await fetchWithSession('/api/protected/profile')
     if (res.ok) profile = await res.json()
   } catch (e) {
     console.error("Failed to fetch profile:", e)
@@ -30,6 +30,21 @@ export default async function AuthRedirectPage(props: {
 
   if (profile) {
     redirect("/dashboard")
+  }
+
+  let hasPassword = true
+  try {
+    const res = await fetchWithSession('/api/protected/auth/password-status')
+    if (res.ok) {
+      const data = await res.json()
+      hasPassword = data.hasPassword
+    }
+  } catch (e) {
+    console.error("Failed to check password status:", e)
+  }
+
+  if (!hasPassword) {
+    redirect("/auth/setup-password")
   }
 
   redirect("/onboarding")

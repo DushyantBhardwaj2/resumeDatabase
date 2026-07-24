@@ -11,6 +11,9 @@ export const auth = betterAuth({
   }),
   secret: process.env.BETTER_AUTH_SECRET,
   baseURL: process.env.BETTER_AUTH_URL || "https://resumint-backend-ihjf.onrender.com",
+  emailAndPassword: {
+    enabled: true,
+  },
   trustedProxyHeaders: true,
   socialProviders: {
     google: {
