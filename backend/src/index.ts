@@ -72,9 +72,7 @@ app.use('/api/protected/*', async (c, next) => {
   let session = await auth.api.getSession({ headers: { cookie } })
 
   if (!session) {
-    // Fallback: pass the raw request object, which lets BetterAuth
-    // extract the cookie from request.headers directly.
-    session = await auth.api.getSession({ request: c.req.raw })
+    session = await auth.api.getSession({ headers: c.req.raw.headers })
   }
 
   if (!session) {
