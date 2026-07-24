@@ -18,7 +18,12 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     },
   },
-  trustedOrigins: [process.env.VERCEL_FRONTEND_URL || "http://localhost:3000"],
+  trustedOrigins: [
+    "https://resume-database.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:8080",
+    ...(process.env.VERCEL_FRONTEND_URL ? [process.env.VERCEL_FRONTEND_URL, process.env.VERCEL_FRONTEND_URL.replace(/\/$/, '')] : []),
+  ],
   advanced: {
     defaultCookieAttributes: {
       sameSite: process.env.NODE_ENV === "development" ? "lax" : "none",
@@ -31,7 +36,8 @@ export const auth = betterAuth({
       create: {
         before: async (user) => {
           const email = user.email.toLowerCase()
-          if (!email.endsWith("@nsut.ac.in")) {
+          const restrictDomain = process.env.RESTRICT_NSUT_DOMAIN === "true"
+          if (restrictDomain && !email.endsWith("@nsut.ac.in")) {
             throw new APIError("FORBIDDEN", { message: "Only @nsut.ac.in emails are allowed." })
           }
         },

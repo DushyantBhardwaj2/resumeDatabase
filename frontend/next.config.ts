@@ -17,11 +17,19 @@ const nextConfig: NextConfig = {
   },
   // API proxy in dev mode — needed because @hono/node-server runs on separate port
   async rewrites() {
-    if (process.env.NODE_ENV !== "development") return [];
+    const backendUrl = process.env.BACKEND_URL || process.env.NEXT_PUBLIC_API_URL || "https://resumint-backend-ihjf.onrender.com";
+    if (process.env.NODE_ENV === "development") {
+      return [
+        {
+          source: "/api/:path*",
+          destination: "http://localhost:8080/api/:path*",
+        },
+      ];
+    }
     return [
       {
         source: "/api/:path*",
-        destination: "http://localhost:8080/api/:path*",
+        destination: `${backendUrl}/api/:path*`,
       },
     ];
   },
