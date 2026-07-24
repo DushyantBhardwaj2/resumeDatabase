@@ -1,8 +1,8 @@
 import { z } from "zod"
 
 export const intentClassifySchema = z.object({
-  intent: z.enum(["CREATE_MEMORY", "UPDATE_MEMORY", "DELETE_MEMORY", "CREATE_RESUME", "SEARCH_MEMORY", "GENERAL_CHAT"]),
-  confidence: z.number().min(0).max(1),
+  intent: z.enum(["CREATE_MEMORY", "UPDATE_MEMORY", "DELETE_MEMORY", "CREATE_RESUME", "SEARCH_MEMORY", "GENERAL_CHAT", "PROVIDE_DATA", "NAVIGATE", "GENERATE_PROFILE_DATA"]),
+  confidence: z.number().min(0).max(1).optional().default(0.9),
   contextHint: z.string().optional(),
 })
 
