@@ -20,6 +20,7 @@ export const auth = betterAuth({
   },
   trustedOrigins: [process.env.VERCEL_FRONTEND_URL || "http://localhost:3000"],
   advanced: {
+    useSecureCookies: process.env.NODE_ENV !== "development",
     defaultCookieAttributes: {
       sameSite: process.env.NODE_ENV === "development" ? "lax" : "none",
       secure: process.env.NODE_ENV !== "development",

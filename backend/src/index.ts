@@ -64,7 +64,24 @@ app.all('/api/auth/*', (c) => {
 
 // Middleware to protect routes and inject session
 app.use('/api/protected/*', async (c, next) => {
-  const session = await auth.api.getSession({ headers: c.req.raw.headers })
+  let session = await auth.api.getSession({ headers: c.req.raw.headers })
+
+  if (!session) {
+    // Robust token extraction fallback (supports __Secure-better-auth.session_token and better-auth.session_token)
+    const authHeader = c.req.header('authorization')
+    const cookieHeader = c.req.header('cookie') || ''
+    const cookieMatch = cookieHeader.match(/(?:__Secure-)?better-auth\.session_token=([^;]+)/)
+    const token = authHeader?.startsWith('Bearer ')
+      ? authHeader.substring(7)
+      : (cookieMatch ? decodeURIComponent(cookieMatch[1]) : null)
+
+    if (token) {
+      const headers = new Headers(c.req.raw.headers)
+      headers.set('authorization', `Bearer ${token}`)
+      session = await auth.api.getSession({ headers })
+    }
+  }
+
   if (!session) {
     return c.json({ error: "Unauthorized" }, 401)
   }
