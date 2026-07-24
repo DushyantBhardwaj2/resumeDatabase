@@ -58,7 +58,7 @@ app.use('/api/auth/*', rateLimiter({
 }))
 
 // BetterAuth handler
-app.on(['POST', 'GET'], '/api/auth/**', (c) => {
+app.all('/api/auth/*', (c) => {
   return auth.handler(c.req.raw)
 })
 
