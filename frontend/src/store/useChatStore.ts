@@ -78,10 +78,30 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       })
       if (res.ok) {
         const messages = await res.json()
+        const initialMessages = (messages && messages.length > 0)
+          ? messages
+          : (mode === 'ONBOARDING' ? [
+              {
+                id: 'greeting',
+                role: 'assistant',
+                content: [
+                  "Hi! I'm your Resumint Assistant. Let's build your Career Vault.",
+                  '',
+                  'You can:',
+                  '- Upload an existing PDF resume',
+                  '- Describe your experience, projects, and skills',
+                  '- Or just start typing!',
+                  '',
+                  'What would you like to do?',
+                ].join('\n'),
+                widget: 'UPLOAD_DROPZONE',
+              }
+            ] : [])
+
         set((state) => ({
           messagesByMode: {
             ...state.messagesByMode,
-            [mode]: messages,
+            [mode]: initialMessages,
           },
         }))
       }
@@ -95,7 +115,23 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     set((state) => ({
       messagesByMode: {
         ...state.messagesByMode,
-        [state.mode]: [],
+        [state.mode]: state.mode === 'ONBOARDING' ? [
+          {
+            id: 'greeting',
+            role: 'assistant',
+            content: [
+              "Hi! I'm your Resumint Assistant. Let's build your Career Vault.",
+              '',
+              'You can:',
+              '- Upload an existing PDF resume',
+              '- Describe your experience, projects, and skills',
+              '- Or just start typing!',
+              '',
+              'What would you like to do?',
+            ].join('\n'),
+            widget: 'UPLOAD_DROPZONE',
+          }
+        ] : [],
       },
       currentPhase: state.mode === 'ONBOARDING' ? 'GREETING' : state.currentPhase,
       extractedData: state.mode === 'ONBOARDING' ? {} : state.extractedData,
