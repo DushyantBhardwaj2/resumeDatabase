@@ -101,7 +101,32 @@ export default function OnboardingPage() {
               Onboarding
             </span>
           </div>
-          <div className="flex items-center gap-2 text-xs text-content-muted">
+          <div className="flex items-center gap-3 text-xs text-content-muted">
+            <button
+              onClick={async () => {
+                await useChatStore.getState().clearChat()
+                addMessage({
+                  id: 'greeting',
+                  role: 'assistant',
+                  content: [
+                    "Hi! I'm your Resumint Assistant. Let's build your Career Vault.",
+                    '',
+                    'You can:',
+                    '- Upload an existing PDF resume',
+                    '- Describe your experience, projects, and skills',
+                    '- Or just start typing!',
+                    '',
+                    'What would you like to do?',
+                  ].join('\n'),
+                  widget: 'UPLOAD_DROPZONE',
+                })
+                toast.info('Chat history reset.')
+              }}
+              className="px-2.5 py-1 text-[11px] font-medium rounded-lg bg-surface-subtle hover:bg-surface-subtle/80 text-content-muted hover:text-content border border-edge/40 transition-colors flex items-center gap-1 cursor-pointer"
+              title="Clear chat history"
+            >
+              Reset Chat
+            </button>
             <span className="hidden sm:inline">AI-Powered Career Vault</span>
             <span className="w-1.5 h-1.5 rounded-full bg-brand animate-pulse" />
           </div>

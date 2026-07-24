@@ -22,7 +22,7 @@ export class ChatUseCases {
     private chatRepo: IChatRepository,
     private intentPrompt: string,
     private memoryExtractPrompt: string,
-  ) {}
+  ) { }
 
   async interact(request: ChatInteractRequestV2, userId: string): Promise<ChatInteractResponseV2> {
     await this.chatRepo.save({ userId, role: "user", content: request.message })
@@ -35,8 +35,6 @@ export class ChatUseCases {
         return this._handleGeneralChat(request.message, userId, kbContext)
 
       case "CREATE_MEMORY":
-      case "PROVIDE_DATA":
-      case "GENERATE_PROFILE_DATA":
         return this._handleCreateMemory(request.message, userId, kbContext)
 
       case "SEARCH_MEMORY":
@@ -96,48 +94,6 @@ export class ChatUseCases {
 
   private async _handleCreateMemory(message: string, userId: string, kbContext: any): Promise<ChatInteractResponseV2> {
     const systemCtx = kbContext?.files?.map((f: any) => f.content).join("\n") ?? ""
-
-    // Handle GitHub repository URLs directly
-    const githubMatch = message.match(/https?:\/\/github\.com\/([^\/\s]+)\/([^\/\s\?#]+)/i)
-    if (githubMatch) {
-      const owner = githubMatch[1]
-      const repo = githubMatch[2].replace(/\.git$/i, '')
-      const repoUrl = `https://github.com/${owner}/${repo}`
-      const formattedTitle = repo.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
-
-      const githubAction: DomainMemoryAction = {
-        type: "CREATE_PROJECT",
-        project: {
-          userId,
-          title: formattedTitle,
-          url: repoUrl,
-          topics: [],
-          languages: [],
-          dependencies: [],
-          techStack: [],
-          tags: [],
-          source: { type: "GITHUB", importedAt: new Date().toISOString() },
-          bullets: [
-            {
-              id: crypto.randomUUID(),
-              text: `Developed and maintained ${formattedTitle} (${repoUrl})`,
-              order: 1,
-              parentType: "project",
-              parentId: "",
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-            }
-          ]
-        }
-      }
-
-      return {
-        reply: `I found GitHub project **${formattedTitle}** (${repoUrl}). Please review and click **Confirm & Save** to add it to your projects.`,
-        type: "proposal-cards",
-        intent: "CREATE_MEMORY",
-        actions: [githubAction],
-      }
-    }
 
     try {
       const result = await this.aiService.generateStructuredData(

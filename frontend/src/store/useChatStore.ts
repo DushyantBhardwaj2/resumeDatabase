@@ -88,7 +88,10 @@ export const useChatStore = create<ChatStore>((set, get) => ({
     } catch { /* ignore */ }
   },
 
-  clearChat: () =>
+  clearChat: async () => {
+    try {
+      await api.api.protected.chat.history.$delete()
+    } catch { /* ignore */ }
     set((state) => ({
       messagesByMode: {
         ...state.messagesByMode,
@@ -96,7 +99,8 @@ export const useChatStore = create<ChatStore>((set, get) => ({
       },
       currentPhase: state.mode === 'ONBOARDING' ? 'GREETING' : state.currentPhase,
       extractedData: state.mode === 'ONBOARDING' ? {} : state.extractedData,
-    })),
+    }))
+  },
 
   sendMessage: async (text) => {
     const { messagesByMode, currentPhase, mode } = get()

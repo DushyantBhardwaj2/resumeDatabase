@@ -38,9 +38,6 @@ export type ChatIntentV2 =
   | "CREATE_RESUME"
   | "SEARCH_MEMORY"
   | "GENERAL_CHAT"
-  | "PROVIDE_DATA"
-  | "NAVIGATE"
-  | "GENERATE_PROFILE_DATA"
 
 export type ChatInteractRequest = {
   messages: ChatMessage[]

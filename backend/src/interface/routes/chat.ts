@@ -39,8 +39,15 @@ export function createChatRouter(container: Container) {
     })
     .get('/history', async (c) => {
       const session = c.get('session')
+      if (!session) return c.json({ error: 'Unauthorized' }, 401)
       const messages = await container.chatRepository.findByUserId(session.user.id, 50)
-      return c.json(messages)
+      return c.json(messages.reverse())
+    })
+    .delete('/history', async (c) => {
+      const session = c.get('session')
+      if (!session) return c.json({ error: 'Unauthorized' }, 401)
+      await container.chatRepository.clearByUserId(session.user.id)
+      return c.json({ status: 'ok' })
     })
 }
 
