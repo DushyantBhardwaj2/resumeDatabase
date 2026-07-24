@@ -114,8 +114,16 @@ const generalRateLimiter = rateLimiter({
 // Apply rate limiters
 app.use('/api/protected/ai/*', aiRateLimiter)
 app.use('/api/protected/chat/*', aiRateLimiter)
-app.use('/api/protected/parse', aiRateLimiter)
 app.use('/api/protected/github/analyze', aiRateLimiter)
+
+// Parse uses its own higher limit (20 per minute)
+const parseRateLimiter = rateLimiter({
+  windowMs: 60 * 1000,
+  limit: 20,
+  keyGenerator: (c) => `parse:${c.get('session')?.user?.id || 'unknown'}`,
+  message: 'Parse rate limit reached. Please wait a moment before uploading again.'
+})
+app.use('/api/protected/parse', parseRateLimiter)
 
 app.use('/api/protected/resume/compile-live', compileRateLimiter)
 
