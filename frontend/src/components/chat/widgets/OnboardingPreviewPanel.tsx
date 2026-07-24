@@ -1,6 +1,9 @@
 'use client'
 
 import { useState, useMemo, useCallback } from 'react'
+import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
+import { api } from '@/config/api-client'
 import { useChatStore } from '@/store/useChatStore'
 import { normalizeProfile } from '@/lib/normalize-profile'
 import { ProfileSectionEditor } from './ProfileSectionEditor'
@@ -18,12 +21,33 @@ import {
   FolderOpen,
   GearSix,
   Certificate,
+  ArrowRight,
 } from '@phosphor-icons/react'
 
 export function OnboardingPreviewPanel() {
+  const router = useRouter()
   const extractedData = useChatStore((s) => s.extractedData)
   const isTyping = useChatStore((s) => s.isTyping)
   const [editingSection, setEditingSection] = useState<SectionName | null>(null)
+  const [saving, setSaving] = useState(false)
+
+  const handleSaveProfile = async () => {
+    setSaving(true)
+    try {
+      const res = await api.api.protected.profile.$post({
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        json: { parsed: extractedData as any },
+      })
+      if (!res.ok) throw new Error('Failed to save profile')
+      useChatStore.setState({ currentPhase: 'COMPLETE' })
+      toast.success('Profile saved to your Career Vault!')
+      router.push('/dashboard')
+    } catch {
+      toast.error('Failed to save profile. Please try again.')
+    } finally {
+      setSaving(false)
+    }
+  }
   
   // Normalize the parsed profile
   const profile = useMemo(() => normalizeProfile(extractedData), [extractedData])
@@ -123,17 +147,35 @@ export function OnboardingPreviewPanel() {
 
   return (
     <div className="space-y-6 max-w-2xl mx-auto pb-12 animate-fade-up">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h2 className="font-display text-xl font-bold text-content">Career Vault Preview</h2>
           <p className="text-xs text-content-muted">This data has been extracted. You can review and edit below.</p>
         </div>
-        {isTyping && (
-          <span className="text-xs bg-brand-light/30 border border-brand/20 text-brand px-2.5 py-0.5 rounded-full flex items-center gap-1.5 animate-pulse">
-            <span className="w-1.5 h-1.5 rounded-full bg-brand" />
-            AI Parsing...
-          </span>
-        )}
+        <div className="flex items-center gap-2">
+          {isTyping && (
+            <span className="text-xs bg-brand-light/30 border border-brand/20 text-brand px-2.5 py-0.5 rounded-full flex items-center gap-1.5 animate-pulse">
+              <span className="w-1.5 h-1.5 rounded-full bg-brand" />
+              AI Parsing...
+            </span>
+          )}
+          <button
+            onClick={handleSaveProfile}
+            disabled={saving}
+            className="px-4 py-2 bg-brand text-brand-fg text-xs font-semibold rounded-[var(--radius-lg)] shadow hover:opacity-90 transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
+          >
+            {saving ? (
+              <span className="flex items-center gap-1.5">
+                <span className="w-3 h-3 rounded-full border-2 border-brand-fg border-t-transparent animate-spin" />
+                Saving...
+              </span>
+            ) : (
+              <>
+                Save & Continue <ArrowRight size={14} weight="bold" />
+              </>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Contact Section */}

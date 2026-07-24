@@ -138,15 +138,17 @@ export const useChatStore = create<ChatStore>((set, get) => ({
         widget: data.type !== 'text' ? data.type : null,
       }
 
+      const isAffirmative = /looks good|looks great|confirm|save|continue|done|good to go|proceed|yes/i.test(text)
+      const hasData = Object.keys(get().extractedData || {}).length > 0
+      const isComplete = (data.intent === 'CREATE_RESUME' && data.type === 'selection') || (mode === 'ONBOARDING' && hasData && isAffirmative)
+
       set((state) => ({
         messagesByMode: {
           ...state.messagesByMode,
           [mode]: [...(state.messagesByMode[mode] || []), assistantMsg],
         },
         isTyping: false,
-        currentPhase: data.intent === 'CREATE_RESUME' && data.type === 'selection'
-          ? 'COMPLETE'
-          : state.currentPhase,
+        currentPhase: isComplete ? 'COMPLETE' : state.currentPhase,
       }))
 
       // Persist both messages to chat history
