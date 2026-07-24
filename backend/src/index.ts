@@ -64,20 +64,22 @@ app.all('/api/auth/*', (c) => {
 
 // Middleware to protect routes and inject session
 app.use('/api/protected/*', async (c, next) => {
+  // First try standard cookie-based session lookup
   let session = await auth.api.getSession({ headers: c.req.raw.headers })
 
   if (!session) {
-    // Robust token extraction fallback (supports __Secure-better-auth.session_token and better-auth.session_token)
-    const authHeader = c.req.header('authorization')
+    // Fallback: extract token from __Secure- prefixed cookie (set by BetterAuth in HTTPS/prod)
+    // and reissue as Authorization: Bearer <token> which the bearer plugin can read
     const cookieHeader = c.req.header('cookie') || ''
-    const cookieMatch = cookieHeader.match(/(?:__Secure-)?better-auth\.session_token=([^;]+)/)
-    const token = authHeader?.startsWith('Bearer ')
-      ? authHeader.substring(7)
-      : (cookieMatch ? decodeURIComponent(cookieMatch[1]) : null)
-
-    if (token) {
+    const cookieMatch = cookieHeader.match(/(?:__Secure-)?better-auth\.session_token=([^;\s]+)/)
+    if (cookieMatch) {
+      const rawToken = decodeURIComponent(cookieMatch[1])
       const headers = new Headers(c.req.raw.headers)
-      headers.set('authorization', `Bearer ${token}`)
+      headers.set('authorization', `Bearer ${rawToken}`)
+      // Also rewrite cookie without __Secure- prefix so BetterAuth cookie parser finds it
+      headers.set('cookie', cookieHeader
+        .replace(/__Secure-better-auth\.session_token=/, 'better-auth.session_token=')
+      )
       session = await auth.api.getSession({ headers })
     }
   }

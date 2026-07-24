@@ -2,7 +2,7 @@ import { betterAuth } from "better-auth"
 import { prisma } from "./prisma"
 import { prismaAdapter } from "better-auth/adapters/prisma"
 import { PrismaClient } from "@prisma/client"
-import { APIError } from "better-auth/api"
+import { bearer } from "better-auth/plugins"
 
 
 export const auth = betterAuth({
@@ -10,7 +10,7 @@ export const auth = betterAuth({
     provider: "postgresql",
   }),
   secret: process.env.BETTER_AUTH_SECRET,
-  baseURL: process.env.BETTER_AUTH_URL || (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "http://localhost:3000"),
+  baseURL: process.env.BETTER_AUTH_URL || "https://resumint-backend-ihjf.onrender.com",
   trustedProxyHeaders: true,
   socialProviders: {
     google: {
@@ -18,7 +18,12 @@ export const auth = betterAuth({
       clientSecret: process.env.GOOGLE_CLIENT_SECRET ?? "",
     },
   },
-  trustedOrigins: [process.env.VERCEL_FRONTEND_URL || "http://localhost:3000"],
+  trustedOrigins: [
+    "https://resume-database.vercel.app",
+    process.env.VERCEL_FRONTEND_URL || "https://resume-database.vercel.app",
+    "http://localhost:3000",
+    "http://localhost:8080",
+  ],
   advanced: {
     useSecureCookies: process.env.NODE_ENV !== "development",
     defaultCookieAttributes: {
@@ -26,14 +31,18 @@ export const auth = betterAuth({
       secure: process.env.NODE_ENV !== "development",
     },
   },
-  plugins: [],
+  plugins: [bearer()],
   databaseHooks: {
     user: {
       create: {
         before: async (user) => {
-          const email = user.email.toLowerCase()
-          if (!email.endsWith("@nsut.ac.in")) {
-            throw new APIError("FORBIDDEN", { message: "Only @nsut.ac.in emails are allowed." })
+          // Domain restriction — only active if RESTRICT_NSUT_DOMAIN=true
+          if (process.env.RESTRICT_NSUT_DOMAIN === "true") {
+            const { APIError } = await import("better-auth/api")
+            const email = user.email.toLowerCase()
+            if (!email.endsWith("@nsut.ac.in")) {
+              throw new APIError("FORBIDDEN", { message: "Only @nsut.ac.in emails are allowed." })
+            }
           }
         },
       },
