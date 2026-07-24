@@ -24,7 +24,7 @@ export function createParseRouter(container: Container) {
         }
 
         const buffer = Buffer.from(await file.arrayBuffer())
-        const result = await container.parseUseCases.parsePdf(buffer)
+        const result = await container.resumeUseCases.parseResume(buffer)
         return c.json(result)
       } catch (err: any) {
         logger.error({ err, tag: 'parse' }, 'PDF parse error')
